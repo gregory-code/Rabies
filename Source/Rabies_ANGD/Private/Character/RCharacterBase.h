@@ -3,27 +3,31 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "GameplayEffectTypes.h"
+#include "GameplayAbilities/RGameplayCueInterface.h"
+
+#include "GenericTeamAgentInterface.h"
+
 #include "RCharacterBase.generated.h"
 
+class URAbilitySystemComponent;
+class URAttributeSet;
+class UGameplayEffect;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeadStatusChanged, bool /*bIsDead*/);
+
 UCLASS()
-class ARCharacterBase : public ACharacter
+class ARCharacterBase : public ACharacter//, public IAbilitySystemInterface, public IRGameplayCueInterface, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
 public:
+	FOnDeadStatusChanged OnDeadStatusChanged;
+
 	// Sets default values for this character's properties
 	ARCharacterBase();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
