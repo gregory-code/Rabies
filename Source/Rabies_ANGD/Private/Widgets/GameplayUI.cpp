@@ -30,12 +30,12 @@ void UGameplayUI::NativeConstruct()
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 {
-	PlayerHealthBar->SetHealth(ChangeData.NewValue, GetAttributeValue(URAttributeSet::GetMaxHealthAttribute()));
+	PlayerHealth->SetHealth(ChangeData.NewValue, GetAttributeValue(URAttributeSet::GetMaxHealthAttribute()));
 }
 
 void UGameplayUI::MaxHealthUpdated(const FOnAttributeChangeData& ChangeData)
 {
-	PlayerHealthBar->SetHealth(GetAttributeValue(URAttributeSet::GetHealthAttribute()), ChangeData.NewValue);
+	PlayerHealth->SetHealth(GetAttributeValue(URAttributeSet::GetHealthAttribute()), ChangeData.NewValue);
 }
 
 float UGameplayUI::GetAttributeValue(const FGameplayAttribute& Attribute) const
