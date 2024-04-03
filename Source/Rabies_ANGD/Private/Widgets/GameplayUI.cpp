@@ -26,6 +26,11 @@ void UGameplayUI::NativeConstruct()
 	}
 
 	OwnerAbilitySystemComponent = OwnerASC;
+
+	float playerHealth = GetAttributeValue(URAttributeSet::GetHealthAttribute());
+	float playerMaxHealth = GetAttributeValue(URAttributeSet::GetMaxHealthAttribute());
+
+	PlayerHealth->SetHealth(playerHealth, playerMaxHealth);
 }
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)

@@ -74,6 +74,10 @@ void ARCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
+	SetupAbilitySystemComponent();
+	InitAttributes();
+	InitAbilities();
+
 	if (NewController && !NewController->IsPlayerController())
 	{
 		SetupAbilitySystemComponent();
@@ -109,6 +113,11 @@ void ARCharacterBase::InitStatusHUD()
 		if (GetController() && GetController()->IsPlayerController())
 			HealthBar->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)

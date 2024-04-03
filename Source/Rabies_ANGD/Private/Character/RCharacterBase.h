@@ -20,7 +20,7 @@ class UGameplayEffect;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeadStatusChanged, bool /*bIsDead*/);
 
 UCLASS()
-class ARCharacterBase : public ACharacter/*, public IAbilitySystemInterface, public IRGameplayCueInterface*/, public IGenericTeamAgentInterface
+class ARCharacterBase : public ACharacter, public IAbilitySystemInterface, /*public IRGameplayCueInterface,*/ public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -46,6 +46,8 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	void InitStatusHUD();
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 private:
 
