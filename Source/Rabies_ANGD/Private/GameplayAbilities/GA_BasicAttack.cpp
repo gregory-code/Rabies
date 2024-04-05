@@ -26,11 +26,19 @@ UGA_BasicAttack::UGA_BasicAttack()
 void UGA_BasicAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	UE_LOG(LogTemp, Error, TEXT("Using ability"));
+
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
+		UE_LOG(LogTemp, Error, TEXT("Dedge"));
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		return;
 	}
+
+	UAbilityTask_WaitGameplayEvent* WaitTargetAquiredEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
+	WaitTargetAquiredEvent->EventReceived.AddDynamic(this, &UGA_BasicAttack::HandleDamage);
+	WaitTargetAquiredEvent->ReadyForActivation();
 
 	SetupWaitInputTask();
 
@@ -41,6 +49,7 @@ void UGA_BasicAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 
 void UGA_BasicAttack::HandleDamage(FGameplayEventData Payload)
 {
+	UE_LOG(LogTemp, Error, TEXT("Oh got damage call"));
 	if (K2_HasAuthority())
 	{
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
@@ -50,7 +59,6 @@ void UGA_BasicAttack::HandleDamage(FGameplayEventData Payload)
 
 void UGA_BasicAttack::TryCommitAttack(FGameplayEventData Payload)
 {
-
 	bAttackCommitted = true;
 }
 
