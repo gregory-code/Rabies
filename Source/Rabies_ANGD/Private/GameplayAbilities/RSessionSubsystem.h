@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Subsystems/GameInstanceSubsystem.h"
 
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 
 #include "RSessionSubsystem.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSessionCreated, bool);
+
 /**
- * //https://forums.unrealengine.com/t/syntax-error-declaring-dynamic-multicast-delegate/679364
+ * //https://cedric-neukirchen.net/docs/session-management/sessions-in-cpp/
 
+ +
  */
-
-//DECLARE_MULTICAST_DELEGATE_OneParam(FOnCreateSessionComplete, bool Successful);
 
 UCLASS()
 class URSessionSubsystem : public UGameInstanceSubsystem
@@ -25,15 +25,17 @@ class URSessionSubsystem : public UGameInstanceSubsystem
 public:
 	URSessionSubsystem();
 
+	void StartSession();
+	void UpdateSession();
 	void CreateSession(int32 NumPublicConnections, bool IsLANMatch);
 
-	//FOnCreateSessionComplete OnCreateSessionCompleteEvent;
+	FOnSessionCreated OnCreateSessionEvent;
 
 protected:
 	void OnCreateSessionCompleted(FName SessionName, bool Successful);
 
 private:
-	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
-	FDelegateHandle CreateSessionCompleteDelegateHandle;
+	FOnCreateSessionCompleteDelegate CreateSessionDelegate;
+	FDelegateHandle CreateSessionDelegateHandle;
 	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;
 };
