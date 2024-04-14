@@ -22,7 +22,7 @@ void UGameplayUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	//quitButton->OnClicked.AddDynamic(this, &UGameplayUI::Quit);
+	quitButton->OnClicked.AddDynamic(this, &UGameplayUI::Quit);
 
 	UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
 	if (OwnerASC)
