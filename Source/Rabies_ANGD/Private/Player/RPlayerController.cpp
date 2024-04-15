@@ -64,7 +64,5 @@ void ARPlayerController::CreateGameplayUI()
 	if (GameplayUI)
 	{
 		GameplayUI->AddToViewport();
-		GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
-		GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
 	}
 }

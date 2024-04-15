@@ -37,6 +37,9 @@ void UGameplayUI::NativeConstruct()
 	float playerMaxHealth = GetAttributeValue(URAttributeSet::GetMaxHealthAttribute());
 
 	PlayerHealth->SetHealth(playerHealth, playerMaxHealth);
+
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+	GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
 }
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)
