@@ -32,6 +32,10 @@ void UEOSGameInstance::LoginCompleted(int numOfPlayers, bool bWasSuccessful, con
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Logged in"));
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to Login"));
+	}
 
 
 }
