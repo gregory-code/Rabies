@@ -3,7 +3,6 @@
 
 #include "Framework/EOSGameInstance.h"
 #include "OnlineSubsystem.h"
-#include "Interfaces/OnlineIdentityInterface.h"
 
 void UEOSGameInstance::Login()
 {

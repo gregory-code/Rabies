@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+
+#include "Interfaces/OnlineIdentityInterface.h"
+#include "Interfaces/OnlineSessionInterface.h"
+
 #include "EOSGameInstance.generated.h"
 
 /**
@@ -23,7 +27,7 @@ protected:
 
 private:
 	class IOnlineSubsystem* onlineSubsystem;
-	TSharedPtr<class IOnlineIdentity, ESPMode::ThreadSafe> identityPtr;
+	IOnlineIdentityPtr identityPtr;
 
 	void LoginCompleted(int numOfPlayers, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
 };
