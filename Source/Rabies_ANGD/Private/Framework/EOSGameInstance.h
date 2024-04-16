@@ -8,6 +8,8 @@
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
+#include "OnlineSessionSettings.h"
+
 #include "EOSGameInstance.generated.h"
 
 /**
@@ -42,6 +44,10 @@ private:
 	void LoginCompleted(int numOfPlayers, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
 	void CreateSessionCompleted(FName SessionName, bool bWasSuccessful);
 	void FindSessionsCompleted(bool bWasSuccessful);
+	void JoinSessionCompleted(FName sessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UWorld> GameLevel;
 
 	FName SessionNameKey{ "SessionName" };
 };

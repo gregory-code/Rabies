@@ -6,6 +6,9 @@
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
 
+
+#include "Kismet/GameplayStatics.h"
+
 void UEOSGameInstance::Login()
 {
 	if (identityPtr)
@@ -32,7 +35,10 @@ void UEOSGameInstance::CreateSession(const FName& SessionName)
 		SessionSettings.bAllowJoinInProgress = true;
 		SessionSettings.bAllowJoinViaPresence = true;
 		SessionSettings.bUseLobbiesIfAvailable = true;
-		SessionSettings.NumPublicConnections = 10;
+		SessionSettings.NumPublicConnections = true;
+		SessionSettings.NumPublicConnections = 4;
+		SessionSettings.bUsesPresence= true;
+
 		SessionSettings.Set(GetSessionNameKey(), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 		sessionPtr->CreateSession(0, SessionName, SessionSettings);
@@ -65,6 +71,8 @@ void UEOSGameInstance::Init()
 	sessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::CreateSessionCompleted);
 
 	sessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &UEOSGameInstance::FindSessionsCompleted);
+
+	sessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::JoinSessionCompleted);
 }
 
 void UEOSGameInstance::LoginCompleted(int numOfPlayers, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error)
@@ -86,18 +94,46 @@ void UEOSGameInstance::CreateSessionCompleted(FName SessionName, bool bWasSucces
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Logged into session"));
+
+		if (!GameLevel.IsValid())
+		{
+			GameLevel.LoadSynchronous();
+		}
+
+		if (GameLevel.IsValid())
+		{
+			const FName levelName = FName(*FPackageName::ObjectPathToPackageName(GameLevel.ToString()));
+			GetWorld()->ServerTravel(levelName.ToString() + "?listen");
+		}
 	}
 }
 
 void UEOSGameInstance::FindSessionsCompleted(bool bWasSuccessful)
 {
-	if (bWasSuccessful)
+	if (bWasSuccessful && sessionSearch->SearchResults.Num() > 1)
 	{
 		for (const FOnlineSessionSearchResult& lobbyFound : sessionSearch->SearchResults)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Found sess: %s"), *lobbyFound.GetSessionIdStr());
 			lobbyFound.GetSessionIdStr();
 		}
+
+		const FOnlineSessionSearchResult& searchResult = sessionSearch->SearchResults[0];
+		FString SessionName;
+		searchResult.Session.SessionSettings.Get(GetSessionNameKey(), SessionName);
+		UE_LOG(LogTemp, Warning, TEXT("Joining Session: %s"), *SessionName)
+		sessionPtr->JoinSession(0, FName{ SessionName }, searchResult);
+	}
+}
+
+void UEOSGameInstance::JoinSessionCompleted(FName sessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+	if (Result == EOnJoinSessionCompleteResult::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Joining Session: %s completed"), *sessionName.ToString())
+		FString TravelURL;
+		sessionPtr->GetResolvedConnectString(sessionName, TravelURL);
+		GetFirstLocalPlayerController(GetWorld())->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
 	}
 }
 

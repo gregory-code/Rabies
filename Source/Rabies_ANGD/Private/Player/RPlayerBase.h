@@ -72,6 +72,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* AbilityCancelAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* QuitOutAction;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
@@ -79,6 +82,9 @@ private:
 
 	UFUNCTION()
 	void Look(const FInputActionValue& InputValue);
+
+	UFUNCTION()
+	void QuitOut();
 
 	UFUNCTION()
 	void DoBasicAttack();

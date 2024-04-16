@@ -38,8 +38,8 @@ void UGameplayUI::NativeConstruct()
 
 	PlayerHealth->SetHealth(playerHealth, playerMaxHealth);
 
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
-	GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
+	//GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+	//GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
 }
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)
