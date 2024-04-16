@@ -23,6 +23,18 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* LoginButton;
 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CreateSessionButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* FindSessionsButton;
+
 	UFUNCTION()
 	void LoginButtonClicked();
+
+	UFUNCTION()
+	void CreateSessionButtonClicked();
+
+	UFUNCTION()
+	void FindSessionsButtonClicked();
 };

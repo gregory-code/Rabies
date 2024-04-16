@@ -12,6 +12,8 @@ void UConnectOnlineMenu::NativeConstruct()
 	GameInst = GetGameInstance<UEOSGameInstance>();
 
 	LoginButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::LoginButtonClicked);
+	CreateSessionButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::CreateSessionButtonClicked);
+	FindSessionsButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::FindSessionsButtonClicked);
 }
 
 void UConnectOnlineMenu::LoginButtonClicked()
@@ -19,5 +21,21 @@ void UConnectOnlineMenu::LoginButtonClicked()
 	if (GameInst)
 	{
 		GameInst->Login();
+	}
+}
+
+void UConnectOnlineMenu::CreateSessionButtonClicked()
+{
+	if (GameInst)
+	{
+		GameInst->CreateSession(FName("TestSession"));
+	}
+}
+
+void UConnectOnlineMenu::FindSessionsButtonClicked()
+{
+	if (GameInst)
+	{
+		GameInst->FindSession();
 	}
 }
