@@ -29,6 +29,12 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* FindSessionsButton;
 
+	UPROPERTY(meta = (BindWidget))
+	class UEditableText* SessionNameText;
+
+	UFUNCTION()
+	void SessionNameTextChanged(const FText& NewText);
+
 	UFUNCTION()
 	void LoginButtonClicked();
 

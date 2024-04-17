@@ -1,1 +1,1 @@
-"C:\Program Files\Epic Games\UE_5.3\Engine\Binaries\Win64\UnrealEditor.exe" "D:\ProfileRedirect\rigdon\Documents\GitHub\Rabies\Rabies_ANGD.uproject" -game -log
+"C:\Program Files\Epic Games\UE_5.3\Engine\Binaries\Win64\UnrealEditor.exe" "D:\Profile Redirect\rigdon\Documents\Rabies\Rabies_ANGD.uproject" -game -log

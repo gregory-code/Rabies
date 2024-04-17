@@ -8,8 +8,6 @@
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
-#include "OnlineSessionSettings.h"
-
 #include "EOSGameInstance.generated.h"
 
 /**
@@ -32,6 +30,8 @@ public:
 
 	const FName& GetSessionNameKey() const { return SessionNameKey; }
 
+	void JoinSessionWithSearchResultIndex(int SearchResultIndex);
+
 protected:
 	virtual void Init() override;
 
@@ -39,7 +39,7 @@ private:
 	class IOnlineSubsystem* onlineSubsystem;
 	IOnlineIdentityPtr identityPtr;
 	IOnlineSessionPtr sessionPtr;
-	TSharedPtr<class FOnlineSessionSearch> sessionSearch;
+	TSharedPtr<FOnlineSessionSearch> sessionSearch;
 
 	void LoginCompleted(int numOfPlayers, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
 	void CreateSessionCompleted(FName SessionName, bool bWasSuccessful);
