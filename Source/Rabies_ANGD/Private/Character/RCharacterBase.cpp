@@ -37,6 +37,7 @@ ARCharacterBase::ARCharacterBase()
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetHealthAttribute()).AddUObject(this, &ARCharacterBase::HealthUpdated);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &ARCharacterBase::MaxHealthUpdated);
+	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetScopingTag()).AddUObject(this, &ARCharacterBase::ScopingTagChanged);
 
 	HealthBarWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Status Widget Comp");
 	HealthBarWidgetComp->SetupAttachment(GetRootComponent());
@@ -118,6 +119,14 @@ void ARCharacterBase::InitStatusHUD()
 UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
+{
+	UE_LOG(LogTemp, Error, TEXT("Changing Scope"));
+	bIsScoping = !bIsScoping;
+	bIsScoping = NewStackCount != 0;
+	ScopingTagChanged(bIsScoping);
 }
 
 void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)

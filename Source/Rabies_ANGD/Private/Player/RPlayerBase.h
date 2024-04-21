@@ -90,6 +90,9 @@ private:
 	void DoBasicAttack();
 
 	UFUNCTION()
+	void ChangeScoping();
+
+	UFUNCTION()
 	void TryActivateSpecialAttack();
 
 	UFUNCTION()
@@ -103,4 +106,6 @@ private:
 
 	FVector GetMoveFwdDir() const;
 	FVector GetMoveRightDir() const;
+
+	virtual void ScopingTagChanged(bool bNewIsAiming) override;
 };

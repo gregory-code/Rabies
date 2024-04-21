@@ -66,6 +66,8 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(jumpInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Jump);
 		enhancedInputComp->BindAction(QuitOutAction, ETriggerEvent::Triggered, this, &ARPlayerBase::QuitOut);
 		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DoBasicAttack);
+		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::ChangeScoping);
+		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Canceled, this, &ARPlayerBase::ChangeScoping);
 		enhancedInputComp->BindAction(specialAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateSpecialAttack);
 		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateUltimateAttack);
 		enhancedInputComp->BindAction(AbilityConfirmAction, ETriggerEvent::Triggered, this, &ARPlayerBase::ConfirmActionTriggered);
@@ -102,6 +104,11 @@ void ARPlayerBase::DoBasicAttack()
 	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
 }
 
+void ARPlayerBase::ChangeScoping()
+{
+	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::Scoping);
+}
+
 void ARPlayerBase::TryActivateSpecialAttack()
 {
 
@@ -114,12 +121,14 @@ void ARPlayerBase::TryActivateUltimateAttack()
 
 void ARPlayerBase::ConfirmActionTriggered()
 {
-
+	UE_LOG(LogTemp, Warning, TEXT("Confirmed"));
+	GetAbilitySystemComponent()->InputConfirm();
 }
 
 void ARPlayerBase::CancelActionTriggered()
 {
-
+	UE_LOG(LogTemp, Warning, TEXT("Cancelled"));
+	GetAbilitySystemComponent()->InputCancel();
 }
 
 FVector ARPlayerBase::GetMoveFwdDir() const
@@ -132,4 +141,18 @@ FVector ARPlayerBase::GetMoveFwdDir() const
 FVector ARPlayerBase::GetMoveRightDir() const
 {
 	return viewCamera->GetRightVector();
+}
+
+void ARPlayerBase::ScopingTagChanged(bool bNewIsAiming)
+{
+	bUseControllerRotationYaw = bNewIsAiming;
+	GetCharacterMovement()->bOrientRotationToMovement = !bNewIsAiming;
+	if (bNewIsAiming)
+	{
+		//LerpCameraToLocalOffset(AimCameraLocalOffset);
+	}
+	else
+	{
+		//LerpCameraToLocalOffset(FVector::ZeroVector);
+	}
 }
