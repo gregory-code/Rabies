@@ -6,7 +6,7 @@
 #include "Character/RCharacterBase.h"
 #include "RPlayerBase.generated.h"
 
-class USpringArmComponent;
+class USceneComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
@@ -24,14 +24,20 @@ public:
 
 private:
 
-	UPROPERTY(visibleAnywhere, Category = "View")
-	USpringArmComponent* cameraBoom;
+	//UPROPERTY(visibleAnywhere, Category = "View")
+	//USpringArmComponent* cameraBoom;
+
+	UPROPERTY(VisibleAnywhere, Category = "View")
+	USceneComponent* viewPivot;
 
 	UPROPERTY(visibleAnywhere, Category = "View")
 	UCameraComponent* viewCamera;
 
 	UPROPERTY(EditDefaultsOnly, Category = "View")
 	FVector AimCameraLocalOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = "View")
+	FVector DefaultCameraLocal;
 
 	UPROPERTY(EditDefaultsOnly, Category = "View")
 	float AimCameraLerpingSpeed = 5;
@@ -111,4 +117,8 @@ private:
 	FVector GetMoveRightDir() const;
 
 	virtual void ScopingTagChanged(bool bNewIsAiming) override;
+
+	void LerpCameraToLocalOffset(const FVector& LocalOffset);
+	void TickCameraLocalOffset(FVector Goal);
+	FTimerHandle CameraLerpHandle;
 };

@@ -2,7 +2,7 @@
 
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-
+#include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
 UGA_Scoping::UGA_Scoping()
@@ -12,7 +12,10 @@ UGA_Scoping::UGA_Scoping()
 
 void UGA_Scoping::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	UE_LOG(LogTemp, Error, TEXT("Starting Scope maybe?"));
+
+	UAbilityTask_WaitCancel* WaitCancel = UAbilityTask_WaitCancel::WaitCancel(this);
+	WaitCancel->OnCancel.AddDynamic(this, &UGA_Scoping::StopScoping); // Use a WaitEvent instead of waitCancel, WaitCancel is a generic keyword used a lot
+	WaitCancel->ReadyForActivation();
 
 	if (!HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
@@ -22,7 +25,7 @@ void UGA_Scoping::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	}
 }
 
-void UGA_Scoping::TargetCancelled(const FGameplayAbilityTargetDataHandle& Data)
+void UGA_Scoping::StopScoping()
 {
 	UE_LOG(LogTemp, Error, TEXT("Target scoping cancelled"));
 	K2_EndAbility();

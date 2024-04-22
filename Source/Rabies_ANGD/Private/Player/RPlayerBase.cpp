@@ -24,17 +24,22 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/SceneComponent.h"
 
 ARPlayerBase::ARPlayerBase()
 {
-	cameraBoom = CreateDefaultSubobject<USpringArmComponent>("Camera Boom");
+	//cameraBoom = CreateDefaultSubobject<USpringArmComponent>("Camera Boom");
+	viewPivot = CreateDefaultSubobject<USceneComponent>("Camera Pivot");
 	viewCamera = CreateDefaultSubobject<UCameraComponent>("View Camera");
 
-	cameraBoom->SetupAttachment(GetRootComponent());
-	viewCamera->SetupAttachment(cameraBoom, USpringArmComponent::SocketName);
+	//cameraBoom->SetupAttachment(GetRootComponent());
+	//viewPivot->SetupAttachment(GetRootComponent());
+	viewCamera->SetupAttachment(viewPivot, USpringArmComponent::SocketName);
+	viewCamera->bUsePawnControlRotation = false;
+	viewCamera->SetRelativeLocation(DefaultCameraLocal);
 
-	cameraBoom->bUsePawnControlRotation = true;
-	cameraBoom->TargetArmLength = 800.f;
+	//cameraBoom->bUsePawnControlRotation = true;
+	//cameraBoom->TargetArmLength = 800.f;
 	bUseControllerRotationYaw = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -66,8 +71,8 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(jumpInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Jump);
 		enhancedInputComp->BindAction(QuitOutAction, ETriggerEvent::Triggered, this, &ARPlayerBase::QuitOut);
 		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DoBasicAttack);
-		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::EnableScoping);
-		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Canceled, this, &ARPlayerBase::DisableScoping);
+		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Started, this, &ARPlayerBase::EnableScoping);
+		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DisableScoping);
 		enhancedInputComp->BindAction(specialAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateSpecialAttack);
 		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateUltimateAttack);
 		enhancedInputComp->BindAction(AbilityConfirmAction, ETriggerEvent::Triggered, this, &ARPlayerBase::ConfirmActionTriggered);
@@ -80,14 +85,22 @@ void ARPlayerBase::Move(const FInputActionValue& InputValue)
 	FVector2D input = InputValue.Get<FVector2D>();
 	input.Normalize();
 
+	viewCamera->SetRelativeLocation(GetActorLocation());
 	AddMovementInput(input.Y * GetMoveFwdDir() + input.X * GetMoveRightDir());
 }
 
 void ARPlayerBase::Look(const FInputActionValue& InputValue)
 {
 	FVector2D input = InputValue.Get<FVector2D>();
-	AddControllerYawInput(input.X);
-	AddControllerPitchInput(-input.Y);
+
+	FRotator currentRot = viewPivot->GetComponentRotation();
+	FRotator newRot = FRotator(currentRot.Pitch - input.Y, currentRot.Yaw - input.X, currentRot.Roll);
+	newRot.Pitch = FMath::ClampAngle(newRot.Pitch, -60.0f, 10.0f);
+
+	viewPivot->SetWorldRotation(newRot);
+
+	//AddControllerYawInput(input.X);
+	//AddControllerPitchInput(-input.Y);
 }
 
 void ARPlayerBase::QuitOut()
@@ -111,7 +124,7 @@ void ARPlayerBase::EnableScoping()
 
 void ARPlayerBase::DisableScoping()
 {
-	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::Scoping);
+	GetAbilitySystemComponent()->InputCancel();
 }
 
 void ARPlayerBase::TryActivateSpecialAttack()
@@ -127,13 +140,13 @@ void ARPlayerBase::TryActivateUltimateAttack()
 void ARPlayerBase::ConfirmActionTriggered()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Confirmed"));
-	GetAbilitySystemComponent()->InputConfirm();
+	//GetAbilitySystemComponent()->InputConfirm();
 }
 
 void ARPlayerBase::CancelActionTriggered()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Cancelled"));
-	GetAbilitySystemComponent()->InputCancel();
+	//GetAbilitySystemComponent()->InputCancel();
 }
 
 FVector ARPlayerBase::GetMoveFwdDir() const
@@ -154,10 +167,30 @@ void ARPlayerBase::ScopingTagChanged(bool bNewIsAiming)
 	GetCharacterMovement()->bOrientRotationToMovement = !bNewIsAiming;
 	if (bNewIsAiming)
 	{
-		//LerpCameraToLocalOffset(AimCameraLocalOffset);
+		LerpCameraToLocalOffset(AimCameraLocalOffset);
 	}
 	else
 	{
-		//LerpCameraToLocalOffset(FVector::ZeroVector);
+		LerpCameraToLocalOffset(DefaultCameraLocal);
 	}
+}
+
+void ARPlayerBase::LerpCameraToLocalOffset(const FVector& LocalOffset)
+{
+	GetWorldTimerManager().ClearTimer(CameraLerpHandle);
+	CameraLerpHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARPlayerBase::TickCameraLocalOffset, LocalOffset));
+}
+
+void ARPlayerBase::TickCameraLocalOffset(FVector Goal)
+{
+	FVector CurrentLocalOffset = viewCamera->GetRelativeLocation();
+	if (FVector::Dist(CurrentLocalOffset, Goal) < 1)
+	{
+		viewCamera->SetRelativeLocation(Goal);
+		return;
+	}
+
+	FVector NewLocalOffset = FMath::Lerp(CurrentLocalOffset, Goal, GetWorld()->GetDeltaSeconds() * AimCameraLerpingSpeed);
+	viewCamera->SetRelativeLocation(NewLocalOffset);
+	CameraLerpHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARPlayerBase::TickCameraLocalOffset, Goal));
 }

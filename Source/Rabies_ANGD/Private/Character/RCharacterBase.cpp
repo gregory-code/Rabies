@@ -123,8 +123,7 @@ UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
 
 void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
 {
-	UE_LOG(LogTemp, Error, TEXT("Changing Scope"));
-	bIsScoping = NewStackCount != 0;
+	bIsScoping = !bIsScoping;
 	ScopingTagChanged(bIsScoping);
 }
 
