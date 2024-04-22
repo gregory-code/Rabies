@@ -29,6 +29,7 @@
 
 ARPlayerBase::ARPlayerBase()
 {
+	//cameraBoom = CreateDefaultSubobject<USpringArmComponent>("Camera Boom");
 	viewPivot = CreateDefaultSubobject<USceneComponent>("Camera Pivot");
 	viewCamera = CreateDefaultSubobject<UCameraComponent>("View Camera");
 
@@ -49,8 +50,6 @@ ARPlayerBase::ARPlayerBase()
 
 void ARPlayerBase::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
 	viewPivot->SetRelativeLocation(GetActorLocation()); // centers the pivot on the player without getting the players rotation
 	
 	if (bIsScoping)
@@ -63,8 +62,6 @@ void ARPlayerBase::Tick(float DeltaTime)
 
 void ARPlayerBase::BeginPlay()
 {
-	Super::BeginPlay();
-
 	playerController = Cast<ARPlayerController>(GetController());
 }
 

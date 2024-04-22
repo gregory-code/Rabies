@@ -22,10 +22,16 @@ class ARPlayerBase : public ARCharacterBase
 public:
 	ARPlayerBase();
 
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void BeginPlay() override;
+
 private:
 
-	//UPROPERTY(visibleAnywhere, Category = "View")
-	//USpringArmComponent* cameraBoom;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	class ARPlayerController* playerController;
 
 	UPROPERTY(VisibleAnywhere, Category = "View")
 	USceneComponent* viewPivot;
@@ -121,4 +127,8 @@ private:
 	void LerpCameraToLocalOffset(const FVector& LocalOffset);
 	void TickCameraLocalOffset(FVector Goal);
 	FTimerHandle CameraLerpHandle;
+
+	float cameraClampMin;
+	float cameraClampMax;
+	bool bIsScoping;
 };

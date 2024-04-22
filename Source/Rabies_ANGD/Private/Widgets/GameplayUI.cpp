@@ -9,6 +9,7 @@
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -40,6 +41,12 @@ void UGameplayUI::NativeConstruct()
 
 	//GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 	//GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
+}
+
+void UGameplayUI::SetCrosshairState(bool state)
+{
+	Crosshair->SetVisibility((state) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	crosshairState = state;
 }
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)
