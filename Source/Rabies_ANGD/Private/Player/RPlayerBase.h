@@ -70,6 +70,9 @@ private:
 	UInputAction* scopeInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* scrollInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* basicAttackAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -106,6 +109,9 @@ private:
 
 	UFUNCTION()
 	void DisableScoping();
+
+	UFUNCTION()
+	void Scroll(const FInputActionValue& InputActionVal);
 
 	UFUNCTION()
 	void TryActivateSpecialAttack();

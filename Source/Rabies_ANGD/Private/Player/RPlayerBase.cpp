@@ -94,6 +94,7 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DoBasicAttack);
 		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Started, this, &ARPlayerBase::EnableScoping);
 		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DisableScoping);
+		enhancedInputComp->BindAction(scrollInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Scroll);
 		enhancedInputComp->BindAction(specialAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateSpecialAttack);
 		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateUltimateAttack);
 		enhancedInputComp->BindAction(AbilityConfirmAction, ETriggerEvent::Triggered, this, &ARPlayerBase::ConfirmActionTriggered);
@@ -144,6 +145,20 @@ void ARPlayerBase::EnableScoping()
 void ARPlayerBase::DisableScoping()
 {
 	GetAbilitySystemComponent()->InputCancel();
+}
+
+void ARPlayerBase::Scroll(const FInputActionValue& InputActionVal)
+{
+
+	float scrollAmount = InputActionVal.Get<float>();
+
+	scrollAmount *= -1;
+
+	DefaultCameraLocal.X += (scrollAmount * 100);
+
+	DefaultCameraLocal.X = FMath::Clamp(DefaultCameraLocal.X, -800, -200);
+
+	viewCamera->SetRelativeLocation(DefaultCameraLocal);
 }
 
 void ARPlayerBase::TryActivateSpecialAttack()
