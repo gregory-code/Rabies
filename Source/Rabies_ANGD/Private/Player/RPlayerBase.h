@@ -90,7 +90,10 @@ private:
 	void DoBasicAttack();
 
 	UFUNCTION()
-	void ChangeScoping();
+	void EnableScoping();
+
+	UFUNCTION()
+	void DisableScoping();
 
 	UFUNCTION()
 	void TryActivateSpecialAttack();
