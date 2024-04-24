@@ -158,7 +158,11 @@ void ARPlayerBase::Scroll(const FInputActionValue& InputActionVal)
 
 	DefaultCameraLocal.X = FMath::Clamp(DefaultCameraLocal.X, -800, -200);
 
-	viewCamera->SetRelativeLocation(DefaultCameraLocal);
+	if (!bIsScoping)
+	{
+		GetWorldTimerManager().ClearTimer(CameraLerpHandle);
+		viewCamera->SetRelativeLocation(DefaultCameraLocal);
+	}
 }
 
 void ARPlayerBase::TryActivateSpecialAttack()
