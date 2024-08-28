@@ -90,6 +90,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* QuitOutAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* interactInputAction;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
@@ -125,6 +128,9 @@ private:
 	UFUNCTION()
 	void CancelActionTriggered();
 
+	UFUNCTION()
+	void Interact();
+
 	FVector GetMoveFwdDir() const;
 	FVector GetMoveRightDir() const;
 
@@ -137,4 +143,11 @@ private:
 	float cameraClampMin;
 	float cameraClampMax;
 	bool bIsScoping;
+
+	/////////////////////////////////
+	/*          Interact           */
+	////////////////////////////////
+
+	bool canInteract;
+
 };

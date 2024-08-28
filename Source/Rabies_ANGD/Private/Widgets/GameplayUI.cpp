@@ -23,7 +23,7 @@ void UGameplayUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	quitButton->OnClicked.AddDynamic(this, &UGameplayUI::Quit);
+	//quitButton->OnClicked.AddDynamic(this, &UGameplayUI::Quit);
 
 	UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
 	if (OwnerASC)
@@ -76,11 +76,11 @@ float UGameplayUI::GetAttributeValue(const FGameplayAttribute& Attribute) const
 	return -1;
 }
 
-void UGameplayUI::Quit()
-{
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
-	{
-		UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, true);
-	}
-}
+//void UGameplayUI::Quit()
+//{
+//	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+//	if (PlayerController)
+//	{
+//		UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, true);
+//	}
+//}

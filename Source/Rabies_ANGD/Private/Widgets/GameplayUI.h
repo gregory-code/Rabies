@@ -50,9 +50,9 @@ private:
 	//     Test n' Online      //
 	//************************//
 
-	UPROPERTY(meta = (BindWidget))
-	class UButton* quitButton;
+	//UPROPERTY(meta = (BindWidget))
+	//class UButton* quitButton;
 
-	UFUNCTION()
-	void Quit();
+	//UFUNCTION()
+	//void Quit();
 };

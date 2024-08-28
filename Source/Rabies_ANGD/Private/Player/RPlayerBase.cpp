@@ -99,6 +99,7 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateUltimateAttack);
 		enhancedInputComp->BindAction(AbilityConfirmAction, ETriggerEvent::Triggered, this, &ARPlayerBase::ConfirmActionTriggered);
 		enhancedInputComp->BindAction(AbilityCancelAction, ETriggerEvent::Triggered, this, &ARPlayerBase::CancelActionTriggered);
+		enhancedInputComp->BindAction(interactInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Interact);
 	}
 }
 
@@ -185,6 +186,10 @@ void ARPlayerBase::CancelActionTriggered()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Cancelled"));
 	//GetAbilitySystemComponent()->InputCancel();
+}
+
+void ARPlayerBase::Interact()
+{
 }
 
 FVector ARPlayerBase::GetMoveFwdDir() const
