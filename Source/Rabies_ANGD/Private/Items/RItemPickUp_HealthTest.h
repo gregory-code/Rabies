@@ -4,19 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Items/RItemPickUpBase.h"
-#include "RItemPickUp_Test.generated.h"
+#include "RItemPickUp_HealthTest.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ARItemPickUp_Test : public ARItemPickUpBase
+class ARItemPickUp_HealthTest : public ARItemPickUpBase
 {
 	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly, Category = "Upgrade")
-	float AddedSpeed;
 
 private:
 	virtual void GiveUpgrade() override;
