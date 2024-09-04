@@ -23,6 +23,8 @@
 
 #include "Net/UnrealNetwork.h"
 
+#include "Framework/RGameMode.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SceneComponent.h"
@@ -99,6 +101,8 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateUltimateAttack);
 		enhancedInputComp->BindAction(AbilityConfirmAction, ETriggerEvent::Triggered, this, &ARPlayerBase::ConfirmActionTriggered);
 		enhancedInputComp->BindAction(AbilityCancelAction, ETriggerEvent::Triggered, this, &ARPlayerBase::CancelActionTriggered);
+		enhancedInputComp->BindAction(InteractInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Interact);
+		enhancedInputComp->BindAction(PausingInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Pause);
 	}
 }
 
@@ -185,6 +189,25 @@ void ARPlayerBase::CancelActionTriggered()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Cancelled"));
 	//GetAbilitySystemComponent()->InputCancel();
+}
+
+void ARPlayerBase::Interact()
+{
+}
+
+void ARPlayerBase::Pause()
+{
+	ARGameMode* GameMode = GetWorld()->GetAuthGameMode<ARGameMode>();
+	if (isPaused)
+	{
+		isPaused = false;
+		GameMode->UnpausingGame();
+	}
+	else
+	{
+		isPaused = true;
+		GameMode->PausingGame();
+	}
 }
 
 FVector ARPlayerBase::GetMoveFwdDir() const
