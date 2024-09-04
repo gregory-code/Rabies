@@ -14,4 +14,11 @@ class ARGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TSubclassOf<UUserWidget> DeathWidget;
+
+	UFUNCTION()
+	void GameOver();
+
 };
