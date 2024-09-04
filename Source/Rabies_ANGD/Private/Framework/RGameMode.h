@@ -18,7 +18,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Config")
 	TSubclassOf<UUserWidget> DeathWidget;
 
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TSubclassOf<UUserWidget> PauseWidget;
+
 	UFUNCTION()
 	void GameOver();
+
+	UFUNCTION()
+	void PausingGame();
+
+	UFUNCTION()
+	void UnpausingGame();
 
 };

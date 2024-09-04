@@ -7,6 +7,8 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Framework/RGameMode.h"
+
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAttributeSet.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
@@ -146,6 +148,8 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 
 	if (ChangeData.NewValue <= 0)
 	{
+		ARGameMode* GameMode = GetWorld()->GetAuthGameMode<ARGameMode>();
+		GameMode->GameOver();
 		// die
 	}
 }

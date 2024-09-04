@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PauseUI.generated.h"
 
+class UButton;
 /**
  * 
  */
@@ -14,4 +15,25 @@ class UPauseUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	UButton* QuitButton;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	UButton* ReturnButton;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	UButton* MenuButton;
+
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnQuitClick();
+
+	UFUNCTION()
+	void OnReturnClick();
+
+	UFUNCTION()
+	void OnMenuClick();
+
 };

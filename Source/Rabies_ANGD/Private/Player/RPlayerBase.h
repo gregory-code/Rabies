@@ -91,7 +91,10 @@ private:
 	UInputAction* QuitOutAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* interactInputAction;
+	UInputAction* InteractInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* PausingInputAction;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -131,6 +134,9 @@ private:
 	UFUNCTION()
 	void Interact();
 
+	UFUNCTION()
+	void Pause();
+
 	FVector GetMoveFwdDir() const;
 	FVector GetMoveRightDir() const;
 
@@ -149,5 +155,11 @@ private:
 	////////////////////////////////
 
 	bool canInteract;
+
+	/////////////////////////////////
+	/*          Pause	           */
+	////////////////////////////////
+
+	bool isPaused;
 
 };

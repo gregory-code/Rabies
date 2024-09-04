@@ -18,3 +18,23 @@ void ARGameMode::GameOver()
 		}
 	}
 }
+
+void ARGameMode::PausingGame()
+{
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+	UUserWidget* Widget = CreateWidget(GetWorld(), PauseWidget);
+	if (Widget)
+	{
+		Widget->AddToViewport();
+	}
+}
+
+void ARGameMode::UnpausingGame()
+{
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
+	UUserWidget* Widget = CreateWidget(GetWorld(), PauseWidget);
+	if (Widget)
+	{
+		Widget->RemoveFromViewport();
+	}
+}
