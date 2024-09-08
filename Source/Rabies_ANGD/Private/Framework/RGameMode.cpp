@@ -19,22 +19,35 @@ void ARGameMode::GameOver()
 	}
 }
 
-void ARGameMode::PausingGame()
+void ARGameMode::PausingGame(bool SetPause)
 {
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
-	UUserWidget* Widget = CreateWidget(GetWorld(), PauseWidget);
-	if (Widget)
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = SetPause;
+
+	if (!PauseUI && PauseWidget)
 	{
-		Widget->AddToViewport();
+		PauseUI = CreateWidget(GetWorld(), PauseWidget);
+	}
+
+	if (PauseUI && SetPause)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("I am Pausing"));
+		PauseUI->AddToViewport();
+	}
+	else if (PauseUI && !SetPause)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("I am Unpausing"));
+		PauseUI->RemoveFromParent();
+		PauseUI = nullptr;
 	}
 }
 
-void ARGameMode::UnpausingGame()
-{
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
-	UUserWidget* Widget = CreateWidget(GetWorld(), PauseWidget);
-	if (Widget)
-	{
-		Widget->RemoveFromViewport();
-	}
-}
+//void ARGameMode::UnpausingGame()
+//{
+//	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
+//	/*UUserWidget* Widget = 
+//	if (Widget)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("I am Unpausing"));
+//		Widget->RemoveFromParent();
+//	}*/
+//}

@@ -21,13 +21,17 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Config")
 	TSubclassOf<UUserWidget> PauseWidget;
 
+	UPROPERTY()
+	UUserWidget* PauseUI = nullptr;
+
 	UFUNCTION()
 	void GameOver();
 
 	UFUNCTION()
-	void PausingGame();
+	void PausingGame(bool SetPause);
 
-	UFUNCTION()
-	void UnpausingGame();
+	//UFUNCTION()
+	//void UnpausingGame();
+
 
 };

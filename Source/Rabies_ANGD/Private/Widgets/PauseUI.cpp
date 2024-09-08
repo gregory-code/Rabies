@@ -4,6 +4,7 @@
 #include "Widgets/PauseUI.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/RPlayerBase.h"
 
 void UPauseUI::NativeConstruct()
 {
@@ -33,6 +34,10 @@ void UPauseUI::OnQuitClick()
 
 void UPauseUI::OnReturnClick()
 {
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
+	ARPlayerBase* CurrentPlayer = Cast<ARPlayerBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	CurrentPlayer->SetPausetoFalse();
+	RemoveFromParent();
 }
 
 void UPauseUI::OnMenuClick()

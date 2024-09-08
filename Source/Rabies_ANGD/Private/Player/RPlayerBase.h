@@ -162,4 +162,7 @@ private:
 
 	bool isPaused;
 
+	public:
+	void SetPausetoFalse();
+
 };

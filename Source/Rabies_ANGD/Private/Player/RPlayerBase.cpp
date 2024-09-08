@@ -181,13 +181,13 @@ void ARPlayerBase::TryActivateUltimateAttack()
 
 void ARPlayerBase::ConfirmActionTriggered()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Confirmed"));
+	//UE_LOG(LogTemp, Warning, TEXT("Confirmed"));
 	//GetAbilitySystemComponent()->InputConfirm();
 }
 
 void ARPlayerBase::CancelActionTriggered()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Cancelled"));
+	//UE_LOG(LogTemp, Warning, TEXT("Cancelled"));
 	//GetAbilitySystemComponent()->InputCancel();
 }
 
@@ -198,15 +198,17 @@ void ARPlayerBase::Interact()
 void ARPlayerBase::Pause()
 {
 	ARGameMode* GameMode = GetWorld()->GetAuthGameMode<ARGameMode>();
+	isPaused = !isPaused;
+
 	if (isPaused)
 	{
-		isPaused = false;
-		GameMode->UnpausingGame();
+		GameMode->PausingGame(isPaused);
+		//Remove all controls to the characters when they are paused.
 	}
 	else
 	{
-		isPaused = true;
-		GameMode->PausingGame();
+		GameMode->PausingGame(isPaused);
+		//Return all controls to the characters when they are unpaused.
 	}
 }
 
@@ -263,4 +265,9 @@ void ARPlayerBase::TickCameraLocalOffset(FVector Goal)
 	FVector NewLocalOffset = FMath::Lerp(CurrentLocalOffset, Goal, GetWorld()->GetDeltaSeconds() * AimCameraLerpingSpeed);
 	viewCamera->SetRelativeLocation(NewLocalOffset);
 	CameraLerpHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARPlayerBase::TickCameraLocalOffset, Goal));
+}
+
+void ARPlayerBase::SetPausetoFalse()
+{
+	isPaused = false;
 }
