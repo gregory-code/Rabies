@@ -41,13 +41,28 @@ void ARGameMode::PausingGame(bool SetPause)
 	}
 }
 
-//void ARGameMode::UnpausingGame()
-//{
-//	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = false;
-//	/*UUserWidget* Widget = 
-//	if (Widget)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("I am Unpausing"));
-//		Widget->RemoveFromParent();
-//	}*/
-//}
+void ARGameMode::InteractingUI(bool SetInteraction)
+{
+	if (PauseUI)
+	{
+		return;
+	}
+
+	if (!InteractUI && InteractionWidget)
+	{
+		InteractUI = CreateWidget(GetWorld(), InteractionWidget);
+	}
+
+	if (InteractUI && SetInteraction)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("I can interact now"));
+		InteractUI->AddToViewport();
+	}
+	else if (InteractUI && !SetInteraction)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("I cannot interact now"));
+		InteractUI->RemoveFromParent();
+	}
+
+}
+

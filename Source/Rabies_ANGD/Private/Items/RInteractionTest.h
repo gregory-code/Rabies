@@ -6,6 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "RInteractionTest.generated.h"
 
+class UStaticMeshComponent;
+class USphereComponent;
+class ARItemPickUpBase;
+class USceneComponent;
+
 UCLASS()
 class ARInteractionTest : public AActor
 {
@@ -15,12 +20,30 @@ public:
 	// Sets default values for this actor's properties
 	ARInteractionTest();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* InteractMesh;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	USphereComponent* SphereCollider;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+private:
+	UFUNCTION()
+	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	/////////////////////////////////
+	/*        Spawn Item	       */
+	////////////////////////////////
+
+	UPROPERTY(EditDefaultsOnly, Category = "Item")
+	TSubclassOf<class ARItemPickUpBase> ItemSpawned;
+
+
+public:
+	UFUNCTION()
+	void SpawnItem();
 
 };

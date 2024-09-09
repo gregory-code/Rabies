@@ -21,8 +21,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Config")
 	TSubclassOf<UUserWidget> PauseWidget;
 
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TSubclassOf<UUserWidget> InteractionWidget;
+
 	UPROPERTY()
 	UUserWidget* PauseUI = nullptr;
+
+	UPROPERTY()
+	UUserWidget* InteractUI = nullptr;
 
 	UFUNCTION()
 	void GameOver();
@@ -30,8 +36,6 @@ public:
 	UFUNCTION()
 	void PausingGame(bool SetPause);
 
-	//UFUNCTION()
-	//void UnpausingGame();
-
-
+	UFUNCTION()
+	void InteractingUI(bool SetInteraction);
 };

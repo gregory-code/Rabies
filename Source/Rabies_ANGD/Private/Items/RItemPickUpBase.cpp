@@ -15,7 +15,7 @@ ARItemPickUpBase::ARItemPickUpBase()
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Upgrade Mesh"));
 	ItemMesh->SetupAttachment(SphereCollider);
-	ItemMesh->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));\
+	ItemMesh->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
 }
 

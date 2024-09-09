@@ -2,26 +2,58 @@
 
 
 #include "Items/RInteractionTest.h"
+#include "Components/SphereComponent.h"
+#include "Player/RPlayerBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Items/RItemPickUpBase.h"
+
 
 // Sets default values
 ARInteractionTest::ARInteractionTest()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	SphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider"));
+	SphereCollider->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+	RootComponent = SphereCollider;
 
+	InteractMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Interact Mesh"));
+	InteractMesh->SetupAttachment(SphereCollider);
+	InteractMesh->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 }
 
 // Called when the game starts or when spawned
 void ARInteractionTest::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ARInteractionTest::OnSphereOverlap);
 }
 
-// Called every frame
-void ARInteractionTest::Tick(float DeltaTime)
+void ARInteractionTest::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaTime);
+	ARPlayerBase* Player = Cast<ARPlayerBase>(OtherActor);
 
+	if (Player)
+	{
+		SpawnItem();
+	}
+}
+
+void ARInteractionTest::SpawnItem()
+{
+	if (ItemSpawned != nullptr)
+	{
+		UWorld* const World = GetWorld();
+		if (World != nullptr)
+		{
+			const FRotator SpawnRotation = GetActorRotation();
+			const FVector SpawnLocation = GetActorLocation() + FVector(100,0,0);
+
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+			World->SpawnActor<ARItemPickUpBase>(ItemSpawned, SpawnLocation, SpawnRotation, ActorSpawnParams);
+		}
+	}
+	//Spawn the new item
+	Destroy();
 }
 
