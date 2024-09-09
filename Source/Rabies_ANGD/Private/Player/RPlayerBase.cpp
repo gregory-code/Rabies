@@ -193,6 +193,13 @@ void ARPlayerBase::CancelActionTriggered()
 
 void ARPlayerBase::Interact()
 {
+	if (!canInteract)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("I cannot interact"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("I am interacting"));
 }
 
 void ARPlayerBase::Pause()
@@ -265,6 +272,11 @@ void ARPlayerBase::TickCameraLocalOffset(FVector Goal)
 	FVector NewLocalOffset = FMath::Lerp(CurrentLocalOffset, Goal, GetWorld()->GetDeltaSeconds() * AimCameraLerpingSpeed);
 	viewCamera->SetRelativeLocation(NewLocalOffset);
 	CameraLerpHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARPlayerBase::TickCameraLocalOffset, Goal));
+}
+
+void ARPlayerBase::SetInteraction(bool setInteract)
+{
+	canInteract = setInteract;
 }
 
 void ARPlayerBase::SetPausetoFalse()

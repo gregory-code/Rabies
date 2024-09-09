@@ -6,6 +6,7 @@
 #include "Player/RPlayerBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Items/RItemPickUpBase.h"
+#include "Framework/RGameMode.h"
 
 
 // Sets default values
@@ -25,6 +26,7 @@ void ARInteractionTest::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ARInteractionTest::OnSphereOverlap);
+	SphereCollider->OnComponentEndOverlap.AddDynamic(this, &ARInteractionTest::OnSphereEndOverlap);
 }
 
 void ARInteractionTest::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -33,7 +35,18 @@ void ARInteractionTest::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent
 
 	if (Player)
 	{
-		SpawnItem();
+		Player->SetInteraction(true);
+		//SpawnItem();
+	}
+}
+
+void ARInteractionTest::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	ARPlayerBase* Player = Cast<ARPlayerBase>(OtherActor);
+
+	if (Player)
+	{
+		Player->SetInteraction(false);
 	}
 }
 

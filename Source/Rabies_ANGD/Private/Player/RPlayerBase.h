@@ -156,6 +156,9 @@ private:
 
 	bool canInteract;
 
+	public:
+	void SetInteraction(bool setInteract);
+
 	/////////////////////////////////
 	/*          Pause	           */
 	////////////////////////////////
