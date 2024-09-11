@@ -10,7 +10,7 @@
 
 #include "EOSGameInstance.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnSessionSearchCompleted, TArray<class FOnlineSessionSearchResult> /* Seach results */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSessionSearchCompleted, const TArray<class FOnlineSessionSearchResult>& /* Seach results */);
 /**
  * 
  */

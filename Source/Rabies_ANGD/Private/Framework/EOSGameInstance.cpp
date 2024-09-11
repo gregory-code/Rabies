@@ -36,7 +36,7 @@ void UEOSGameInstance::CreateSession(const FName& SessionName)
 		SessionSettings.bAllowJoinViaPresence = true;
 		SessionSettings.bUseLobbiesIfAvailable = true;
 		SessionSettings.bUsesPresence= true;
-		SessionSettings.NumPublicConnections = 10;
+		SessionSettings.NumPublicConnections = 4;
 
 		SessionSettings.Set(GetSessionNameKey(), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 

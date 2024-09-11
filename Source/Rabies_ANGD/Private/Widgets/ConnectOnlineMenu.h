@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+
+#include "Interfaces/OnlineIdentityInterface.h"
+#include "Interfaces/OnlineSessionInterface.h"
+
 #include "ConnectOnlineMenu.generated.h"
 
 /**
@@ -32,6 +36,12 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UEditableText* SessionNameText;
 
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* LobbyListScrollBox;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Lobby")
+	TSubclassOf<class UOpenLobby> OnlineLobbyClass;
+
 	UFUNCTION()
 	void SessionNameTextChanged(const FText& NewText);
 
@@ -43,4 +53,11 @@ private:
 
 	UFUNCTION()
 	void FindSessionsButtonClicked();
+
+	void SessionSearchCompleted(const TArray<FOnlineSessionSearchResult>& searchResults);
+
+	UFUNCTION()
+	void LobbySelected(int lobbyIndex);
+
+	int SelectedLobbyIndex = -1;
 };

@@ -2,9 +2,16 @@
 
 
 #include "Widgets/ConnectOnlineMenu.h"
+
+#include "OnlineSubsystem.h"
+#include "Online/OnlineSessionNames.h"
+#include "OnlineSessionSettings.h"
+
 #include "Framework/EOSGameInstance.h"
 #include "Components/EditableText.h"
+#include "Components/ScrollBox.h"
 #include "Components/Button.h"
+#include "Widgets/OpenLobby.h"
 
 void UConnectOnlineMenu::NativeConstruct()
 {
@@ -18,6 +25,8 @@ void UConnectOnlineMenu::NativeConstruct()
 	SessionNameText->OnTextChanged.AddDynamic(this, &UConnectOnlineMenu::SessionNameTextChanged);
 
 	CreateSessionButton->SetIsEnabled(false);
+
+	GameInst->SearchCompleted.AddUObject(this, &UConnectOnlineMenu::SessionSearchCompleted);
 }
 
 void UConnectOnlineMenu::SessionNameTextChanged(const FText& NewText)
@@ -47,4 +56,28 @@ void UConnectOnlineMenu::FindSessionsButtonClicked()
 	{
 		GameInst->FindSession();
 	}
+}
+
+void UConnectOnlineMenu::SessionSearchCompleted(const TArray<FOnlineSessionSearchResult>& searchResults)
+{
+	LobbyListScrollBox->ClearChildren();
+
+	int index = 0;
+
+	for (const FOnlineSessionSearchResult& searchResult : searchResults)
+	{
+		FString sessionName = GameInst->GetSessionName(searchResult);
+		
+		UOpenLobby* LobbyEntry = CreateWidget<UOpenLobby>(LobbyListScrollBox, OnlineLobbyClass);
+		LobbyEntry->InitLobbyEntry(FName(sessionName), index);
+		LobbyListScrollBox->AddChild(LobbyEntry);
+		LobbyEntry->OnLobbyEntrySelected.AddDynamic(this, &UConnectOnlineMenu::LobbySelected);
+
+		index++;
+	}
+}
+
+void UConnectOnlineMenu::LobbySelected(int lobbyIndex)
+{
+	SelectedLobbyIndex = lobbyIndex;
 }
