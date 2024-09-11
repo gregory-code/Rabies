@@ -71,6 +71,13 @@ void UEOSGameInstance::JoinSessionWithSearchResultIndex(int SearchResultIndex)
 	sessionPtr->JoinSession(0, FName{ SessionName }, SearchResult);
 }
 
+FString UEOSGameInstance::GetSessionName(const FOnlineSessionSearchResult& SearchResult) const
+{
+	FString searchResultValue = "Name None";
+	SearchResult.Session.SessionSettings.Get(GetSessionNameKey(), searchResultValue);
+	return searchResultValue;
+}
+
 void UEOSGameInstance::Init()
 {
 	Super::Init();
@@ -130,9 +137,12 @@ void UEOSGameInstance::FindSessionsCompleted(bool bWasSuccessful)
 	{
 		for (const FOnlineSessionSearchResult& lobbyFound : sessionSearch->SearchResults)
 		{
+			FString LobbyName = GetSessionName(lobbyFound);
 			UE_LOG(LogTemp, Warning, TEXT("Found sess: %s"), *lobbyFound.GetSessionIdStr());
 			lobbyFound.GetSessionIdStr();
 		}
+
+		SearchCompleted.Broadcast(sessionSearch->SearchResults);
 
 		JoinSessionWithSearchResultIndex(0);
 	}

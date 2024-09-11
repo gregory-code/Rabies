@@ -10,6 +10,7 @@
 
 #include "EOSGameInstance.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSessionSearchCompleted, TArray<class FOnlineSessionSearchResult> /* Seach results */);
 /**
  * 
  */
@@ -19,6 +20,8 @@ class UEOSGameInstance : public UGameInstance
 	GENERATED_BODY()
 	
 public:
+	FOnSessionSearchCompleted SearchCompleted;
+
 	UFUNCTION(BlueprintCallable)
 	void Login();
 
@@ -31,6 +34,8 @@ public:
 	const FName& GetSessionNameKey() const { return SessionNameKey; }
 
 	void JoinSessionWithSearchResultIndex(int SearchResultIndex);
+
+	FString GetSessionName(const FOnlineSessionSearchResult& SearchResult) const;
 
 protected:
 	virtual void Init() override;
