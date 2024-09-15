@@ -160,7 +160,7 @@ void UEOSGameInstance::FindSessionsCompleted(bool bWasSuccessful)
 
 		SearchCompleted.Broadcast(sessionSearch->SearchResults);
 
-		JoinSessionWithSearchResultIndex(0);
+		//JoinSessionWithSearchResultIndex(0);
 	}
 }
 
