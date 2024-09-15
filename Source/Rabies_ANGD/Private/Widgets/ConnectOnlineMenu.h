@@ -34,6 +34,9 @@ private:
 	class UButton* FindSessionsButton;
 
 	UPROPERTY(meta = (BindWidget))
+	class UButton* JoinLobbyButton;
+
+	UPROPERTY(meta = (BindWidget))
 	class UEditableText* SessionNameText;
 
 	UPROPERTY(meta = (BindWidget))
@@ -58,6 +61,9 @@ private:
 
 	UFUNCTION()
 	void LobbySelected(int lobbyIndex);
+
+	UFUNCTION()
+	void JoinLobbyButtonClicked();
 
 	int SelectedLobbyIndex = -1;
 };

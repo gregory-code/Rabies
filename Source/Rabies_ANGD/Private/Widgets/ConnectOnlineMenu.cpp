@@ -23,6 +23,8 @@ void UConnectOnlineMenu::NativeConstruct()
 	CreateSessionButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::CreateSessionButtonClicked);
 	FindSessionsButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::FindSessionsButtonClicked);
 	SessionNameText->OnTextChanged.AddDynamic(this, &UConnectOnlineMenu::SessionNameTextChanged);
+	JoinLobbyButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::JoinLobbyButtonClicked);
+	JoinLobbyButton->SetIsEnabled(false);
 
 	CreateSessionButton->SetIsEnabled(false);
 
@@ -80,4 +82,16 @@ void UConnectOnlineMenu::SessionSearchCompleted(const TArray<FOnlineSessionSearc
 void UConnectOnlineMenu::LobbySelected(int lobbyIndex)
 {
 	SelectedLobbyIndex = lobbyIndex;
+	if (SelectedLobbyIndex != -1)
+	{
+		JoinLobbyButton->SetIsEnabled(true);
+	}
+}
+
+void UConnectOnlineMenu::JoinLobbyButtonClicked()
+{
+	if (GameInst)
+	{
+		GameInst->JoinLobbyBySearchIndex(SelectedLobbyIndex);
+	}
 }

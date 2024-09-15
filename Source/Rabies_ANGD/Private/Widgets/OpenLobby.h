@@ -34,7 +34,7 @@ private:
 	UFUNCTION()
 	void LobbyButtonClicked();
 
-	int LobbyIndex;
+	int LobbyIndex = -1;
 
 protected:
 

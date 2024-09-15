@@ -22,6 +22,8 @@ class UEOSGameInstance : public UGameInstance
 public:
 	FOnSessionSearchCompleted SearchCompleted;
 
+	void JoinLobbyBySearchIndex(int index);
+
 	UFUNCTION(BlueprintCallable)
 	void Login();
 
