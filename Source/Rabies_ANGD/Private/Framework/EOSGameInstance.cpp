@@ -6,6 +6,9 @@
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
 
+#include "Engine/World.h"
+
+#include "Player/RMainMenuController.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -18,6 +21,22 @@ void UEOSGameInstance::Login()
 		onlineAccountCredentials.Id = "";
 		onlineAccountCredentials.Token = "";
 		identityPtr->Login(0, onlineAccountCredentials);
+	}
+}
+
+void UEOSGameInstance::LoginCompleted(int numOfPlayers, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error)
+{
+	if (bWasSuccessful)
+	{
+		if (MenuController)
+		{
+			MenuController->ChangeOnlineMenuState(bWasSuccessful);
+			UE_LOG(LogTemp, Warning, TEXT("Logged in"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to Login"));
 	}
 }
 
@@ -94,6 +113,11 @@ FString UEOSGameInstance::GetSessionName(const FOnlineSessionSearchResult& Searc
 	return searchResultValue;
 }
 
+void UEOSGameInstance::SetMenuController(ARMainMenuController* menuController)
+{
+	MenuController = menuController;
+}
+
 void UEOSGameInstance::Init()
 {
 	Super::Init();
@@ -108,20 +132,6 @@ void UEOSGameInstance::Init()
 	sessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &UEOSGameInstance::FindSessionsCompleted);
 
 	sessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &UEOSGameInstance::JoinSessionCompleted);
-}
-
-void UEOSGameInstance::LoginCompleted(int numOfPlayers, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error)
-{
-	if (bWasSuccessful)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Logged in"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to Login"));
-	}
-
-
 }
 
 void UEOSGameInstance::CreateSessionCompleted(FName SessionName, bool bWasSuccessful)

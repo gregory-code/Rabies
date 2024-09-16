@@ -39,10 +39,14 @@ public:
 
 	FString GetSessionName(const FOnlineSessionSearchResult& SearchResult) const;
 
+	void SetMenuController(class ARMainMenuController* menuController);
+
 protected:
 	virtual void Init() override;
 
 private:
+	class ARMainMenuController* MenuController;
+
 	class IOnlineSubsystem* onlineSubsystem;
 	IOnlineIdentityPtr identityPtr;
 	IOnlineSessionPtr sessionPtr;

@@ -24,8 +24,6 @@ protected:
 	class UEOSGameInstance* GameInst;
 
 private:
-	UPROPERTY(meta = (BindWidget))
-	class UButton* LoginButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* CreateSessionButton;
@@ -47,9 +45,6 @@ private:
 
 	UFUNCTION()
 	void SessionNameTextChanged(const FText& NewText);
-
-	UFUNCTION()
-	void LoginButtonClicked();
 
 	UFUNCTION()
 	void CreateSessionButtonClicked();
