@@ -11,6 +11,7 @@
 #include "Framework/EOSGameInstance.h"
 #include "Components/EditableText.h"
 #include "Components/ScrollBox.h"
+#include "Components/Overlay.h"
 #include "Components/Button.h"
 
 void UMainMenu::NativeConstruct()
@@ -19,10 +20,15 @@ void UMainMenu::NativeConstruct()
 
 	MultiplayerButton->OnClicked.AddDynamic(this, &UMainMenu::MultiplayerClicked);
 	SingeplayerButton->OnClicked.AddDynamic(this, &UMainMenu::SingleplayerClicked);
+	SettingsButton->OnClicked.AddDynamic(this, &UMainMenu::SettingsClicked);
+	CreditsButton->OnClicked.AddDynamic(this, &UMainMenu::CreditsClicked);
 
 	GameInst = GetGameInstance<UEOSGameInstance>();
 
-	OnlineMenu->SetVisibility(ESlateVisibility::Hidden);
+	ChangeMainMenuState(true);
+	ChangeConnectMenuState(false);
+	ChangeSettingsState(false);
+	ChangeCreditsState(false);
 }
 
 void UMainMenu::SingleplayerClicked()
@@ -38,14 +44,46 @@ void UMainMenu::MultiplayerClicked()
 	}
 }
 
+void UMainMenu::SettingsClicked()
+{
+	ChangeMainMenuState(false);
+	ChangeSettingsState(true);
+}
+
+void UMainMenu::CreditsClicked()
+{
+	ChangeMainMenuState(false);
+	ChangeCreditsState(true);
+}
+
+void UMainMenu::ChangeMainMenuState(bool state)
+{
+	if (state)
+		MainMenuOverlay->SetVisibility(ESlateVisibility::Visible);
+	else
+		MainMenuOverlay->SetVisibility(ESlateVisibility::Hidden);
+}
+
 void UMainMenu::ChangeConnectMenuState(bool state)
 {
 	if (state)
-	{
 		OnlineMenu->SetVisibility(ESlateVisibility::Visible);
-	}
 	else
-	{
 		OnlineMenu->SetVisibility(ESlateVisibility::Hidden);
-	}
+}
+
+void UMainMenu::ChangeSettingsState(bool state)
+{
+	if (state)
+		SettingsOverlay->SetVisibility(ESlateVisibility::Visible);
+	else
+		SettingsOverlay->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMainMenu::ChangeCreditsState(bool state)
+{
+	if (state)
+		CreditsOverlay->SetVisibility(ESlateVisibility::Visible);
+	else
+		CreditsOverlay->SetVisibility(ESlateVisibility::Hidden);
 }

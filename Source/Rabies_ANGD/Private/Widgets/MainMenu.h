@@ -21,7 +21,16 @@ class UMainMenu : public UUserWidget
 public:
 
 	UFUNCTION()
+	void ChangeMainMenuState(bool state);
+
+	UFUNCTION()
 	void ChangeConnectMenuState(bool state);
+
+	UFUNCTION()
+	void ChangeSettingsState(bool state);
+
+	UFUNCTION()
+	void ChangeCreditsState(bool state);
 	
 protected:
 
@@ -41,11 +50,32 @@ private:
 	class UButton* MultiplayerButton;
 
 	UPROPERTY(meta = (BindWidget))
+	class UButton* SettingsButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CreditsButton;
+
+	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* TitleScreenText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UOverlay* MainMenuOverlay;
+
+	UPROPERTY(meta = (BindWidget))
+	class UOverlay* SettingsOverlay;
+
+	UPROPERTY(meta = (BindWidget))
+	class UOverlay* CreditsOverlay;
 
 	UFUNCTION()
 	void SingleplayerClicked();
 
 	UFUNCTION()
 	void MultiplayerClicked();
+
+	UFUNCTION()
+	void SettingsClicked();
+
+	UFUNCTION()
+	void CreditsClicked();
 };
