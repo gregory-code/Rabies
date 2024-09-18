@@ -15,7 +15,7 @@ class URButton : public UUserWidget
 	GENERATED_BODY()
 	
 protected:
-	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 private:
 	UFUNCTION()
@@ -28,19 +28,19 @@ private:
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_Style")
+	UPROPERTY(EditAnywhere, Category = "Rabies_Style")
 	FVector2D DefaultScale;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_Style")
+	UPROPERTY(EditAnywhere, Category = "Rabies_Style")
 	float DefaultRotation;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_Style")
+	UPROPERTY(EditAnywhere, Category = "Rabies_Style")
 	float HoverScale;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_Style")
+	UPROPERTY(EditAnywhere, Category = "Rabies_Style")
 	float HoverRotation;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_Style")
+	UPROPERTY(EditAnywhere, Category = "Rabies_Style")
 	FText ButtonsText;
 
 	UPROPERTY(meta = (BindWidget))
@@ -49,15 +49,15 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* RabiesButton;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_ColorStyle")
+	UPROPERTY(EditAnywhere, Category = "Rabies_ColorStyle")
 	FSlateColor NormalColor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_ColorStyle")
+	UPROPERTY(EditAnywhere, Category = "Rabies_ColorStyle")
 	FSlateColor HoveredColor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_ColorStyle")
+	UPROPERTY(EditAnywhere, Category = "Rabies_ColorStyle")
 	FSlateColor PressedColor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rabies_ColorStyle")
+	UPROPERTY(EditAnywhere, Category = "Rabies_ColorStyle")
 	FSlateColor BorderColor;
 };

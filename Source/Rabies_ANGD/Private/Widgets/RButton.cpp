@@ -9,9 +9,14 @@
 #include "Components/TextBlock.h"
 #include "Engine/Engine.h"
 
-void URButton::NativeConstruct()
+void URButton::NativePreConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativePreConstruct();
+
+	if (RabiesText)
+	{
+		RabiesText->SetText(ButtonsText);
+	}
 
 	if (RabiesButton)
 	{
@@ -30,6 +35,8 @@ void URButton::NativeConstruct()
 		rabbiesStyle.Pressed.OutlineSettings.Color = BorderColor;
 
 		RabiesButton->SetStyle(rabbiesStyle);
+		
+		OnUnhoverButton();
 	}
 }
 

@@ -7,6 +7,7 @@
 #include "OnlineSessionSettings.h"
 
 #include "Widgets/ConnectOnlineMenu.h"
+#include "Widgets/RButton.h"
 
 #include "Framework/EOSGameInstance.h"
 #include "Components/EditableText.h"
@@ -18,10 +19,10 @@ void UMainMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	MultiplayerButton->OnClicked.AddDynamic(this, &UMainMenu::MultiplayerClicked);
-	SingeplayerButton->OnClicked.AddDynamic(this, &UMainMenu::SingleplayerClicked);
-	SettingsButton->OnClicked.AddDynamic(this, &UMainMenu::SettingsClicked);
-	CreditsButton->OnClicked.AddDynamic(this, &UMainMenu::CreditsClicked);
+	MultiplayerBtn->RabiesButton->OnClicked.AddDynamic(this, &UMainMenu::MultiplayerClicked);
+	SingeplayerBtn->RabiesButton->OnClicked.AddDynamic(this, &UMainMenu::SingleplayerClicked);
+	SettingsBtn->RabiesButton->OnClicked.AddDynamic(this, &UMainMenu::SettingsClicked);
+	CreditsBtn->RabiesButton->OnClicked.AddDynamic(this, &UMainMenu::CreditsClicked);
 
 	GameInst = GetGameInstance<UEOSGameInstance>();
 

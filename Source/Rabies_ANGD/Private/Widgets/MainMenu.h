@@ -44,16 +44,16 @@ private:
 	class UConnectOnlineMenu* OnlineMenu;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* SingeplayerButton;
+	class URButton* SingeplayerBtn;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* MultiplayerButton;
+	class URButton* MultiplayerBtn;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* SettingsButton;
+	class URButton* SettingsBtn;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* CreditsButton;
+	class URButton* CreditsBtn;
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* TitleScreenText;
