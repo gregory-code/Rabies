@@ -21,6 +21,7 @@ private:
 protected:
 	virtual void NativeConstruct() override;
 
+	UPROPERTY()
 	class AEOSGameState* GameState;
 
 	UFUNCTION()
