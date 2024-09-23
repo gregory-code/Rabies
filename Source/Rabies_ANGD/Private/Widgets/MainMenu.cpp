@@ -42,7 +42,6 @@ void UMainMenu::MultiplayerClicked()
 	if (GameInst)
 	{
 		GameInst->Login();
-		ChangeMainMenuState(false);
 	}
 }
 

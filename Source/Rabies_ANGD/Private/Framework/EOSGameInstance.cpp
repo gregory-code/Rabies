@@ -82,6 +82,8 @@ void UEOSGameInstance::CreateSession(const FName& SessionName)
 
 		SessionSettings.Set(GetSessionNameKey(), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
+		CurrentLobbyName = SessionName;
+
 		sessionPtr->CreateSession(0, SessionName, SessionSettings);
 	}
 }
@@ -163,18 +165,7 @@ void UEOSGameInstance::CreateSessionCompleted(FName SessionName, bool bWasSucces
 
 	if (bWasSuccessful)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Logged into session"));
-
-		if (!GameLevel.IsValid())
-		{
-			GameLevel.LoadSynchronous();
-		}
-
-		if (GameLevel.IsValid())
-		{
-			const FName levelName = FName(*FPackageName::ObjectPathToPackageName(GameLevel.ToString()));
-			GetWorld()->ServerTravel(levelName.ToString() + "?listen");
-		}
+		LoadMapAndListen(CharacterSelctLevel);
 	}
 }
 
@@ -205,6 +196,20 @@ void UEOSGameInstance::JoinSessionCompleted(FName sessionName, EOnJoinSessionCom
 		FString TravelURL;
 		sessionPtr->GetResolvedConnectString(sessionName, TravelURL);
 		GetFirstLocalPlayerController(GetWorld())->ClientTravel(TravelURL, TRAVEL_Absolute);
+	}
+}
+
+void UEOSGameInstance::LoadMapAndListen(TSoftObjectPtr<UWorld> levelToLoad)
+{
+	if (!levelToLoad.IsValid())
+	{
+		levelToLoad.LoadSynchronous();
+	}
+
+	if (levelToLoad.IsValid())
+	{
+		const FName levelName = FName(*FPackageName::ObjectPathToPackageName(levelToLoad.ToString()));
+		GetWorld()->ServerTravel(levelName.ToString() + "?listen");
 	}
 }
 

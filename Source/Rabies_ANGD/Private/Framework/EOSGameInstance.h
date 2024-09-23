@@ -38,6 +38,7 @@ public:
 	void JoinSessionWithSearchResultIndex(int SearchResultIndex);
 
 	FString GetSessionName(const FOnlineSessionSearchResult& SearchResult) const;
+	FORCEINLINE FName GetCurrentSessionName() const { return CurrentLobbyName; }
 
 	void SetMenuController(class ARMainMenuController* menuController);
 
@@ -60,5 +61,12 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> GameLevel;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UWorld> CharacterSelctLevel;
+
 	FName SessionNameKey{ "SessionName" };
+
+	void LoadMapAndListen(TSoftObjectPtr<UWorld> levelToLoad);
+
+	FName CurrentLobbyName;
 };

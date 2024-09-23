@@ -14,4 +14,6 @@ class ARCharacterSelectMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void InitGameState() override;
 };
