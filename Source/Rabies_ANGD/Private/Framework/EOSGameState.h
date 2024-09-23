@@ -6,6 +6,7 @@
 #include "GameFramework/GameState.h"
 #include "EOSGameState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSessionNameReplicated, const FName&, name);
 /**
  * 
  */
@@ -15,14 +16,19 @@ class AEOSGameState : public AGameState
 	GENERATED_BODY()
 
 public:
+	FOnSessionNameReplicated OnSessionNameReplicated;
+
 	FORCEINLINE FName GetSessionName() const { return SessionName; };
 
 	void SetSessionName(const FName& updatedSessionName);
 	
 private:
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_SessionName)
 	FName SessionName;
+
+	UFUNCTION()
+	void OnRep_SessionName();
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
