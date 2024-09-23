@@ -42,6 +42,7 @@ void UMainMenu::MultiplayerClicked()
 	if (GameInst)
 	{
 		GameInst->Login();
+		ChangeMainMenuState(false);
 	}
 }
 
@@ -68,9 +69,9 @@ void UMainMenu::ChangeMainMenuState(bool state)
 void UMainMenu::ChangeConnectMenuState(bool state)
 {
 	if (state)
-		OnlineMenu->SetVisibility(ESlateVisibility::Visible);
+		OnlineMenuLobby->SetVisibility(ESlateVisibility::Visible);
 	else
-		OnlineMenu->SetVisibility(ESlateVisibility::Hidden);
+		OnlineMenuLobby->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UMainMenu::ChangeSettingsState(bool state)

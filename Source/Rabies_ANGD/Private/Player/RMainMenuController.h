@@ -26,6 +26,9 @@ public:
 	UFUNCTION()
 	void ChangeOnlineMenuState(bool state);
 
+	UFUNCTION()
+	void ChangeMainMenuState(bool state);
+
 private:
 	void PostPossessionSetup(APawn* NewPawn);
 
