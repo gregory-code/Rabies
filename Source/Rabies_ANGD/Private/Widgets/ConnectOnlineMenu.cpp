@@ -6,6 +6,12 @@
 #include "OnlineSubsystem.h"
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
+#include "Kismet/GameplayStatics.h"
+#include "Widgets/RButton.h"
+
+#include "Engine/World.h"
+
+#include "Player/RMainMenuController.h"
 
 #include "Framework/EOSGameInstance.h"
 #include "Components/EditableText.h"
@@ -19,20 +25,22 @@ void UConnectOnlineMenu::NativeConstruct()
 
 	GameInst = GetGameInstance<UEOSGameInstance>();
 
-	CreateSessionButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::CreateSessionButtonClicked);
-	FindSessionsButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::FindSessionsButtonClicked);
-	SessionNameText->OnTextChanged.AddDynamic(this, &UConnectOnlineMenu::SessionNameTextChanged);
-	JoinLobbyButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::JoinLobbyButtonClicked);
-	JoinLobbyButton->SetIsEnabled(false);
+	ReturnBtn->RabiesButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::Return);
 
-	CreateSessionButton->SetIsEnabled(false);
+	CreateSessionBtn->RabiesButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::CreateSessionButtonClicked);
+	FindSessionsBtn->RabiesButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::FindSessionsButtonClicked);
+	SessionNameText->OnTextChanged.AddDynamic(this, &UConnectOnlineMenu::SessionNameTextChanged);
+	JoinLobbyBtn->RabiesButton->OnClicked.AddDynamic(this, &UConnectOnlineMenu::JoinLobbyButtonClicked);
+	JoinLobbyBtn->RabiesButton->SetIsEnabled(false);
+
+	CreateSessionBtn->RabiesButton->SetIsEnabled(false);
 
 	GameInst->SearchCompleted.AddUObject(this, &UConnectOnlineMenu::SessionSearchCompleted);
 }
 
 void UConnectOnlineMenu::SessionNameTextChanged(const FText& NewText)
 {
-	CreateSessionButton->SetIsEnabled(!NewText.IsEmpty());
+	CreateSessionBtn->RabiesButton->SetIsEnabled(!NewText.IsEmpty());
 }
 
 void UConnectOnlineMenu::CreateSessionButtonClicked()
@@ -75,7 +83,23 @@ void UConnectOnlineMenu::LobbySelected(int lobbyIndex)
 	SelectedLobbyIndex = lobbyIndex;
 	if (SelectedLobbyIndex != -1)
 	{
-		JoinLobbyButton->SetIsEnabled(true);
+		JoinLobbyBtn->RabiesButton->SetIsEnabled(true);
+	}
+}
+
+void UConnectOnlineMenu::Return()
+{
+	ARMainMenuController* mainMenuController = Cast<ARMainMenuController>(GetWorld()->GetFirstPlayerController());
+
+	if (mainMenuController)
+	{
+		mainMenuController->ChangeMainMenuState(true);
+		mainMenuController->ChangeOnlineMenuState(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Return button clicked, but there is no mainmenuController sadge"));
+		// Handle the case where the cast failed
 	}
 }
 

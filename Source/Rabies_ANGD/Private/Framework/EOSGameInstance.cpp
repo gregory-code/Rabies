@@ -14,13 +14,30 @@
 
 void UEOSGameInstance::Login()
 {
+
 	if (identityPtr)
 	{
-		FOnlineAccountCredentials onlineAccountCredentials;
-		onlineAccountCredentials.Type = "accountportal";
-		onlineAccountCredentials.Id = "";
-		onlineAccountCredentials.Token = "";
-		identityPtr->Login(0, onlineAccountCredentials);
+		int32 loginStatus = identityPtr->GetLoginStatus(0);
+
+		if (loginStatus == 2) //player is already logged in
+		{
+			if (MenuController)
+			{
+				MenuController->ChangeMainMenuState(false);
+				MenuController->ChangeOnlineMenuState(true);
+				UE_LOG(LogTemp, Warning, TEXT("Already Logged in"));
+			}
+		}
+		else
+		{
+			FOnlineAccountCredentials onlineAccountCredentials;
+			onlineAccountCredentials.Type = "accountportal";
+			onlineAccountCredentials.Id = "";
+			onlineAccountCredentials.Token = "";
+			identityPtr->Login(0, onlineAccountCredentials);
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Login Status: %d"), loginStatus);
 	}
 }
 
@@ -30,13 +47,19 @@ void UEOSGameInstance::LoginCompleted(int numOfPlayers, bool bWasSuccessful, con
 	{
 		if (MenuController)
 		{
-			MenuController->ChangeOnlineMenuState(bWasSuccessful);
+			MenuController->ChangeMainMenuState(false);
+			MenuController->ChangeOnlineMenuState(true);
 			UE_LOG(LogTemp, Warning, TEXT("Logged in"));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to Login"));
+		if (MenuController)
+		{
+			MenuController->ChangeMainMenuState(true);
+			MenuController->ChangeOnlineMenuState(false);
+			UE_LOG(LogTemp, Warning, TEXT("Failed to Login"));
+		}
 	}
 }
 

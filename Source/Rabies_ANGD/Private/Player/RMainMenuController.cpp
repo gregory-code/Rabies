@@ -40,6 +40,14 @@ void ARMainMenuController::ChangeOnlineMenuState(bool state)
 	}
 }
 
+void ARMainMenuController::ChangeMainMenuState(bool state)
+{
+	if (MenuUI)
+	{
+		MenuUI->ChangeMainMenuState(state);
+	}
+}
+
 void ARMainMenuController::PostPossessionSetup(APawn* NewPawn)
 {
 

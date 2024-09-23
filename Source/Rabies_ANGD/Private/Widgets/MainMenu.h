@@ -41,7 +41,7 @@ protected:
 private:
 
 	UPROPERTY(meta = (BindWidget))
-	class UConnectOnlineMenu* OnlineMenu;
+	class UConnectOnlineMenu* OnlineMenuLobby;
 
 	UPROPERTY(meta = (BindWidget))
 	class URButton* SingeplayerBtn;
