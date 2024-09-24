@@ -5,7 +5,9 @@
 #include "Components/TextBlock.h"
 #include "Framework/EOSGameState.h"
 #include "Engine/World.h"
+#include "Components/ListView.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerState.h"
 
 void ULobbyDisplay::NativeConstruct()
 {
@@ -19,10 +21,27 @@ void ULobbyDisplay::NativeConstruct()
 		FName lobbyName = GameState->GetSessionName();
 		LobbyName->SetText(FText::FromName(lobbyName));
 		GameState->OnSessionNameReplicated.AddDynamic(this, &ULobbyDisplay::SessionNameReplicated);
+	
+		LobbyPlayerList->SetListItems(GameState->PlayerArray);
+
+		GetWorld()->GetTimerManager().SetTimer(PlayerListUpdateHandle, this, &ULobbyDisplay::RefreshPlayerList, 1, true);
 	}
+
+
 }
 
 void ULobbyDisplay::SessionNameReplicated(const FName& newSessionName)
 {
 	LobbyName->SetText(FText::FromName(newSessionName));
+}
+
+void ULobbyDisplay::RefreshPlayerList()
+{
+	if (GameState)
+	{
+		LobbyPlayerList->SetListItems(GameState->PlayerArray);
+
+		FString displayNumText = FString::Printf(TEXT("%d/4"), LobbyPlayerList->GetNumItems());
+		LobbyPlayerNumber->SetText(FText::FromString(displayNumText));
+	}
 }
