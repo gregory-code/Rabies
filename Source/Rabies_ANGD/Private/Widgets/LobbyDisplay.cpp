@@ -41,7 +41,7 @@ void ULobbyDisplay::RefreshPlayerList()
 	{
 		LobbyPlayerList->SetListItems(GameState->PlayerArray);
 
-		FString displayNumText = FString::Printf(TEXT("%d/4"), LobbyPlayerList->GetNumItems());
+		FString displayNumText = FString(LobbyPlayerList->GetNumItems() + "/4");
 		LobbyPlayerNumber->SetText(FText::FromString(displayNumText));
 	}
 }
