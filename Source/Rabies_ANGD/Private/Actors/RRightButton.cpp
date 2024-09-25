@@ -6,7 +6,6 @@
 
 void ARRightButton::OnActorClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	// Your custom logic when the actor is clicked
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("RightButton clicked!"));
