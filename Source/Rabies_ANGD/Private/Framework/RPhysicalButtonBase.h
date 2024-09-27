@@ -25,6 +25,9 @@ public:
 	UFUNCTION()
 	void OnActorClicked(AActor* TouchedActor, FKey ButtonPressed);
 
+	UPROPERTY()
+	class ARCharacterSelectController* CharacterSelectController;
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	class UStaticMeshComponent* MyMeshComponent;

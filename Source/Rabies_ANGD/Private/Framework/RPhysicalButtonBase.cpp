@@ -3,7 +3,9 @@
 
 #include "Framework/RPhysicalButtonBase.h"
 #include "Components/StaticMeshComponent.h"
+#include "Player/RCharacterSelectController.h"
 #include "Engine/Engine.h"
+#include "Engine/World.h"
 
 // Sets default values
 ARPhysicalButtonBase::ARPhysicalButtonBase()
@@ -25,6 +27,7 @@ void ARPhysicalButtonBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CharacterSelectController = Cast<ARCharacterSelectController>(GetWorld()->GetFirstPlayerController());
 }
 
 // Called every frame

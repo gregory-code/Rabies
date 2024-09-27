@@ -35,7 +35,7 @@ void AEOSPlayerState::Server_CharacterSelected_Implementation(URCharacterDefinat
 
 bool AEOSPlayerState::Server_CharacterSelected_Validate(URCharacterDefination* newSelectedCharacterDefination)
 {
-	return false;
+	return true;
 }
 
 void AEOSPlayerState::OnRep_SelectedCharacter()

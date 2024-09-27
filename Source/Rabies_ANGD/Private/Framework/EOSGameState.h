@@ -31,7 +31,7 @@ public:
 	bool bCharcterSelected(const URCharacterDefination* CharacterToCheck) const;
 	void UpdateCharacterSelection(const URCharacterDefination* Selected, const URCharacterDefination* Deselected);
 
-	void ConfirmSelection();
+	URCharacterDefination* GetDefinationFromIndex(int index);
 	
 private:
 	
@@ -51,7 +51,7 @@ private:
 	TArray<const URCharacterDefination*> SelectedCharacters;
 
 	UPROPERTY()
-	URCharacterDefination* CurrentlyHoveredCharacter;
+	class AEOSPlayerState* PlayerState;
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;

@@ -2,6 +2,7 @@
 
 
 #include "Actors/RRightButton.h"
+#include "Player/RCharacterSelectController.h"
 #include "Engine/Engine.h"
 
 void ARRightButton::OnActorClicked(AActor* TouchedActor, FKey ButtonPressed)

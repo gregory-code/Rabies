@@ -4,18 +4,17 @@
 #include "Framework/EOSGameState.h"
 #include "Net/UnrealNetwork.h"
 #include "Framework/RCharacterDefination.h"
+#include "Framework/EOSPlayerState.h"
+#include "Player/RCharacterSelectController.h"
 
 void AEOSGameState::BeginPlay()
 {
 	Super::BeginPlay();
-
-
-	CurrentlyHoveredCharacter = Characters[0];
 }
 
-void AEOSGameState::ConfirmSelection()
+URCharacterDefination* AEOSGameState::GetDefinationFromIndex(int index)
 {
-	//Server_CharacterSelected // Continue this on episode 18 5 minutes and 30 seconds in.
+	return Characters[index];
 }
 
 void AEOSGameState::SetSessionName(const FName& updatedSessionName)
