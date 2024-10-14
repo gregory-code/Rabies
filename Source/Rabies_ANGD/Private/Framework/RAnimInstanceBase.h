@@ -52,7 +52,7 @@ public:
 	float GetRightSpeed() const { return RightSpeed; }
 
 	UFUNCTION(BlueprintCallable, Category = "Animation", meta = (BlueprintThreadSafe))
-	bool GetRangedAttacking() const { return bRangedAttacking; }
+	bool GetRangedAttacking() const { return bAttacking && bIsScoping; }
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
@@ -81,7 +81,8 @@ private:
 
 	bool bIsScoping;
 
-	bool bRangedAttacking;
+	bool bAttacking;
 
+	void AttackingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 	void ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 };

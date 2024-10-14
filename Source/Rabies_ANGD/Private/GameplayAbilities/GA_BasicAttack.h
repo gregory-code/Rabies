@@ -35,4 +35,6 @@ private:
 	bool bAttackCommitted;
 
 	void SetupWaitInputTask();
+
+	void StopAttacking(FGameplayEventData Payload);
 };

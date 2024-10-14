@@ -140,12 +140,12 @@ void ARPlayerBase::QuitOut()
 void ARPlayerBase::DoBasicAttack()
 {
 	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
-	bRangedAttacking = true;
 }
 
 void ARPlayerBase::StopBasicAttack()
 {
-	bRangedAttacking = false;
+	FGameplayEventData eventData;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, URAbilityGenericTags::GetEndAttackTag(), eventData);
 }
 
 void ARPlayerBase::EnableScoping()
@@ -155,7 +155,8 @@ void ARPlayerBase::EnableScoping()
 
 void ARPlayerBase::DisableScoping()
 {
-	GetAbilitySystemComponent()->InputCancel();
+	FGameplayEventData eventData;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, URAbilityGenericTags::GetEndScopingTag(), eventData);
 }
 
 void ARPlayerBase::Scroll(const FInputActionValue& InputActionVal)

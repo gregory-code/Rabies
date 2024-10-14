@@ -7,6 +7,7 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
+#include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "AbilitySystemBlueprintLibrary.h"
 
 #include "GameplayTagsManager.h"
@@ -34,6 +35,10 @@ void UGA_BasicAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		return;
 	}
+
+	UAbilityTask_WaitGameplayEvent* WaitStopEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndAttackTag());
+	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_BasicAttack::StopAttacking);
+	WaitStopEvent->ReadyForActivation();
 
 	UAbilityTask_WaitGameplayEvent* WaitTargetAquiredEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
 	WaitTargetAquiredEvent->EventReceived.AddDynamic(this, &UGA_BasicAttack::HandleDamage);
@@ -73,4 +78,10 @@ void UGA_BasicAttack::SetupWaitInputTask()
 	UAbilityTask_WaitInputPress* WaitInputPress = UAbilityTask_WaitInputPress::WaitInputPress(this);
 	WaitInputPress->OnPress.AddDynamic(this, &UGA_BasicAttack::AbilityInputPressed);
 	WaitInputPress->ReadyForActivation();
+}
+
+void UGA_BasicAttack::StopAttacking(FGameplayEventData Payload)
+{
+	UE_LOG(LogTemp, Error, TEXT("Target attacking cancelled"));
+	K2_EndAbility();
 }

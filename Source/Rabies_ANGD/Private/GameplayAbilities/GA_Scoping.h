@@ -23,5 +23,5 @@ private:
 
 
 	UFUNCTION()
-	void StopScoping();
+	void StopScoping(FGameplayEventData Payload);
 };

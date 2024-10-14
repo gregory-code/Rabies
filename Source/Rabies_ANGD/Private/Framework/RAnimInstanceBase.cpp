@@ -28,6 +28,7 @@ void URAnimInstanceBase::NativeInitializeAnimation()
 		if (OwnerASC)
 		{
 			OwnerASC->RegisterGameplayTagEvent(URAbilityGenericTags::GetScopingTag()).AddUObject(this, &URAnimInstanceBase::ScopingTagChanged);
+			OwnerASC->RegisterGameplayTagEvent(URAbilityGenericTags::GetAttackingTag()).AddUObject(this, &URAnimInstanceBase::AttackingTagChanged);
 		}
 	}
 
@@ -44,8 +45,6 @@ void URAnimInstanceBase::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 	{
 		Speed = OwnerCharacter->GetVelocity().Length();
 		bIsJumping = OwnerMovementComp->IsFalling();
-
-		//bRangedAttacking = Cast<RPlayerBase>(OwnerCharacter)->bRangedAttacking;
 
 		FRotator characterRot = OwnerCharacter->GetActorRotation();
 		FRotator lookRot = OwnerCharacter->GetViewRotation();
@@ -70,4 +69,9 @@ void URAnimInstanceBase::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 void URAnimInstanceBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
 {
 	bIsScoping = NewStackCount != 0;
+}
+
+void URAnimInstanceBase::AttackingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
+{
+	bAttacking = NewStackCount != 0;
 }
