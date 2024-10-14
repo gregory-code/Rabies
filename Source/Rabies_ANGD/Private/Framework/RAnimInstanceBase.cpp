@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "GameFramework/Character.h"
+#include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
@@ -26,7 +27,7 @@ void URAnimInstanceBase::NativeInitializeAnimation()
 		UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TryGetPawnOwner());
 		if (OwnerASC)
 		{
-			//OwnerASC->RegisterGameplayTagEvent(URAbilityGenericTags::GetAimingTag()).AddUObject(this, &URAnimInstanceBase::AimingTagChanged);
+			OwnerASC->RegisterGameplayTagEvent(URAbilityGenericTags::GetScopingTag()).AddUObject(this, &URAnimInstanceBase::ScopingTagChanged);
 		}
 	}
 
@@ -43,6 +44,8 @@ void URAnimInstanceBase::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 	{
 		Speed = OwnerCharacter->GetVelocity().Length();
 		bIsJumping = OwnerMovementComp->IsFalling();
+
+		//bRangedAttacking = Cast<RPlayerBase>(OwnerCharacter)->bRangedAttacking;
 
 		FRotator characterRot = OwnerCharacter->GetActorRotation();
 		FRotator lookRot = OwnerCharacter->GetViewRotation();

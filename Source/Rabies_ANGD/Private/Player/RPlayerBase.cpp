@@ -94,6 +94,7 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(jumpInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Jump);
 		enhancedInputComp->BindAction(QuitOutAction, ETriggerEvent::Triggered, this, &ARPlayerBase::QuitOut);
 		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DoBasicAttack);
+		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Canceled, this, &ARPlayerBase::StopBasicAttack);
 		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Started, this, &ARPlayerBase::EnableScoping);
 		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DisableScoping);
 		enhancedInputComp->BindAction(scrollInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Scroll);
@@ -139,6 +140,12 @@ void ARPlayerBase::QuitOut()
 void ARPlayerBase::DoBasicAttack()
 {
 	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
+	bRangedAttacking = true;
+}
+
+void ARPlayerBase::StopBasicAttack()
+{
+	bRangedAttacking = false;
 }
 
 void ARPlayerBase::EnableScoping()
