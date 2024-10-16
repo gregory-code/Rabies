@@ -29,8 +29,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SceneComponent.h"
 
-#define ECC_RangedAttack ECC_GameTraceChannel2
-
 ARPlayerBase::ARPlayerBase()
 {
 	viewPivot = CreateDefaultSubobject<USceneComponent>("Camera Pivot");

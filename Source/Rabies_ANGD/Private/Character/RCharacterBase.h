@@ -52,16 +52,20 @@ public:
 public:
 	FORCEINLINE bool IsScoping() const { return bIsScoping; }
 
+	UFUNCTION()
+	AActor* Hitscan(float range, float sphereRadius);
+
 private:
 
 	void ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 	virtual void ScopingTagChanged(bool bNewIsAiming) {/*empty in base*/ };
 	bool bIsScoping;
+	FHitResult hitResult;
 
 	UPROPERTY(VisibleAnywhere, Category = "Gameplay Ability")
 	URAbilitySystemComponent* AbilitySystemComponent;
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	URAttributeSet* AttributeSet;
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")

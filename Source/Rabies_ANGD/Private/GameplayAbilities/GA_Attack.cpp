@@ -10,6 +10,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "Character/RCharacterBase.h"
 #include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -62,8 +63,23 @@ void UGA_Attack::HandleDamage(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
+		ARCharacterBase* player = Cast<ARCharacterBase>(GetOwningActorFromActorInfo());
+		if (player)
+		{
+			AActor* hitActor = player->Hitscan(300, 1);
+			if (hitActor)
+			{
+				Payload.Target = Cast<ARCharacterBase>(hitActor);
+				if (Payload.Target != nullptr)
+				{
+					UE_LOG(LogTemp, Error, TEXT("Attacking FRIEND"));
+					FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
+				}
+			}
+		}
+		//FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+		//ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
 		//ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
 	}
 }
