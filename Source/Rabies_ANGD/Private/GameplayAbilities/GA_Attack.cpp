@@ -60,7 +60,6 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 
 void UGA_Attack::HandleDamage(FGameplayEventData Payload)
 {
-	UE_LOG(LogTemp, Error, TEXT("Getting attacked handling gameplay"));
 	if (K2_HasAuthority())
 	{
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));

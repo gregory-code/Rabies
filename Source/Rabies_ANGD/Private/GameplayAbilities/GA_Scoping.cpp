@@ -7,6 +7,8 @@
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "GameplayAbilities/RAbilitySystemComponent.h"
+
 #include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -32,21 +34,27 @@ void UGA_Scoping::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_Scoping::StopScoping);
 	WaitStopEvent->ReadyForActivation();
 
-	ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
-	if (player)
+	if (K2_HasAuthority())
 	{
-		player->SetMovementSpeed(player->BaseScopingSpeed);
-		UE_LOG(LogTemp, Error, TEXT("Scoping speed"));
+		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(ScopeSlowdownClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
+		//ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
 	}
 }
 
 void UGA_Scoping::StopScoping(FGameplayEventData Payload)
 {
-	ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
-	if (player)
+	URAbilitySystemComponent* AbilitySystem = Cast<URAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+	if (AbilitySystem)
 	{
-		player->SetMovementSpeed(player->BaseMovementSpeed);
-		UE_LOG(LogTemp, Error, TEXT("Regular walking Speed"));
+		FGameplayEffectQuery Query;
+		Query.EffectDefinition = ScopeSlowdownClass;
+
+		const TArray<FActiveGameplayEffectHandle>& ActiveEffects = AbilitySystem->GetActiveEffects(Query);
+		if (ActiveEffects.Num() > 0)
+		{
+			AbilitySystem->RemoveActiveGameplayEffect(ActiveEffects[0]);
+		}
 	}
 
 	K2_EndAbility();

@@ -61,13 +61,16 @@ void ARPlayerBase::Tick(float DeltaTime)
 	{
 		FRotator playerRot = viewPivot->GetRelativeRotation();
 		playerRot.Roll = 0;
-		SetActorRotation(playerRot);
+		SetActorRotation(playerRot); // replciate this movement as well as Movement Component
 	}
 }
 
 void ARPlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//SetReplicates(true);
+	//SetReplicateMovement(true);
 
 	playerController = Cast<ARPlayerController>(GetController());
 }
@@ -95,7 +98,7 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(lookInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Look);
 		enhancedInputComp->BindAction(jumpInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Jump);
 		enhancedInputComp->BindAction(QuitOutAction, ETriggerEvent::Triggered, this, &ARPlayerBase::QuitOut);
-		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Started, this, &ARPlayerBase::DoBasicAttack);
+		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DoBasicAttack);
 		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Completed, this, &ARPlayerBase::StopBasicAttack);
 		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Started, this, &ARPlayerBase::EnableScoping);
 		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Completed, this, &ARPlayerBase::DisableScoping);

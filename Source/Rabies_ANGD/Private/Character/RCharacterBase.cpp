@@ -39,6 +39,7 @@ ARCharacterBase::ARCharacterBase()
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetHealthAttribute()).AddUObject(this, &ARCharacterBase::HealthUpdated);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &ARCharacterBase::MaxHealthUpdated);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMovementSpeedAttribute()).AddUObject(this, &ARCharacterBase::MovementSpeedUpdated);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetScopingTag()).AddUObject(this, &ARCharacterBase::ScopingTagChanged);
 
 	HealthBarWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Status Widget Comp");
@@ -64,14 +65,7 @@ void ARCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	InitStatusHUD();
-
-	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
-	GetCharacterMovement()->BrakingDecelerationWalking = BaseBreakingSpeed;
-	GetCharacterMovement()->MaxAcceleration = BaseAcceleration;
-	GetCharacterMovement()->JumpZVelocity = BaseJumpHeight;
-	GetCharacterMovement()->GravityScale = BaseGravity;
 }
-
 
 
 // Called every frame
@@ -116,8 +110,15 @@ void ARCharacterBase::InitStatusHUD()
 
 	HealthBar->SetRenderScale(FVector2D{ 0.5f });
 
-	UE_LOG(LogTemp, Error, TEXT("health is: %d / %d"), AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
-	HealthBar->SetHealth(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
+	if (AttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("health is: %d / %d"), AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
+		HealthBar->SetHealth(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s NO ATTRIBUTE SET"), *GetName());
+	}
 
 	if (IsLocallyControlled())
 	{
@@ -131,11 +132,6 @@ UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-void ARCharacterBase::SetMovementSpeed(float newSpeed)
-{
-	GetCharacterMovement()->MaxWalkSpeed = newSpeed;
-}
-
 void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
 {
 	bIsScoping = !bIsScoping;
@@ -144,6 +140,12 @@ void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 New
 
 void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 {
+	if (!AttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s NO ATTRIBUTE SET"), *GetName());
+		return;
+	}
+
 	if (HealthBar)
 		HealthBar->SetHealth(ChangeData.NewValue, AttributeSet->GetMaxHealth());
 
@@ -161,16 +163,27 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 
 	if (ChangeData.NewValue <= 0)
 	{
-		ARGameMode* GameMode = GetWorld()->GetAuthGameMode<ARGameMode>();
-		GameMode->GameOver();
+		//ARGameMode* GameMode = GetWorld()->GetAuthGameMode<ARGameMode>();
+		//GameMode->GameOver();
 		// die
 	}
 }
 
 void ARCharacterBase::MaxHealthUpdated(const FOnAttributeChangeData& ChangeData)
 {
+	if (!AttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s NO ATTRIBUTE SET"), *GetName());
+		return;
+	}
+
 	if (HealthBar)
 		HealthBar->SetHealth(AttributeSet->GetHealth(), ChangeData.NewValue);
+}
+
+void ARCharacterBase::MovementSpeedUpdated(const FOnAttributeChangeData& ChangeData)
+{
+	GetCharacterMovement()->MaxWalkSpeed = ChangeData.NewValue;
 }
 
 void ARCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
