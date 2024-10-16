@@ -1,22 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameplayAbilities/GA_BasicAttack.h"
-#include "GameplayAbilities/RAbilityGenericTags.h"
+#include "GameplayAbilities/GA_Attack.h"
 
+#include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
-#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayAbilities/RAbilityGenericTags.h"
 
-#include "GameplayTagsManager.h"
+#include "Player/RPlayerBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
-UGA_BasicAttack::UGA_BasicAttack()
+UGA_Attack::UGA_Attack()
 {
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("ability.attack.activate"));
 	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("ability.attack.activate"));
-	ActivationBlockedTags.AddTag(URAbilityGenericTags::GetScopingTag());
+	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetAttackingTag());
 
 	FAbilityTriggerData TriggerData;
 	TriggerData.TriggerTag = URAbilityGenericTags::GetBasicAttackActivationTag();
@@ -24,35 +25,42 @@ UGA_BasicAttack::UGA_BasicAttack()
 	AbilityTriggers.Add(TriggerData);
 }
 
-void UGA_BasicAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	UE_LOG(LogTemp, Error, TEXT("Using ability"));
+	//Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
+		UE_LOG(LogTemp, Error, TEXT("Ending Attack no commitment"));
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		return;
 	}
 
-	UAbilityTask_WaitGameplayEvent* WaitStopEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndAttackTag());
-	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_BasicAttack::StopAttacking);
-	WaitStopEvent->ReadyForActivation();
+	if (!HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Ending Attack no authority"));
+		K2_EndAbility();
+		return;
+	}
 
 	UAbilityTask_WaitGameplayEvent* WaitTargetAquiredEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
-	WaitTargetAquiredEvent->EventReceived.AddDynamic(this, &UGA_BasicAttack::HandleDamage);
+	WaitTargetAquiredEvent->EventReceived.AddDynamic(this, &UGA_Attack::HandleDamage);
 	WaitTargetAquiredEvent->ReadyForActivation();
 
-	SetupWaitInputTask();
-
 	UAbilityTask_WaitGameplayEvent* WaitForActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetBasicAttackActivationTag());
-	WaitForActivation->EventReceived.AddDynamic(this, &UGA_BasicAttack::TryCommitAttack);
+	WaitForActivation->EventReceived.AddDynamic(this, &UGA_Attack::TryCommitAttack);
 	WaitForActivation->ReadyForActivation();
+
+	UAbilityTask_WaitGameplayEvent* WaitStopEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndAttackTag());
+	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_Attack::StopAttacking);
+	WaitStopEvent->ReadyForActivation();
+
+	SetupWaitInputTask();
 }
 
-void UGA_BasicAttack::HandleDamage(FGameplayEventData Payload)
+void UGA_Attack::HandleDamage(FGameplayEventData Payload)
 {
+	UE_LOG(LogTemp, Error, TEXT("Getting attacked handling gameplay"));
 	if (K2_HasAuthority())
 	{
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
@@ -61,27 +69,27 @@ void UGA_BasicAttack::HandleDamage(FGameplayEventData Payload)
 	}
 }
 
-void UGA_BasicAttack::TryCommitAttack(FGameplayEventData Payload)
+void UGA_Attack::TryCommitAttack(FGameplayEventData Payload)
 {
 	HandleDamage(Payload);
 	bAttackCommitted = true;
 }
 
-void UGA_BasicAttack::AbilityInputPressed(float TimeWaited)
+void UGA_Attack::AbilityInputPressed(float TimeWaited)
 {
 	SetupWaitInputTask();
 	TryCommitAttack(FGameplayEventData());
 }
 
-void UGA_BasicAttack::SetupWaitInputTask()
+void UGA_Attack::SetupWaitInputTask()
 {
 	UAbilityTask_WaitInputPress* WaitInputPress = UAbilityTask_WaitInputPress::WaitInputPress(this);
-	WaitInputPress->OnPress.AddDynamic(this, &UGA_BasicAttack::AbilityInputPressed);
+	WaitInputPress->OnPress.AddDynamic(this, &UGA_Attack::AbilityInputPressed);
 	WaitInputPress->ReadyForActivation();
 }
 
-void UGA_BasicAttack::StopAttacking(FGameplayEventData Payload)
+void UGA_Attack::StopAttacking(FGameplayEventData Payload)
 {
-	UE_LOG(LogTemp, Error, TEXT("Target attacking cancelled"));
+	UE_LOG(LogTemp, Error, TEXT("Attacking cancelled"));
 	K2_EndAbility();
 }

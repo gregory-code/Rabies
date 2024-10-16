@@ -29,6 +29,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SceneComponent.h"
 
+#define ECC_RangedAttack ECC_GameTraceChannel2
+
 ARPlayerBase::ARPlayerBase()
 {
 	viewPivot = CreateDefaultSubobject<USceneComponent>("Camera Pivot");
@@ -93,10 +95,10 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(lookInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Look);
 		enhancedInputComp->BindAction(jumpInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Jump);
 		enhancedInputComp->BindAction(QuitOutAction, ETriggerEvent::Triggered, this, &ARPlayerBase::QuitOut);
-		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DoBasicAttack);
-		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Canceled, this, &ARPlayerBase::StopBasicAttack);
+		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Started, this, &ARPlayerBase::DoBasicAttack);
+		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Completed, this, &ARPlayerBase::StopBasicAttack);
 		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Started, this, &ARPlayerBase::EnableScoping);
-		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DisableScoping);
+		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Completed, this, &ARPlayerBase::DisableScoping);
 		enhancedInputComp->BindAction(scrollInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Scroll);
 		enhancedInputComp->BindAction(specialAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateSpecialAttack);
 		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::TryActivateUltimateAttack);
@@ -212,7 +214,7 @@ void ARPlayerBase::Interact()
 
 void ARPlayerBase::Pause()
 {
-	ARGameMode* GameMode = GetWorld()->GetAuthGameMode<ARGameMode>();
+	/*ARGameMode* GameMode = GetWorld()->GetAuthGameMode<ARGameMode>();
 	isPaused = !isPaused;
 
 	if (isPaused)
@@ -224,7 +226,7 @@ void ARPlayerBase::Pause()
 	{
 		GameMode->PausingGame(isPaused);
 		//Return all controls to the characters when they are unpaused.
-	}
+	}*/
 }
 
 FVector ARPlayerBase::GetMoveFwdDir() const

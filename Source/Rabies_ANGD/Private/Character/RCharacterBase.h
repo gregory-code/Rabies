@@ -52,6 +52,27 @@ public:
 public:
 	FORCEINLINE bool IsScoping() const { return bIsScoping; }
 
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	float BaseMovementSpeed = 10;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	float BaseScopingSpeed = 10;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	float BaseBreakingSpeed = 10;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	float BaseAcceleration = 10;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	float BaseJumpHeight = 10;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	float BaseGravity = 10;
+
+	UFUNCTION()
+	void SetMovementSpeed(float newSpeed);
+
 private:
 
 	void ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
@@ -72,6 +93,7 @@ private:
 
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void MaxHealthUpdated(const FOnAttributeChangeData& ChangeData);
+
 
 private:
 

@@ -64,7 +64,15 @@ void ARCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	InitStatusHUD();
+
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+	GetCharacterMovement()->BrakingDecelerationWalking = BaseBreakingSpeed;
+	GetCharacterMovement()->MaxAcceleration = BaseAcceleration;
+	GetCharacterMovement()->JumpZVelocity = BaseJumpHeight;
+	GetCharacterMovement()->GravityScale = BaseGravity;
 }
+
+
 
 // Called every frame
 void ARCharacterBase::Tick(float DeltaTime)
@@ -121,6 +129,11 @@ void ARCharacterBase::InitStatusHUD()
 UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ARCharacterBase::SetMovementSpeed(float newSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = newSpeed;
 }
 
 void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)

@@ -7,6 +7,9 @@
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "Player/RPlayerBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 UGA_Scoping::UGA_Scoping()
 {
 	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetScopingTag());
@@ -14,6 +17,12 @@ UGA_Scoping::UGA_Scoping()
 
 void UGA_Scoping::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	if (!HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Ending scope no authority"));
+		K2_EndAbility();
+		return;
+	}
 
 	//UAbilityTask_WaitCancel* WaitCancel = UAbilityTask_WaitCancel::WaitCancel(this);
 	//WaitCancel->OnCancel.AddDynamic(this, &UGA_Scoping::StopScoping); // Use a WaitEvent instead of waitCancel, WaitCancel is a generic keyword used a lot
@@ -23,16 +32,22 @@ void UGA_Scoping::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_Scoping::StopScoping);
 	WaitStopEvent->ReadyForActivation();
 
-	if (!HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
+	ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
+	if (player)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Ending scope no authority"));
-		K2_EndAbility();
-		return;
+		player->SetMovementSpeed(player->BaseScopingSpeed);
+		UE_LOG(LogTemp, Error, TEXT("Scoping speed"));
 	}
 }
 
 void UGA_Scoping::StopScoping(FGameplayEventData Payload)
 {
-	UE_LOG(LogTemp, Error, TEXT("Target scoping cancelled"));
+	ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
+	if (player)
+	{
+		player->SetMovementSpeed(player->BaseMovementSpeed);
+		UE_LOG(LogTemp, Error, TEXT("Regular walking Speed"));
+	}
+
 	K2_EndAbility();
 }
