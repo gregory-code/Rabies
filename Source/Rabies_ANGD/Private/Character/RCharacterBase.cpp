@@ -155,7 +155,7 @@ AActor* ARCharacterBase::Hitscan(float range, float sphereRadius)
 
 void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
 {
-	bIsScoping = !bIsScoping;
+	bIsScoping = NewStackCount != 0;
 	ScopingTagChanged(bIsScoping);
 }
 
@@ -204,8 +204,33 @@ void ARCharacterBase::MaxHealthUpdated(const FOnAttributeChangeData& ChangeData)
 
 void ARCharacterBase::MovementSpeedUpdated(const FOnAttributeChangeData& ChangeData)
 {
-	UE_LOG(LogTemp, Error, TEXT("Speed is: %d / and their new walk speed is: %d"), AttributeSet->GetMovementSpeed(), ChangeData.NewValue);
-	GetCharacterMovement()->MaxWalkSpeed = ChangeData.NewValue;
+	if (!AttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s NO ATTRIBUTE SET"), *GetName());
+		return;
+	}
+
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Speed is: %f / and their new walk speed is: %f"), AttributeSet->GetMovementSpeed(), ChangeData.NewValue);
+		GetCharacterMovement()->MaxWalkSpeed = ChangeData.NewValue;
+	}
+}
+
+void ARCharacterBase::ClientPlayAnimMontage_Implementation(UAnimMontage* montage)
+{
+	if (!HasAuthority())
+	{
+		PlayAnimMontage(montage);
+	}
+}
+
+void ARCharacterBase::ClientStopAnimMontage_Implementation(UAnimMontage* montage)
+{
+	if (!HasAuthority())
+	{
+		StopAnimMontage(montage);
+	}
 }
 
 void ARCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

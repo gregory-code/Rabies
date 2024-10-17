@@ -94,7 +94,8 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	{
 		enhancedInputComp->BindAction(moveInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Move);
 		enhancedInputComp->BindAction(lookInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Look);
-		enhancedInputComp->BindAction(jumpInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Jump);
+		enhancedInputComp->BindAction(jumpInputAction, ETriggerEvent::Started, this, &ARPlayerBase::StartJump);
+		enhancedInputComp->BindAction(jumpInputAction, ETriggerEvent::Completed, this, &ARPlayerBase::ReleaseJump);
 		enhancedInputComp->BindAction(QuitOutAction, ETriggerEvent::Triggered, this, &ARPlayerBase::QuitOut);
 		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Triggered, this, &ARPlayerBase::DoBasicAttack);
 		enhancedInputComp->BindAction(basicAttackAction, ETriggerEvent::Completed, this, &ARPlayerBase::StopBasicAttack);
@@ -129,6 +130,34 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 	newRot.Pitch = FMath::ClampAngle(newRot.Pitch, cameraClampMin, cameraClampMax);
 
 	viewPivot->SetWorldRotation(newRot);
+}
+
+void ARPlayerBase::StartJump()
+{
+	GetWorldTimerManager().ClearTimer(SuperJumpHandle);
+	CurrentJumpHoldDuration = SuperJumpHoldDuration;
+	SuperJumpHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARPlayerBase::HoldJump, CurrentJumpHoldDuration));
+}
+
+void ARPlayerBase::HoldJump(float timeRemaining)
+{
+	if (CurrentJumpHoldDuration > 0)
+	{
+		CurrentJumpHoldDuration -= GetWorld()->GetDeltaSeconds();
+		SuperJumpHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARPlayerBase::HoldJump, CurrentJumpHoldDuration));
+	}
+}
+
+void ARPlayerBase::ReleaseJump()
+{
+	if (CurrentJumpHoldDuration <= 0)
+	{
+		PlayAnimMontage(SuperJumpAnimMontage);
+	}
+	else
+	{
+		Jump();
+	}
 }
 
 void ARPlayerBase::QuitOut()
@@ -244,7 +273,7 @@ FVector ARPlayerBase::GetMoveRightDir() const
 
 void ARPlayerBase::ScopingTagChanged(bool bNewIsAiming)
 {
-	//bUseControllerRotationYaw = bNewIsAiming;
+	bUseControllerRotationYaw = bNewIsAiming;
 	bIsScoping = bNewIsAiming;
 	GetCharacterMovement()->bOrientRotationToMovement = !bNewIsAiming;
 

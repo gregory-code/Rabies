@@ -10,6 +10,8 @@
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+
 #include "Character/RCharacterBase.h"
 #include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -34,13 +36,6 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	{
 		UE_LOG(LogTemp, Error, TEXT("Ending Attack no commitment"));
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-		return;
-	}
-
-	if (!HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
-	{
-		UE_LOG(LogTemp, Error, TEXT("Ending Attack no authority"));
-		K2_EndAbility();
 		return;
 	}
 
@@ -69,13 +64,16 @@ void UGA_Attack::HandleDamage(FGameplayEventData Payload)
 			AActor* hitActor = player->Hitscan(300, 1);
 			if (hitActor)
 			{
-				Payload.Target = Cast<ARCharacterBase>(hitActor);
-				if (Payload.Target != nullptr)
+				if (hitActor == GetOwningActorFromActorInfo() || !Cast<ARPlayerBase>(hitActor))
 				{
-					UE_LOG(LogTemp, Error, TEXT("Attacking FRIEND"));
-					FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
+					return;
 				}
+
+				Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(hitActor);
+
+				UE_LOG(LogTemp, Error, TEXT("Attacking FRIEND"));
+				FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
 			}
 		}
 		//FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));

@@ -69,6 +69,11 @@ private:
 	UInputAction* jumpInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	float SuperJumpHoldDuration = 1;
+
+	float CurrentJumpHoldDuration;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* scopeInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -105,6 +110,15 @@ private:
 
 	UFUNCTION()
 	void Look(const FInputActionValue& InputValue);
+
+	UFUNCTION()
+	void StartJump();
+
+	UFUNCTION()
+	void HoldJump(float timeRemaining);
+
+	UFUNCTION()
+	void ReleaseJump();
 
 	UFUNCTION()
 	void QuitOut();
@@ -151,6 +165,7 @@ private:
 	void LerpCameraToLocalOffset(const FVector& LocalOffset);
 	void TickCameraLocalOffset(FVector Goal);
 	FTimerHandle CameraLerpHandle;
+	FTimerHandle SuperJumpHandle;
 
 	float cameraClampMin;
 	float cameraClampMax;
@@ -173,5 +188,12 @@ private:
 
 	public:
 	void SetPausetoFalse();
+
+	/////////////////////////////////
+	/*          Anim	           */
+	////////////////////////////////
+
+	UPROPERTY(EditDefaultsOnly, Category = "Anim")
+	UAnimMontage* SuperJumpAnimMontage;
 
 };

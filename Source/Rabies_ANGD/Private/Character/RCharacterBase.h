@@ -78,6 +78,13 @@ private:
 	void MaxHealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void MovementSpeedUpdated(const FOnAttributeChangeData& ChangeData);
 
+public:
+	UFUNCTION(NetMulticast, Unreliable)
+	void ClientPlayAnimMontage(UAnimMontage* montage);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void ClientStopAnimMontage(UAnimMontage* montage);
+
 
 private:
 
