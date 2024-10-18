@@ -30,10 +30,10 @@ public:
 
 	bool bRangedAttacking;
 
-private:
-
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	class ARPlayerController* playerController;
+
+private:
 
 	UPROPERTY(VisibleAnywhere, Category = "View")
 	USceneComponent* viewPivot;
@@ -115,9 +115,6 @@ private:
 	void StartJump();
 
 	UFUNCTION()
-	void HoldJump(float timeRemaining);
-
-	UFUNCTION()
 	void ReleaseJump();
 
 	UFUNCTION()
@@ -165,7 +162,6 @@ private:
 	void LerpCameraToLocalOffset(const FVector& LocalOffset);
 	void TickCameraLocalOffset(FVector Goal);
 	FTimerHandle CameraLerpHandle;
-	FTimerHandle SuperJumpHandle;
 
 	float cameraClampMin;
 	float cameraClampMax;
@@ -177,7 +173,7 @@ private:
 
 	bool canInteract;
 
-	public:
+public:
 	void SetInteraction(bool setInteract);
 
 	/////////////////////////////////
@@ -186,14 +182,20 @@ private:
 
 	bool isPaused;
 
-	public:
 	void SetPausetoFalse();
 
 	/////////////////////////////////
 	/*          Anim	           */
 	////////////////////////////////
 
-	UPROPERTY(EditDefaultsOnly, Category = "Anim")
-	UAnimMontage* SuperJumpAnimMontage;
+	/////////////////////////////////
+	/*          Passives           */
+	////////////////////////////////
 
+private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Passive")
+	bool bInstantJump;
+
+	bool bHoldingJump = false;
 };

@@ -43,6 +43,7 @@ ARCharacterBase::ARCharacterBase()
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &ARCharacterBase::MaxHealthUpdated);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMovementSpeedAttribute()).AddUObject(this, &ARCharacterBase::MovementSpeedUpdated);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetScopingTag()).AddUObject(this, &ARCharacterBase::ScopingTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetFlyingTag()).AddUObject(this, &ARCharacterBase::FlyingTagChanged);
 
 	HealthBarWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Status Widget Comp");
 	HealthBarWidgetComp->SetupAttachment(GetRootComponent());
@@ -157,6 +158,12 @@ void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 New
 {
 	bIsScoping = NewStackCount != 0;
 	ScopingTagChanged(bIsScoping);
+}
+
+void ARCharacterBase::FlyingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
+{
+	bIsFlying = NewStackCount != 0;
+	FlyingTagChanged(bIsFlying);
 }
 
 void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)

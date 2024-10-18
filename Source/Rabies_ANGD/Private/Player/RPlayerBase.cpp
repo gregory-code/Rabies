@@ -7,12 +7,11 @@
 #include "EnhancedInputComponent.h"
 #include "Player/RPlayerController.h"
 
-#include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAttributeSet.h"
+#include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
-#include "GameplayAbilities/RAbilityGenericTags.h"
 #include "Animation/AnimInstance.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
@@ -43,6 +42,7 @@ ARPlayerBase::ARPlayerBase()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(1080.f);
 	GetCharacterMovement()->JumpZVelocity = 600.f;
+	GetCharacterMovement()->AirControl = 0.7f;
 
 	cameraClampMax = 10;
 	cameraClampMin = -60;
@@ -54,6 +54,19 @@ void ARPlayerBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	viewPivot->SetRelativeLocation(GetActorLocation()); // centers the pivot on the player without getting the players rotation
+
+	if (IsFlying() && GetCharacterMovement()->IsFalling() == false && bHoldingJump == false)
+	{
+		FGameplayEventData eventData;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, URAbilityGenericTags::GetEndFlyingTag(), eventData);
+	}
+
+	if (IsFlying() && bHoldingJump)
+	{
+		FVector NewVelocity = GetVelocity();
+		NewVelocity.Z = FMath::Lerp(NewVelocity.Z, -0.1f, 4 * DeltaTime);
+		GetCharacterMovement()->Velocity = NewVelocity;
+	}
 	
 	if (bIsScoping)
 	{
@@ -66,9 +79,6 @@ void ARPlayerBase::Tick(float DeltaTime)
 void ARPlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//SetReplicates(true);
-	//SetReplicateMovement(true);
 
 	playerController = Cast<ARPlayerController>(GetController());
 }
@@ -113,6 +123,8 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void ARPlayerBase::Move(const FInputActionValue& InputValue)
 {
+	if (GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetUnActionableTag()) || GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag())) return;
+
 	FVector2D input = InputValue.Get<FVector2D>();
 	input.Normalize();
 
@@ -134,27 +146,25 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 
 void ARPlayerBase::StartJump()
 {
-	GetWorldTimerManager().ClearTimer(SuperJumpHandle);
-	CurrentJumpHoldDuration = SuperJumpHoldDuration;
-	SuperJumpHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARPlayerBase::HoldJump, CurrentJumpHoldDuration));
-}
-
-void ARPlayerBase::HoldJump(float timeRemaining)
-{
-	if (CurrentJumpHoldDuration > 0)
+	if (bInstantJump)
 	{
-		CurrentJumpHoldDuration -= GetWorld()->GetDeltaSeconds();
-		SuperJumpHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARPlayerBase::HoldJump, CurrentJumpHoldDuration));
+		Jump();
+		return;
 	}
+
+	bHoldingJump = true;
+	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::Passive); // Dot's jump fly
 }
 
 void ARPlayerBase::ReleaseJump()
 {
-	if (CurrentJumpHoldDuration <= 0)
-	{
-		PlayAnimMontage(SuperJumpAnimMontage);
-	}
-	else
+	if (bInstantJump) return;
+
+	FGameplayEventData eventData;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, URAbilityGenericTags::GetEndTakeOffChargeTag(), eventData);
+
+	bHoldingJump = false;
+	if (!IsFlying())
 	{
 		Jump();
 	}

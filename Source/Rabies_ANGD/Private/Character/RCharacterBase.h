@@ -51,6 +51,7 @@ public:
 
 public:
 	FORCEINLINE bool IsScoping() const { return bIsScoping; }
+	FORCEINLINE bool IsFlying() const { return bIsFlying; }
 
 	UFUNCTION()
 	AActor* Hitscan(float range, float sphereRadius);
@@ -60,6 +61,10 @@ private:
 	void ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 	virtual void ScopingTagChanged(bool bNewIsAiming) {/*empty in base*/ };
 	bool bIsScoping;
+
+	void FlyingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
+	virtual void FlyingTagChanged(bool bNewIsAiming) {/*empty in base*/ };
+	bool bIsFlying;
 	FHitResult hitResult;
 
 	UPROPERTY(VisibleAnywhere, Category = "Gameplay Ability")
