@@ -33,6 +33,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	class ARPlayerController* playerController;
 
+	UPROPERTY()
+	FVector2D MoveInput;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "View")

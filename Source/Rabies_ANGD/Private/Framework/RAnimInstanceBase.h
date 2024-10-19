@@ -61,7 +61,7 @@ public:
 	bool GetFlying() const { return bFlying; }
 
 	UFUNCTION(BlueprintCallable, Category = "Animation", meta = (BlueprintThreadSafe))
-	bool IsMovingInAir() const { return AirSpeed != 0; }
+	bool IsMovingInAir() const { return AirSpeed >= 250; }
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")

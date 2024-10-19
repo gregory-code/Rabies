@@ -41,6 +41,8 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	if (Player == nullptr)
 		return;
 
+	bFlying = false;
+
 	UAbilityTask_WaitGameplayEvent* EndFlyingEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndFlyingTag());
 	EndFlyingEvent->EventReceived.AddDynamic(this, &UGA_DotFlying::StopFlying);
 	EndFlyingEvent->ReadyForActivation();
@@ -48,7 +50,7 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	UAbilityTask_WaitGameplayEvent* EndTakeOffEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndTakeOffChargeTag());
 	EndTakeOffEvent->EventReceived.AddDynamic(this, &UGA_DotFlying::StopTakeOff);
 	EndTakeOffEvent->ReadyForActivation();
-
+	
 	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
 	CurrentHoldDuration = 0;
 
@@ -77,13 +79,22 @@ void UGA_DotFlying::StopFlying(FGameplayEventData Payload)
 	Player->playerController->ChangeTakeOffState(false, 0);
 	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
 
+	Player->PlayAnimMontage(HardLandingMontage);
+
 	K2_EndAbility();
 }
 
 void UGA_DotFlying::StopTakeOff(FGameplayEventData Payload)
 {
+	if (bFlying)
+	{
+		return;
+	}
+
 	Player->playerController->ChangeTakeOffState(false, 0);
 	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
+
+	K2_EndAbility();
 }
 
 void UGA_DotFlying::Hold(float timeRemaining)
@@ -97,12 +108,15 @@ void UGA_DotFlying::Hold(float timeRemaining)
 	}
 	else
 	{
+		bFlying = true;
+
 		Player->playerController->ChangeTakeOffState(false, 0);
 		GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
 
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(FlyingSpeedClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
 
+		Player->GetAbilitySystemComponent()->AddLooseGameplayTag(URAbilityGenericTags::GetTakeOffDelayTag());
 		Player->GetAbilitySystemComponent()->AddLooseGameplayTag(URAbilityGenericTags::GetUnActionableTag());
 		Player->GetAbilitySystemComponent()->AddLooseGameplayTag(URAbilityGenericTags::GetFlyingTag());
 		Player->PlayAnimMontage(TakeOffMontage);

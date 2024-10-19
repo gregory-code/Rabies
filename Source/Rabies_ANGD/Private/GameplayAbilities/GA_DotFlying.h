@@ -26,6 +26,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Anim")
 	UAnimMontage* TakeOffMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Anim")
+	UAnimMontage* HardLandingMontage;
+
 	UFUNCTION()
 	void StopFlying(FGameplayEventData Payload);
 
@@ -35,6 +38,7 @@ private:
 	FTimerHandle TakeOffHandle;
 
 	float CurrentHoldDuration;
+	bool bFlying;
 
 	void Hold(float timeRemaining);
 
