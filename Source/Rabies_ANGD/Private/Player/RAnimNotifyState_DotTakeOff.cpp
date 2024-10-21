@@ -28,7 +28,7 @@ void URAnimNotifyState_DotTakeOff::NotifyTick(USkeletalMeshComponent* MeshComp, 
 	if (!Player) return;
 
 	FVector NewVelocity = Player->GetVelocity();
-	NewVelocity.Z += 1200;
+	NewVelocity.Z += 40;
 	Player->GetCharacterMovement()->Velocity = NewVelocity;
 }
 
