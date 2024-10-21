@@ -82,11 +82,11 @@ void ARCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	SetupAbilitySystemComponent();
-	InitAttributes();
-	InitAbilities();
+	//SetupAbilitySystemComponent();
+	//InitAttributes();
+	//InitAbilities();
 
-	if (NewController && !NewController->IsPlayerController())
+	if (NewController && NewController->IsPlayerController())
 	{
 		SetupAbilitySystemComponent();
 		InitAttributes();
@@ -137,7 +137,7 @@ UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
 
 AActor* ARCharacterBase::Hitscan(float range, float sphereRadius)
 {
-	FVector lineStart = GetActorLocation() + (GetActorForwardVector() * 70);
+	FVector lineStart = GetMesh()->GetSocketLocation(RangedAttackSocketName);
 	FVector lineEnd = lineStart + GetActorForwardVector() * range;
 	DrawDebugLine(GetWorld(), lineStart, lineEnd, FColor::Green);
 
@@ -217,11 +217,8 @@ void ARCharacterBase::MovementSpeedUpdated(const FOnAttributeChangeData& ChangeD
 		return;
 	}
 
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Speed is: %f / and their new walk speed is: %f"), AttributeSet->GetMovementSpeed(), ChangeData.NewValue);
-		GetCharacterMovement()->MaxWalkSpeed = ChangeData.NewValue;
-	}
+	UE_LOG(LogTemp, Error, TEXT("Speed is: %f / and their new walk speed is: %f"), AttributeSet->GetMovementSpeed(), ChangeData.NewValue);
+	GetCharacterMovement()->MaxWalkSpeed = ChangeData.NewValue;
 }
 
 void ARCharacterBase::ClientPlayAnimMontage_Implementation(UAnimMontage* montage)

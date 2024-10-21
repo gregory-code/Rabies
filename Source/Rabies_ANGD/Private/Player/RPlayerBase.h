@@ -36,6 +36,8 @@ public:
 	UPROPERTY()
 	FVector2D MoveInput;
 
+	bool bHoldingJump = false;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "View")
@@ -70,11 +72,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* jumpInputAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	float SuperJumpHoldDuration = 1;
-
-	float CurrentJumpHoldDuration;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* scopeInputAction;
@@ -199,6 +196,4 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Passive")
 	bool bInstantJump;
-
-	bool bHoldingJump = false;
 };

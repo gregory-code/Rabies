@@ -66,6 +66,7 @@ private:
 	virtual void FlyingTagChanged(bool bNewIsAiming) {/*empty in base*/ };
 	bool bIsFlying;
 	FHitResult hitResult;
+	FName RangedAttackSocketName = TEXT("Ranged_Socket");
 
 	UPROPERTY(VisibleAnywhere, Category = "Gameplay Ability")
 	URAbilitySystemComponent* AbilitySystemComponent;

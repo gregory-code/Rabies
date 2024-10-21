@@ -298,6 +298,7 @@ void ARPlayerBase::ScopingTagChanged(bool bNewIsAiming)
 	}
 	else
 	{
+		DisableScoping();
 		cameraClampMax = 10;
 		cameraClampMin = -60;
 		LerpCameraToLocalOffset(DefaultCameraLocal);

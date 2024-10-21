@@ -56,8 +56,9 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 	if (!Player->GetCharacterMovement() || Player->GetCharacterMovement()->IsFalling()) return;
 
-	Player->playerController->ChangeTakeOffState(true, 0);
-	TakeOffHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_DotFlying::Hold, CurrentHoldDuration));
+	//Player->playerController->ChangeTakeOffState(true, 0);
+
+	//TakeOffHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_DotFlying::Hold, CurrentHoldDuration));
 }
 
 void UGA_DotFlying::StopFlying(FGameplayEventData Payload)
@@ -109,9 +110,6 @@ void UGA_DotFlying::Hold(float timeRemaining)
 	else
 	{
 		bFlying = true;
-
-		Player->playerController->ChangeTakeOffState(false, 0);
-		GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
 
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(FlyingSpeedClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
