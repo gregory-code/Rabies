@@ -53,9 +53,6 @@ public:
 	FORCEINLINE bool IsScoping() const { return bIsScoping; }
 	FORCEINLINE bool IsFlying() const { return bIsFlying; }
 
-	UFUNCTION()
-	AActor* Hitscan(float range, float sphereRadius);
-
 private:
 
 	void ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
@@ -65,8 +62,6 @@ private:
 	void FlyingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 	virtual void FlyingTagChanged(bool bNewIsAiming) {/*empty in base*/ };
 	bool bIsFlying;
-	FHitResult hitResult;
-	FName RangedAttackSocketName = TEXT("Ranged_Socket");
 
 	UPROPERTY(VisibleAnywhere, Category = "Gameplay Ability")
 	URAbilitySystemComponent* AbilitySystemComponent;

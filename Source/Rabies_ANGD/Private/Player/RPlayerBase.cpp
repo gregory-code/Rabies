@@ -28,14 +28,16 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SceneComponent.h"
 
+#define ECC_RangedAttack ECC_GameTraceChannel2
+
 ARPlayerBase::ARPlayerBase()
 {
 	viewPivot = CreateDefaultSubobject<USceneComponent>("Camera Pivot");
 	viewCamera = CreateDefaultSubobject<UCameraComponent>("View Camera");
 
 	viewCamera->SetupAttachment(viewPivot, USpringArmComponent::SocketName);
-	viewCamera->bUsePawnControlRotation = false;
 	viewCamera->SetRelativeLocation(DefaultCameraLocal);
+	viewCamera->bUsePawnControlRotation = false;
 
 	bUseControllerRotationYaw = false;
 
@@ -72,7 +74,8 @@ void ARPlayerBase::Tick(float DeltaTime)
 	{
 		FRotator playerRot = viewPivot->GetRelativeRotation();
 		playerRot.Roll = 0;
-		SetActorRotation(playerRot); // replciate this movement as well as Movement Component
+		//playerController->SetControlRotation(playerRot);
+		//SetControlRotaiton(playerRot); // replciate this movement as well as Movement Component
 	}
 }
 
@@ -142,6 +145,30 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 	newRot.Pitch = FMath::ClampAngle(newRot.Pitch, cameraClampMin, cameraClampMax);
 
 	viewPivot->SetWorldRotation(newRot);
+}
+
+AActor* ARPlayerBase::Hitscan(float range, float sphereRadius)
+{
+	FVector startTrace = viewCamera->GetComponentLocation();
+	FVector endTrace = startTrace + viewCamera->GetForwardVector() * range;
+
+	//FVector lineStart = GetMesh()->GetSocketLocation(RangedAttackSocketName);
+	//FVector lineEnd = lineStart + GetActorForwardVector() * range;
+
+
+	DrawDebugLine(GetWorld(), startTrace, endTrace, FColor::Green);
+
+	FCollisionShape collisionShape = FCollisionShape::MakeSphere(sphereRadius);
+	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startTrace, endTrace, FQuat::Identity, ECC_RangedAttack, collisionShape);
+	if (hit)
+	{
+		//FString actorName = hitResult.GetActor()->GetName();
+		//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Hit!"));
+
+		return hitResult.GetActor();
+	}
+
+	return nullptr;
 }
 
 void ARPlayerBase::StartJump()

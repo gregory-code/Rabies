@@ -58,17 +58,13 @@ void UGA_Attack::HandleDamage(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		ARCharacterBase* player = Cast<ARCharacterBase>(GetOwningActorFromActorInfo());
+		ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
 		if (player)
 		{
-			AActor* hitActor = player->Hitscan(300, 1);
-			if (hitActor)
+			AActor* hitActor = player->Hitscan(9000, 1);
+			if (hitActor == nullptr) return;
+			if (hitActor != player)
 			{
-				if (hitActor == GetOwningActorFromActorInfo() || !Cast<ARPlayerBase>(hitActor))
-				{
-					return;
-				}
-
 				Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(hitActor);
 
 				UE_LOG(LogTemp, Error, TEXT("Attacking FRIEND"));

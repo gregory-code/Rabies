@@ -38,6 +38,9 @@ public:
 
 	bool bHoldingJump = false;
 
+	UFUNCTION()
+	AActor* Hitscan(float range, float sphereRadius);
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "View")
@@ -162,6 +165,7 @@ private:
 	void LerpCameraToLocalOffset(const FVector& LocalOffset);
 	void TickCameraLocalOffset(FVector Goal);
 	FTimerHandle CameraLerpHandle;
+	FHitResult hitResult;
 
 	float cameraClampMin;
 	float cameraClampMax;
@@ -187,6 +191,8 @@ public:
 	/////////////////////////////////
 	/*          Anim	           */
 	////////////////////////////////
+
+	FName RangedAttackSocketName = TEXT("Ranged_Socket");
 
 	/////////////////////////////////
 	/*          Passives           */

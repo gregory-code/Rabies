@@ -25,8 +25,6 @@
 #include "Perception/AISense_Sight.h"
 #include "Perception/AISense_Touch.h"
 
-#define ECC_RangedAttack ECC_GameTraceChannel2
-
 // Sets default values
 ARCharacterBase::ARCharacterBase()
 {
@@ -135,25 +133,6 @@ UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-AActor* ARCharacterBase::Hitscan(float range, float sphereRadius)
-{
-	FVector lineStart = GetMesh()->GetSocketLocation(RangedAttackSocketName);
-	FVector lineEnd = lineStart + GetActorForwardVector() * range;
-	DrawDebugLine(GetWorld(), lineStart, lineEnd, FColor::Green);
-
-	FCollisionShape collisionShape = FCollisionShape::MakeSphere(sphereRadius);
-	bool hit = GetWorld()->SweepSingleByChannel(hitResult, lineStart, lineEnd, FQuat::Identity, ECC_RangedAttack, collisionShape);
-	if (hit)
-	{
-		//FString actorName = hitResult.GetActor()->GetName();
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Hit!"));
-
-		return hitResult.GetActor();
-	}
-
-	return nullptr;
-}
-
 void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
 {
 	bIsScoping = NewStackCount != 0;
@@ -217,7 +196,7 @@ void ARCharacterBase::MovementSpeedUpdated(const FOnAttributeChangeData& ChangeD
 		return;
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("Speed is: %f / and their new walk speed is: %f"), AttributeSet->GetMovementSpeed(), ChangeData.NewValue);
+	//UE_LOG(LogTemp, Error, TEXT("Speed is: %f / and their new walk speed is: %f"), AttributeSet->GetMovementSpeed(), ChangeData.NewValue);
 	GetCharacterMovement()->MaxWalkSpeed = ChangeData.NewValue;
 }
 
