@@ -112,6 +112,9 @@ private:
 	void Move(const FInputActionValue& InputValue);
 
 	UFUNCTION()
+	void RotatePlayer(float DeltaTime);
+
+	UFUNCTION()
 	void Look(const FInputActionValue& InputValue);
 
 	UFUNCTION()

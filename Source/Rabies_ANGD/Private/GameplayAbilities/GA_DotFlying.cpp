@@ -56,7 +56,9 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 	if (!Player->GetCharacterMovement() || Player->GetCharacterMovement()->IsFalling()) return;
 
-	//Player->playerController->ChangeTakeOffState(true, 0);
+	
+
+	//Player->playerController->ChangeTakeOffState(true, 0); // THE ISSUE IS THAT THE PLAYERCONTROLLER IS NULL IN ONLINE MULTIPLAYER WHATTTTTTTTTTTTTTTTTTT
 
 	//TakeOffHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_DotFlying::Hold, CurrentHoldDuration));
 }

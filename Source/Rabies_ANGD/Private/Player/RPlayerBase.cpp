@@ -11,12 +11,14 @@
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Animation/AnimInstance.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
 
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -72,10 +74,7 @@ void ARPlayerBase::Tick(float DeltaTime)
 	
 	if (bIsScoping)
 	{
-		FRotator playerRot = viewPivot->GetRelativeRotation();
-		playerRot.Roll = 0;
-		//playerController->SetControlRotation(playerRot);
-		//SetControlRotaiton(playerRot); // replciate this movement as well as Movement Component
+		RotatePlayer(DeltaTime);
 	}
 }
 
@@ -134,6 +133,29 @@ void ARPlayerBase::Move(const FInputActionValue& InputValue)
 	AddMovementInput(MoveInput.Y * GetMoveFwdDir() + MoveInput.X * GetMoveRightDir());
 }
 
+void ARPlayerBase::RotatePlayer(float DeltaTime)
+{
+	FRotator cameraRot = viewPivot->GetComponentRotation();
+	cameraRot.Roll = 0;
+
+	FRotator currentRot = GetActorRotation();
+
+	float yawDiff = cameraRot.Yaw - currentRot.Yaw;
+	float pitchDiff = cameraRot.Pitch - currentRot.Pitch;
+
+	if (yawDiff > 180.0f) yawDiff -= 360.0f;
+	if (yawDiff < -180.0f) yawDiff += 360.0f;
+
+	if (pitchDiff > 180.0f) pitchDiff -= 360.0f;
+	if (pitchDiff < -180.0f) pitchDiff += 360.0f;
+
+	float yawInput = FMath::Lerp(0.0f, yawDiff, 10 * DeltaTime);
+	float pitchInput = FMath::Lerp(0.0f, pitchDiff, 10 * DeltaTime);
+
+	AddControllerYawInput(yawInput);
+	AddControllerPitchInput(pitchInput);
+}
+
 void ARPlayerBase::Look(const FInputActionValue& InputValue)
 {
 	FVector2D input = InputValue.Get<FVector2D>();
@@ -149,23 +171,42 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 
 AActor* ARPlayerBase::Hitscan(float range, float sphereRadius)
 {
-	FVector startTrace = viewCamera->GetComponentLocation();
-	FVector endTrace = startTrace + viewCamera->GetForwardVector() * range;
+	int32 sizeX, sizeY;
+	ARPlayerController* PlayerController = Cast<ARPlayerController>(GetController());
 
-	//FVector lineStart = GetMesh()->GetSocketLocation(RangedAttackSocketName);
-	//FVector lineEnd = lineStart + GetActorForwardVector() * range;
+	if (PlayerController == nullptr) return nullptr;
 
+	PlayerController->GetViewportSize(sizeX, sizeY);
 
-	DrawDebugLine(GetWorld(), startTrace, endTrace, FColor::Green);
+	sizeX /= 2.0f;
+	sizeY /= 2.0f;
 
-	FCollisionShape collisionShape = FCollisionShape::MakeSphere(sphereRadius);
-	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startTrace, endTrace, FQuat::Identity, ECC_RangedAttack, collisionShape);
-	if (hit)
+	FVector WorldLocation;
+	FVector WorldDirection;
+	if (PlayerController->DeprojectScreenPositionToWorld(sizeX, sizeY, WorldLocation, WorldDirection))
 	{
-		//FString actorName = hitResult.GetActor()->GetName();
-		//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Hit!"));
+		FVector startTrace = viewCamera->GetComponentLocation();
+		FVector endTrace = startTrace + WorldDirection * range;
 
-		return hitResult.GetActor();
+		//FVector lineStart = GetMesh()->GetSocketLocation(RangedAttackSocketName);
+		//FVector lineEnd = lineStart + GetActorForwardVector() * range;
+
+
+		DrawDebugLine(GetWorld(), startTrace, endTrace, FColor::Green);
+
+		FCollisionShape collisionShape = FCollisionShape::MakeSphere(sphereRadius);
+		bool hit = GetWorld()->SweepSingleByChannel(hitResult, startTrace, endTrace, FQuat::Identity, ECC_RangedAttack, collisionShape);
+		if (hit)
+		{
+			//FString actorName = hitResult.GetActor()->GetName();
+			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Hit!"));
+
+			return hitResult.GetActor();
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("I cannot interact"));
 	}
 
 	return nullptr;
