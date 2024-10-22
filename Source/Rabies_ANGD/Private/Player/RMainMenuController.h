@@ -13,6 +13,12 @@ UCLASS()
 class ARMainMenuController : public APlayerController
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void OnRep_PlayerState() override;
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnRep_PlayerState"))
+	void BP_OnRep_PlayerState();
 	
 public:
 	//this function calls only on the server
@@ -29,8 +35,19 @@ public:
 	UFUNCTION()
 	void ChangeMainMenuState(bool state);
 
+	UFUNCTION()
+	void ConfirmCharacterChoice();
+
+	int GetPlayerID();
+
 private:
+	class ACineCameraActor* CineCamera;
+
+	class ALevelSequenceActor* MainMenuSequence;
+
 	void PostPossessionSetup(APawn* NewPawn);
+
+	void JoinedSession();
 
 	void CreateMenuUI();
 
@@ -39,4 +56,12 @@ private:
 
 	UPROPERTY()
 	UMainMenu* MenuUI;
+
+	UPROPERTY()
+	class URCharacterDefination* CurrentlyHoveredCharacter;
+
+	UPROPERTY()
+	class AEOSGameState* GameState;
+
+	int myPlayerID;
 };
