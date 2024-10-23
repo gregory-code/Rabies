@@ -155,6 +155,7 @@ void ARMainMenuController::JoinedSession()
 	if (SequencePlayer)
 	{
 		SequencePlayer->Play();
+		SequencePlayer->OnFinished.AddDynamic(this, &ARMainMenuController::OnSequenceEnd);
 	}
 }
 
@@ -175,5 +176,20 @@ void ARMainMenuController::CreateMenuUI()
 	if (MenuUI)
 	{
 		MenuUI->AddToViewport();
+	}
+}
+
+void ARMainMenuController::OnSequenceEnd()
+{
+	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
+	if (SequencePlayer)
+	{
+		FMovieSceneSequencePlaybackParams playbackParams;
+		playbackParams.Frame = FFrameNumber(70);
+
+		SequencePlayer->SetPlaybackPosition(playbackParams);
+		SequencePlayer->Play();
+
+		SequencePlayer->OnFinished.AddDynamic(this, &ARMainMenuController::OnSequenceEnd);
 	}
 }

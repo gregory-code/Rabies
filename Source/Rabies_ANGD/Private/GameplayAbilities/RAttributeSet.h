@@ -35,6 +35,7 @@ public:
 	ATTRIBUTE_ACCESSORS(URAttributeSet, UltimateCooldownReduction)
 	ATTRIBUTE_ACCESSORS(URAttributeSet, MovementSpeed)
 	ATTRIBUTE_ACCESSORS(URAttributeSet, Gravity)
+	ATTRIBUTE_ACCESSORS(URAttributeSet, VelocityY)
 	ATTRIBUTE_ACCESSORS(URAttributeSet, ReviveSpeed)
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
@@ -75,6 +76,9 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_Gravity)
 	FGameplayAttributeData Gravity;
 
+	UPROPERTY(ReplicatedUsing = OnRep_VelocityY)
+	FGameplayAttributeData VelocityY;
+
 	UPROPERTY(ReplicatedUsing = OnRep_ReviveSpeed)
 	FGameplayAttributeData ReviveSpeed;
 
@@ -112,6 +116,9 @@ private:
 	void OnRep_MovementSpeed(const FGameplayAttributeData& OldValue);
 	UFUNCTION()
 	void OnRep_Gravity(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_VelocityY(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
 	void OnRep_ReviveSpeed(const FGameplayAttributeData& OldValue);

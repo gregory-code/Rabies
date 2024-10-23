@@ -51,6 +51,9 @@ private:
 
 	void CreateMenuUI();
 
+	UFUNCTION()
+	void OnSequenceEnd();
+
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UMainMenu> MenuUIClass;
 

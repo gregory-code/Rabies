@@ -50,6 +50,14 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	UAbilityTask_WaitGameplayEvent* EndTakeOffEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndTakeOffChargeTag());
 	EndTakeOffEvent->EventReceived.AddDynamic(this, &UGA_DotFlying::StopTakeOff);
 	EndTakeOffEvent->ReadyForActivation();
+
+	UAbilityTask_WaitGameplayEvent* GravityJumpEffectAdd = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetApplyGravityJump());
+	GravityJumpEffectAdd->EventReceived.AddDynamic(this, &UGA_DotFlying::ApplyGravityJump);
+	GravityJumpEffectAdd->ReadyForActivation();
+
+	UAbilityTask_WaitGameplayEvent* GravityJumpEffectRemove = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetRemoveGravityJump());
+	GravityJumpEffectRemove->EventReceived.AddDynamic(this, &UGA_DotFlying::RemoveGravityJump);
+	GravityJumpEffectRemove->ReadyForActivation();
 	
 	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
 	CurrentHoldDuration = 0;
@@ -58,7 +66,7 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 	
 
-	Player->playerController->ChangeTakeOffState(true, 0); // THE ISSUE IS THAT THE PLAYERCONTROLLER IS NULL IN ONLINE MULTIPLAYER WHATTTTTTTTTTTTTTTTTTT
+	Player->playerController->ChangeTakeOffState(true, 0);
 
 	TakeOffHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_DotFlying::Hold, CurrentHoldDuration));
 }
@@ -110,6 +118,21 @@ void UGA_DotFlying::Hold(float timeRemaining)
 	}
 }
 
+void UGA_DotFlying::ApplyGravityJump(FGameplayEventData Payload)
+{
+	FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(GravityJumpClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+	GravityJumpEffectHandle = ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
+}
+
+void UGA_DotFlying::RemoveGravityJump(FGameplayEventData Payload)
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+	if (ASC)
+	{
+		ASC->RemoveActiveGameplayEffect(GravityJumpEffectHandle);
+	}
+}
+
 void UGA_DotFlying::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -117,5 +140,6 @@ void UGA_DotFlying::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	if (ASC)
 	{
 		ASC->RemoveActiveGameplayEffect(FlyingSpeedEffectHandle);
+		ASC->RemoveActiveGameplayEffect(GravityJumpEffectHandle);
 	}
 }
