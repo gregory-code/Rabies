@@ -73,12 +73,6 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 void UGA_DotFlying::StopFlying(FGameplayEventData Payload)
 {
-	Player->GetAbilitySystemComponent()->RemoveLooseGameplayTag(URAbilityGenericTags::GetFlyingTag());
-	Player->playerController->ChangeTakeOffState(false, 0);
-	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
-
-	Player->PlayAnimMontage(HardLandingMontage);
-
 	K2_EndAbility();
 }
 
@@ -88,9 +82,6 @@ void UGA_DotFlying::StopTakeOff(FGameplayEventData Payload)
 	{
 		return;
 	}
-
-	Player->playerController->ChangeTakeOffState(false, 0);
-	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
 
 	K2_EndAbility();
 }
@@ -136,6 +127,14 @@ void UGA_DotFlying::RemoveGravityJump(FGameplayEventData Payload)
 void UGA_DotFlying::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+	Player->playerController->ChangeTakeOffState(false, 0);
+	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
+
+	Player->GetAbilitySystemComponent()->RemoveLooseGameplayTag(URAbilityGenericTags::GetFlyingTag());
+
+	Player->PlayAnimMontage(HardLandingMontage);
+
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
 	if (ASC)
 	{
