@@ -82,7 +82,6 @@ void ARPlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	playerController = Cast<ARPlayerController>(GetController());
 }
 
 void ARPlayerBase::PawnClientRestart()
@@ -169,28 +168,37 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 	viewPivot->SetWorldRotation(newRot);
 }
 
+void ARPlayerBase::SetRabiesPlayerController(ARPlayerController* newController)
+{
+	playerController = newController;
+}
+
 AActor* ARPlayerBase::Hitscan(float range, float sphereRadius)
 {
 	int32 sizeX, sizeY;
-	ARPlayerController* PlayerController = Cast<ARPlayerController>(GetController());
+	sizeX = -1;
+	sizeY = -1;
 
-	if (PlayerController == nullptr) return nullptr;
+	if (playerController == nullptr) return nullptr;
 
-	PlayerController->GetViewportSize(sizeX, sizeY);
+	//playerController->GetViewportSize(sizeX, sizeY);
 
+	//FVector2D viewport = (GEngine->GameViewport->Viewport->GetSizeXY());
 	sizeX /= 2.0f;
 	sizeY /= 2.0f;
 
+	//viewport.X /= 2.0f;
+	//viewport.Y /= 2.0f;
+
 	FVector WorldLocation;
 	FVector WorldDirection;
-	if (PlayerController->DeprojectScreenPositionToWorld(sizeX, sizeY, WorldLocation, WorldDirection))
-	{
+	//if (playerController->DeprojectScreenPositionToWorld(viewport.X, viewport.Y, WorldLocation, WorldDirection))
+	//{
 		FVector startTrace = viewCamera->GetComponentLocation();
-		FVector endTrace = startTrace + WorldDirection * range;
+		FVector endTrace = startTrace + viewCamera->GetComponentRotation().Vector() * range;
 
 		//FVector lineStart = GetMesh()->GetSocketLocation(RangedAttackSocketName);
 		//FVector lineEnd = lineStart + GetActorForwardVector() * range;
-
 
 		DrawDebugLine(GetWorld(), startTrace, endTrace, FColor::Green);
 
@@ -203,11 +211,11 @@ AActor* ARPlayerBase::Hitscan(float range, float sphereRadius)
 
 			return hitResult.GetActor();
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("I cannot interact"));
-	}
+	//}
+	//else
+	//{
+		//UE_LOG(LogTemp, Warning, TEXT("I cannot interact"));
+	//}
 
 	return nullptr;
 }
@@ -240,11 +248,11 @@ void ARPlayerBase::ReleaseJump()
 
 void ARPlayerBase::QuitOut()
 {
-	APlayerController* PlayerController = GetController<APlayerController>();
+	/*APlayerController* PlayerController = GetController<APlayerController>();
 	if (PlayerController)
 	{
 		UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, true);
-	}
+	}*/
 }
 
 void ARPlayerBase::DoBasicAttack()
@@ -355,7 +363,8 @@ void ARPlayerBase::ScopingTagChanged(bool bNewIsAiming)
 	bIsScoping = bNewIsAiming;
 	GetCharacterMovement()->bOrientRotationToMovement = !bNewIsAiming;
 
-	if (playerController)
+
+	if (IsValid(playerController))
 		playerController->ChangeCrosshairState(bNewIsAiming);
 
 	if (bNewIsAiming)

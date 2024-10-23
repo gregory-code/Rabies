@@ -78,6 +78,7 @@ private:
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void MaxHealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void MovementSpeedUpdated(const FOnAttributeChangeData& ChangeData);
+	void GravityUpdated(const FOnAttributeChangeData& ChangeData);
 
 public:
 	UFUNCTION(NetMulticast, Unreliable)

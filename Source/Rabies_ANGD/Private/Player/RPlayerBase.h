@@ -36,6 +36,9 @@ public:
 	UPROPERTY()
 	FVector2D MoveInput;
 
+	UFUNCTION()
+	void SetRabiesPlayerController(class ARPlayerController* newController);
+
 	bool bHoldingJump = false;
 
 	UFUNCTION()
