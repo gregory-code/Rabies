@@ -28,7 +28,7 @@ public:
 	FOnClientHitScan ClientHitScan;
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void ClientCallHitScan();
+	void ClientCallHitScan(FVector startPos, FVector endPos);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

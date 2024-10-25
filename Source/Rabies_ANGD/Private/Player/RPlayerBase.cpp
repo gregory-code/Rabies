@@ -177,14 +177,14 @@ void ARPlayerBase::Hitscan(float range)
 {
 	if (HasAuthority())
 	{
-		ClientCallHitScan();
+		FVector startPos = GetActorLocation() + GetActorForwardVector() * 60; //viewCamera->GetComponentLocation();
+		FVector endPos = startPos + GetActorForwardVector() * range; //startPos + viewCamera->GetComponentRotation().Vector() * 9000;
+		ClientCallHitScan(startPos, endPos);
 	}
 }
 
-void ARPlayerBase::ClientCallHitScan_Implementation()
+void ARPlayerBase::ClientCallHitScan_Implementation(FVector startPos, FVector endPos)
 {
-	FVector startPos = viewCamera->GetComponentLocation();
-	FVector endPos = startPos + viewCamera->GetComponentRotation().Vector() * 9000;
 	DrawDebugLine(GetWorld(), startPos, endPos, FColor::Green);
 
 	FCollisionShape collisionShape = FCollisionShape::MakeSphere(1);
@@ -199,7 +199,7 @@ void ARPlayerBase::ClientCallHitScan_Implementation()
 }
 
 
-bool ARPlayerBase::ClientCallHitScan_Validate()
+bool ARPlayerBase::ClientCallHitScan_Validate(FVector startPos, FVector endPos)
 {
 	return true;
 }

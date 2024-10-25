@@ -134,6 +134,41 @@ UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void ARCharacterBase::PlayMontage(UAnimMontage* MontageToPlay)
+{
+	if (MontageToPlay)
+	{
+		if (GetMesh()->GetAnimInstance())
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(MontageToPlay);
+		}
+	}
+}
+
+void ARCharacterBase::StartDeath()
+{
+	PlayMontage(DeathMontage);
+	//AbilitySystemComponent->ApplyGameplayEffect(DeathEffect);
+	AbilitySystemComponent->AddLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
+	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// change the AI perception
+	OnDeadStatusChanged.Broadcast(true);
+}
+
+void ARCharacterBase::DeathTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
+{
+	if (NewStackCount == 0) // for getting revived
+	{
+		StopAnimMontage(DeathMontage);
+		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		AbilitySystemComponent->ApplyFullStat();
+		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		// change the AI perception
+		OnDeadStatusChanged.Broadcast(false);
+	}
+}
+
 void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
 {
 	bIsScoping = NewStackCount != 0;
@@ -171,9 +206,11 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 
 	if (ChangeData.NewValue <= 0)
 	{
-		//ARGameMode* GameMode = GetWorld()->GetAuthGameMode<ARGameMode>();
-		//GameMode->GameOver();
-		// die
+		StartDeath();
+		if (HasAuthority() && ChangeData.GEModData)
+		{
+
+		}
 	}
 }
 

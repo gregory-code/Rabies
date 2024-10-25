@@ -55,6 +55,17 @@ public:
 
 private:
 
+	void PlayMontage(UAnimMontage* MontageToPlay);
+
+	void StartDeath();
+	void DeathTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Death")
+	UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Death")
+	TSubclassOf<UGameplayEffect> DeathEffect;
+
 	void ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 	virtual void ScopingTagChanged(bool bNewIsAiming) {/*empty in base*/ };
 	bool bIsScoping;
