@@ -173,51 +173,35 @@ void ARPlayerBase::SetRabiesPlayerController(ARPlayerController* newController)
 	playerController = newController;
 }
 
-AActor* ARPlayerBase::Hitscan(float range, float sphereRadius)
+void ARPlayerBase::Hitscan(float range)
 {
-	int32 sizeX, sizeY;
-	sizeX = -1;
-	sizeY = -1;
+	if (HasAuthority())
+	{
+		ClientCallHitScan();
+	}
+}
 
-	if (playerController == nullptr) return nullptr;
+void ARPlayerBase::ClientCallHitScan_Implementation()
+{
+	FVector startPos = viewCamera->GetComponentLocation();
+	FVector endPos = startPos + viewCamera->GetComponentRotation().Vector() * 9000;
+	DrawDebugLine(GetWorld(), startPos, endPos, FColor::Green);
 
-	//playerController->GetViewportSize(sizeX, sizeY);
+	FCollisionShape collisionShape = FCollisionShape::MakeSphere(1);
+	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startPos, endPos, FQuat::Identity, ECC_RangedAttack, collisionShape);
+	if (hit)
+	{
+		FString actorName = hitResult.GetActor()->GetName();
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
+		ClientHitScan.Broadcast(hitResult.GetActor(), startPos, endPos);
+		return;
+	}
+}
 
-	//FVector2D viewport = (GEngine->GameViewport->Viewport->GetSizeXY());
-	sizeX /= 2.0f;
-	sizeY /= 2.0f;
 
-	//viewport.X /= 2.0f;
-	//viewport.Y /= 2.0f;
-
-	FVector WorldLocation;
-	FVector WorldDirection;
-	//if (playerController->DeprojectScreenPositionToWorld(viewport.X, viewport.Y, WorldLocation, WorldDirection))
-	//{
-		FVector startTrace = viewCamera->GetComponentLocation();
-		FVector endTrace = startTrace + viewCamera->GetComponentRotation().Vector() * range;
-
-		//FVector lineStart = GetMesh()->GetSocketLocation(RangedAttackSocketName);
-		//FVector lineEnd = lineStart + GetActorForwardVector() * range;
-
-		DrawDebugLine(GetWorld(), startTrace, endTrace, FColor::Green);
-
-		FCollisionShape collisionShape = FCollisionShape::MakeSphere(sphereRadius);
-		bool hit = GetWorld()->SweepSingleByChannel(hitResult, startTrace, endTrace, FQuat::Identity, ECC_RangedAttack, collisionShape);
-		if (hit)
-		{
-			//FString actorName = hitResult.GetActor()->GetName();
-			//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Hit!"));
-
-			return hitResult.GetActor();
-		}
-	//}
-	//else
-	//{
-		//UE_LOG(LogTemp, Warning, TEXT("I cannot interact"));
-	//}
-
-	return nullptr;
+bool ARPlayerBase::ClientCallHitScan_Validate()
+{
+	return true;
 }
 
 void ARPlayerBase::StartJump()
