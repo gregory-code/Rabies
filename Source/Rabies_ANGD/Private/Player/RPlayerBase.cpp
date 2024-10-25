@@ -165,14 +165,18 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 
 	newRot.Pitch = FMath::ClampAngle(newRot.Pitch, cameraClampMin, cameraClampMax);
 
+
 	viewPivot->SetWorldRotation(newRot);
+	if (HasAuthority())
+	{
+		//ClientUpdateViewCameraRotation(viewPivot->GetComponentLocation(), viewPivot->GetComponentRotation());
+	}
 }
 
 void ARPlayerBase::SetRabiesPlayerController(ARPlayerController* newController)
 {
 	playerController = newController;
 }
-
 void ARPlayerBase::Hitscan(float range)
 {
 	if (HasAuthority())
@@ -394,4 +398,31 @@ void ARPlayerBase::SetInteraction(bool setInteract)
 void ARPlayerBase::SetPausetoFalse()
 {
 	isPaused = false;
+}
+
+void ARPlayerBase::ClientUpdateViewCameraRotation_Implementation(FVector viewPivotLoc, FRotator viewPivotRot)
+{
+	viewPivotLocation = viewPivotLoc;
+	viewPivotRotation = viewPivotRot;
+	//OnRep_viewCameraTransform();
+}
+
+bool ARPlayerBase::ClientUpdateViewCameraRotation_Validate(FVector viewPivotLoc, FRotator viewPivotRot)
+{
+	return true;
+}
+
+void ARPlayerBase::OnRep_viewCameraTransform()
+{
+	viewPivot->SetWorldLocation(viewPivotLocation);
+	viewPivot->SetWorldRotation(viewPivotRotation);
+	//UE_LOG(LogTemp, Warning, TEXT("Vector: X: %f, Y: %f, Z: %f"), viewCameraRotation.Vector().X, viewCameraRotation.Vector().Y, viewCameraRotation.Vector().Z);
+}
+
+void ARPlayerBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(ARPlayerBase, viewPivotLocation, COND_SimulatedOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ARPlayerBase, viewPivotRotation, COND_SimulatedOnly, REPNOTIFY_Always);
 }

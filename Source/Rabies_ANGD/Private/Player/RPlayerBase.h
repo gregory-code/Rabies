@@ -221,4 +221,18 @@ private:
 	/////////////////////////////////
 	/*          Online             */
 	////////////////////////////////
+
+	UFUNCTION(NetMulticast, Unreliable, WithValidation)
+	void ClientUpdateViewCameraRotation(FVector viewPivotLoc, FRotator viewPivotRot);
+
+	UPROPERTY(ReplicatedUsing = OnRep_viewCameraTransform)
+	FVector viewPivotLocation;
+
+	UPROPERTY(ReplicatedUsing = OnRep_viewCameraTransform)
+	FRotator viewPivotRotation;
+
+	UFUNCTION()
+	void OnRep_viewCameraTransform();
+
+	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty >& OutLifetimeProps) const override;
 };
