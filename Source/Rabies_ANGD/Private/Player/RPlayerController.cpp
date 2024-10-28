@@ -38,6 +38,7 @@ void ARPlayerController::PostPossessionSetup(APawn* NewPawn)
 	}
 
 	PlayerBase->SetRabiesPlayerController(this);
+	PlayerBase->SetPlayerState();
 	// Set up the players ability system
 
 	CreateGameplayUI();

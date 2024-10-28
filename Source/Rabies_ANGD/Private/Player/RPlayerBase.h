@@ -51,6 +51,9 @@ public:
 	UFUNCTION()
 	void Hitscan(float range);
 
+	UFUNCTION()
+	void SetPlayerState();
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "View")
@@ -208,6 +211,7 @@ public:
 	////////////////////////////////
 
 	FName RangedAttackSocketName = TEXT("Ranged_Socket");
+	FName RootAimingSocketName = TEXT("RootAiming_Socket");
 
 	/////////////////////////////////
 	/*          Passives           */
@@ -222,8 +226,6 @@ private:
 	/*          Online             */
 	////////////////////////////////
 
-	UPROPERTY(Replicated)
-	FRotator hitscanRotation;
-
-	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty >& OutLifetimeProps) const override;
+	UPROPERTY()
+	class AEOSPlayerState* EOSPlayerState;
 };

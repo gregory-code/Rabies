@@ -70,7 +70,7 @@ void UGA_Attack::SendInputForHitScan(FGameplayEventData Payload)
 		ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
 		if (player)
 		{
-			player->Hitscan(900);
+			player->Hitscan(2000);
 			return;
 		}
 	}
