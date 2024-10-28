@@ -27,8 +27,8 @@ public:
 public:
 	FOnClientHitScan ClientHitScan;
 
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void ClientCallHitScan(FVector startPos, FVector endPos);
+	UFUNCTION(NetMulticast, Unreliable, WithValidation)
+	void ClientHitScanResult(AActor* hitActor, FVector start, FVector end);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -222,17 +222,8 @@ private:
 	/*          Online             */
 	////////////////////////////////
 
-	UFUNCTION(NetMulticast, Unreliable, WithValidation)
-	void ClientUpdateViewCameraRotation(FVector viewPivotLoc, FRotator viewPivotRot);
-
-	UPROPERTY(ReplicatedUsing = OnRep_viewCameraTransform)
-	FVector viewPivotLocation;
-
-	UPROPERTY(ReplicatedUsing = OnRep_viewCameraTransform)
-	FRotator viewPivotRotation;
-
-	UFUNCTION()
-	void OnRep_viewCameraTransform();
+	UPROPERTY(Replicated)
+	FRotator hitscanRotation;
 
 	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty >& OutLifetimeProps) const override;
 };

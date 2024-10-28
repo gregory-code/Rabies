@@ -165,12 +165,8 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 
 	newRot.Pitch = FMath::ClampAngle(newRot.Pitch, cameraClampMin, cameraClampMax);
 
-
+	hitscanRotation = newRot;
 	viewPivot->SetWorldRotation(newRot);
-	if (HasAuthority())
-	{
-		//ClientUpdateViewCameraRotation(viewPivot->GetComponentLocation(), viewPivot->GetComponentRotation());
-	}
 }
 
 void ARPlayerBase::SetRabiesPlayerController(ARPlayerController* newController)
@@ -179,31 +175,27 @@ void ARPlayerBase::SetRabiesPlayerController(ARPlayerController* newController)
 }
 void ARPlayerBase::Hitscan(float range)
 {
-	if (HasAuthority())
-	{
-		FVector startPos = GetActorLocation() + GetActorForwardVector() * 60; //viewCamera->GetComponentLocation();
-		FVector endPos = startPos + GetActorForwardVector() * range; //startPos + viewCamera->GetComponentRotation().Vector() * 9000;
-		ClientCallHitScan(startPos, endPos);
-	}
-}
-
-void ARPlayerBase::ClientCallHitScan_Implementation(FVector startPos, FVector endPos)
-{
-	DrawDebugLine(GetWorld(), startPos, endPos, FColor::Green);
+	FVector startPos = GetActorLocation() + GetActorForwardVector() * 60; //viewCamera->GetComponentLocation();
+	FVector endPos = startPos + hitscanRotation.Vector() * range; //startPos + viewCamera->GetComponentRotation().Vector() * 9000;
 
 	FCollisionShape collisionShape = FCollisionShape::MakeSphere(1);
 	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startPos, endPos, FQuat::Identity, ECC_RangedAttack, collisionShape);
 	if (hit)
 	{
-		FString actorName = hitResult.GetActor()->GetName();
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
-		ClientHitScan.Broadcast(hitResult.GetActor(), startPos, endPos);
-		return;
+		ClientHitScanResult(hitResult.GetActor(), startPos, endPos);
+		//ClientHitScan.Broadcast(hitResult.GetActor(), startPos, endPos);
 	}
 }
 
+void ARPlayerBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end)
+{
+	FString actorName = hitActor->GetName();
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
+	DrawDebugLine(GetWorld(), start, end, FColor::Green);
+}
 
-bool ARPlayerBase::ClientCallHitScan_Validate(FVector startPos, FVector endPos)
+
+bool ARPlayerBase::ClientHitScanResult_Validate(AActor* hitActor, FVector start, FVector end)
 {
 	return true;
 }
@@ -400,29 +392,9 @@ void ARPlayerBase::SetPausetoFalse()
 	isPaused = false;
 }
 
-void ARPlayerBase::ClientUpdateViewCameraRotation_Implementation(FVector viewPivotLoc, FRotator viewPivotRot)
-{
-	viewPivotLocation = viewPivotLoc;
-	viewPivotRotation = viewPivotRot;
-	//OnRep_viewCameraTransform();
-}
-
-bool ARPlayerBase::ClientUpdateViewCameraRotation_Validate(FVector viewPivotLoc, FRotator viewPivotRot)
-{
-	return true;
-}
-
-void ARPlayerBase::OnRep_viewCameraTransform()
-{
-	viewPivot->SetWorldLocation(viewPivotLocation);
-	viewPivot->SetWorldRotation(viewPivotRotation);
-	//UE_LOG(LogTemp, Warning, TEXT("Vector: X: %f, Y: %f, Z: %f"), viewCameraRotation.Vector().X, viewCameraRotation.Vector().Y, viewCameraRotation.Vector().Z);
-}
-
 void ARPlayerBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(ARPlayerBase, viewPivotLocation, COND_SimulatedOnly, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ARPlayerBase, viewPivotRotation, COND_SimulatedOnly, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION(ARPlayerBase, hitscanRotation, COND_None);
 }

@@ -22,9 +22,6 @@ private:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	UFUNCTION()
-	void HandleDamage();
-
-	UFUNCTION()
 	void SendInputForHitScan(FGameplayEventData Payload);
 
 	UFUNCTION()

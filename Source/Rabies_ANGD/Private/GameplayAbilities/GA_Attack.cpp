@@ -63,10 +63,6 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	SetupWaitInputTask();
 }
 
-void UGA_Attack::HandleDamage()
-{
-}
-
 void UGA_Attack::SendInputForHitScan(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
