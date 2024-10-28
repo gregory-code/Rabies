@@ -18,6 +18,15 @@ public:
 
 private:
 
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void SpawnChest(FVector SpawnLocation);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chest")
+	TSubclassOf<class AItemChest> ItemChestClass;
+
+	UPROPERTY(Replicated)
+	TArray<class AItemChest*> AllChests;
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 

@@ -12,6 +12,8 @@ AItemChest::AItemChest()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bReplicates = true;
+
 	ChestMesh = CreateDefaultSubobject<UStaticMeshComponent>("Chest Mesh");
 	ChestMesh->SetupAttachment(GetRootComponent());
 	ChestMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
