@@ -16,10 +16,10 @@ void AEOSActionGameState::BeginPlay()
 
 	// this will be on server side
 
-    //SpawnChest(FVector(0, 0, 0));
-
     TArray<AActor*> spawnLocations;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AChestSpawnLocation::StaticClass(), spawnLocations);
+
+    if (spawnLocations.Num() <= AmountOfChests) return;
 
     for (int i = 0; i < AmountOfChests; i++)
     {

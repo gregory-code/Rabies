@@ -17,7 +17,10 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Chest Detail")
-	class UStaticMeshComponent* ChestMesh;
+	class UStaticMeshComponent* ChestBottomMesh;
+
+	UPROPERTY(VisibleAnywhere, Category = "Chest Detail")
+	class UStaticMeshComponent* ChestTopMesh;
 
 protected:
 	// Called when the game starts or when spawned

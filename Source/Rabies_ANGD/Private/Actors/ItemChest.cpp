@@ -14,11 +14,16 @@ AItemChest::AItemChest()
 
 	bReplicates = true;
 
-	ChestMesh = CreateDefaultSubobject<UStaticMeshComponent>("Chest Mesh");
-	ChestMesh->SetupAttachment(GetRootComponent());
-	ChestMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ChestBottomMesh = CreateDefaultSubobject<UStaticMeshComponent>("Chest Bottom Mesh");
+	ChestBottomMesh->SetupAttachment(GetRootComponent());
+	ChestBottomMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
-	RootComponent = ChestMesh;
+	RootComponent = ChestBottomMesh;
+	
+	ChestTopMesh = CreateDefaultSubobject<UStaticMeshComponent>("Chest Top Mesh");
+	ChestTopMesh->SetupAttachment(GetRootComponent());
+	ChestTopMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
 }
 
 // Called when the game starts or when spawned
