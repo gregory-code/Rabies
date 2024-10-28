@@ -97,7 +97,7 @@ void ARCharacterBase::PossessedBy(AController* NewController)
 		APlayerController* OwningPlayerController = Cast<APlayerController>(Controller);
 		// Find the ID
 
-		//TeamId = FGenericTeamId(1);
+		TeamId = FGenericTeamId(1);
 	}
 }
 
@@ -265,8 +265,8 @@ void ARCharacterBase::ClientStopAnimMontage_Implementation(UAnimMontage* montage
 	}
 }
 
-/*void ARCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ARCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ARCharacterBase, TeamId, COND_None);
-}*/
+}
