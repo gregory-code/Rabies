@@ -4,6 +4,9 @@
 #include "Framework/EOSActionGameState.h"
 #include "Net/UnrealNetwork.h"
 #include "Actors/ItemChest.h"
+#include "Kismet/GameplayStatics.h"
+#include "Math/UnrealMathUtility.h"
+#include "Actors/ChestSpawnLocation.h"
 #include "Framework/EOSPlayerState.h"
 #include "Player/RPlayerController.h"
 
@@ -13,7 +16,17 @@ void AEOSActionGameState::BeginPlay()
 
 	// this will be on server side
 
-    SpawnChest(FVector(0, 0, 0));
+    //SpawnChest(FVector(0, 0, 0));
+
+    TArray<AActor*> spawnLocations;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AChestSpawnLocation::StaticClass(), spawnLocations);
+
+    for (int i = 0; i < AmountOfChests; i++)
+    {
+        float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
+        SpawnChest(spawnLocations[randomSpawn]->GetActorLocation());
+        spawnLocations.RemoveAt(randomSpawn);
+    }
 }
 
 void AEOSActionGameState::SpawnChest_Implementation(FVector SpawnLocation)

@@ -18,6 +18,9 @@ public:
 
 private:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Chest")
+	int AmountOfChests;
+
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void SpawnChest(FVector SpawnLocation);
 
