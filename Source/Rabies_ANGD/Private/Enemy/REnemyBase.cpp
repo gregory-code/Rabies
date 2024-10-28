@@ -34,6 +34,18 @@ AREnemyBase::AREnemyBase()
 	AIPerceptionSourceComp->RegisterForSense(UAISense_Sight::StaticClass());
 }
 
+void AREnemyBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
+}
+
+void AREnemyBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
 void AREnemyBase::HitDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	UAISense_Touch::ReportTouchEvent(this, OtherActor, this, GetActorLocation());

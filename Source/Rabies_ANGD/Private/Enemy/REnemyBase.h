@@ -17,6 +17,12 @@ class AREnemyBase : public ARCharacterBase
 public:
 	AREnemyBase();
 
+	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "AI")
 	class UAIPerceptionStimuliSourceComponent* AIPerceptionSourceComp;

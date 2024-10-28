@@ -37,7 +37,7 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "AI")
 	class UAISenseConfig_Touch* TouchConfig;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "AI")
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	class UBehaviorTree* BehaviorTree;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
