@@ -4,17 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameplayAbilities/GA_AbilityBase.h"
-#include "GA_Attack.generated.h"
+#include "GA_RangedGattlingAttack.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UGA_Attack : public UGA_AbilityBase
+class UGA_RangedGattlingAttack : public UGA_AbilityBase
 {
-
 public:
-	UGA_Attack();
+	UGA_RangedGattlingAttack();
 
 private:
 	GENERATED_BODY()
@@ -32,7 +31,7 @@ private:
 	void TryCommitAttack(FGameplayEventData Payload);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	TSubclassOf<class UGameplayEffect> DamageTest;
+	TSubclassOf<class UGameplayEffect> RangedGattlingDamage;
 
 	UFUNCTION()
 	void AbilityInputPressed(float TimeWaited);

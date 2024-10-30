@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameplayAbilities/GA_Attack.h"
+#include "GameplayAbilities/GA_RangedGattlingAttack.h"
 
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -16,7 +16,7 @@
 #include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-UGA_Attack::UGA_Attack()
+UGA_RangedGattlingAttack::UGA_RangedGattlingAttack()
 {
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("ability.attack.activate"));
 	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("ability.attack.activate"));
@@ -28,7 +28,7 @@ UGA_Attack::UGA_Attack()
 	AbilityTriggers.Add(TriggerData);
 }
 
-void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGA_RangedGattlingAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	//Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -40,15 +40,15 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	}
 
 	UAbilityTask_WaitGameplayEvent* WaitTargetAquiredEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
-	WaitTargetAquiredEvent->EventReceived.AddDynamic(this, &UGA_Attack::SendInputForHitScan);
+	WaitTargetAquiredEvent->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::SendInputForHitScan);
 	WaitTargetAquiredEvent->ReadyForActivation();
 
 	UAbilityTask_WaitGameplayEvent* WaitForActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetBasicAttackActivationTag());
-	WaitForActivation->EventReceived.AddDynamic(this, &UGA_Attack::TryCommitAttack);
+	WaitForActivation->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::TryCommitAttack);
 	WaitForActivation->ReadyForActivation();
 
 	UAbilityTask_WaitGameplayEvent* WaitStopEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndAttackTag());
-	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_Attack::StopAttacking);
+	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::StopAttacking);
 	WaitStopEvent->ReadyForActivation();
 
 	Player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
@@ -63,7 +63,7 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	SetupWaitInputTask();
 }
 
-void UGA_Attack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UGA_RangedGattlingAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
@@ -75,19 +75,19 @@ void UGA_Attack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGame
 }
 
 
-void UGA_Attack::SendInputForHitScan(FGameplayEventData Payload)
+void UGA_RangedGattlingAttack::SendInputForHitScan(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
 		if (Player)
 		{
-			Player->Hitscan(2000);
+			Player->Hitscan(4000);
 			return;
 		}
 	}
 }
 
-void UGA_Attack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
+void UGA_RangedGattlingAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
 {
 	if (K2_HasAuthority())
 	{
@@ -98,33 +98,32 @@ void UGA_Attack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVecto
 
 			Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(hitActor);
 
-			//UE_LOG(LogTemp, Error, TEXT("Attacking FRIEND"));
-			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageTest, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RangedGattlingDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
 		}
 	}
 }
 
-void UGA_Attack::TryCommitAttack(FGameplayEventData Payload)
+void UGA_RangedGattlingAttack::TryCommitAttack(FGameplayEventData Payload)
 {
 	SendInputForHitScan(Payload);
 	bAttackCommitted = true;
 }
 
-void UGA_Attack::AbilityInputPressed(float TimeWaited)
+void UGA_RangedGattlingAttack::AbilityInputPressed(float TimeWaited)
 {
 	SetupWaitInputTask();
 	TryCommitAttack(FGameplayEventData());
 }
 
-void UGA_Attack::SetupWaitInputTask()
+void UGA_RangedGattlingAttack::SetupWaitInputTask()
 {
 	UAbilityTask_WaitInputPress* WaitInputPress = UAbilityTask_WaitInputPress::WaitInputPress(this);
-	WaitInputPress->OnPress.AddDynamic(this, &UGA_Attack::AbilityInputPressed);
+	WaitInputPress->OnPress.AddDynamic(this, &UGA_RangedGattlingAttack::AbilityInputPressed);
 	WaitInputPress->ReadyForActivation();
 }
 
-void UGA_Attack::StopAttacking(FGameplayEventData Payload)
+void UGA_RangedGattlingAttack::StopAttacking(FGameplayEventData Payload)
 {
 	K2_EndAbility();
 }
