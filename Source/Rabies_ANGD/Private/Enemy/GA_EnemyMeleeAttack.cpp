@@ -49,5 +49,6 @@ void UGA_EnemyMeleeAttack::TryCommitAttack(FGameplayEventData Payload)
 	if (character)
 	{
 		character->ClientPlayAnimMontage(AttackAnim);
+		character->PlayAnimMontage(AttackAnim);
 	}
 }

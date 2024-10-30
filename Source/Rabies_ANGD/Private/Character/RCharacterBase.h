@@ -30,9 +30,15 @@ public:
 	// Sets default values for this character's properties
 	ARCharacterBase();
 
+	UFUNCTION(BlueprintCallable)
 	void SetupAbilitySystemComponent();
+
+	UFUNCTION(BlueprintCallable)
 	void InitAttributes();
+
+	UFUNCTION(BlueprintCallable)
 	void InitAbilities();
+
 	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 
 protected:
@@ -47,6 +53,7 @@ public:
 
 	void InitStatusHUD();
 
+	UFUNCTION(BlueprintCallable)
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 public:

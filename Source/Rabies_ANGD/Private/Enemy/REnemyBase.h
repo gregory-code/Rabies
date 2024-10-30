@@ -22,9 +22,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-	void InitAbilities();
-
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "AI")
 	class UAIPerceptionStimuliSourceComponent* AIPerceptionSourceComp;
@@ -34,12 +31,5 @@ private:
 
 	UFUNCTION()
 	void DeadStatusUpdated(bool bIsDead);
-
-	FTimerHandle InitAbilitiesHandle;
-		
-	void InitAbilitiesDelay();
-
-	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-	TSubclassOf<class UGameplayAbility> AttackClass;
 
 };

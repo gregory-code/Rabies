@@ -83,15 +83,15 @@ void ARCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	SetupAbilitySystemComponent();
-	InitAttributes();
-	InitAbilities();
+	//SetupAbilitySystemComponent();
+	//InitAttributes();
+	//InitAbilities();
 
 	if (NewController && NewController->IsPlayerController())
 	{
-		//SetupAbilitySystemComponent();
-		//InitAttributes();
-		//InitAbilities();
+		SetupAbilitySystemComponent();
+		InitAttributes();
+		InitAbilities();
 	}
 
 	if (HasAuthority() && Controller && Controller->IsPlayerController())

@@ -5,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Actors/ItemChest.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "Math/UnrealMathUtility.h"
 #include "Enemy/REnemyBase.h"
 #include "Actors/ChestSpawnLocation.h"
@@ -49,7 +50,6 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
     {
         FActorSpawnParameters SpawnParams;
         AREnemyBase* newEnemy = GetWorld()->SpawnActor<AREnemyBase>(EnemyLibrary[EnemyIDToSpawn], SpawnLocation, FRotator::ZeroRotator, SpawnParams);
-        newEnemy->InitAbilities();
         AllEnemies.Add(newEnemy); // make sure that the enemies has bReplicates to true
         // You can do additional setup for NewActor if necessary
     }
