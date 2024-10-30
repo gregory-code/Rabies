@@ -233,7 +233,10 @@ void ARPlayerBase::QuitOut()
 
 void ARPlayerBase::DoBasicAttack()
 {
-	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
+	if (IsScoping())
+	{
+		GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
+	}
 }
 
 void ARPlayerBase::StopBasicAttack()

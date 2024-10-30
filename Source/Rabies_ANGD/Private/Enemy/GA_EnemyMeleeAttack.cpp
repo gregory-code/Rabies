@@ -36,6 +36,8 @@ void UGA_EnemyMeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		return;
 	}
 
+	UE_LOG(LogTemp, Error, TEXT("Set up attack"));
+
 	UAbilityTask_WaitGameplayEvent* WaitForActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetBasicAttackActivationTag());
 	WaitForActivation->EventReceived.AddDynamic(this, &UGA_EnemyMeleeAttack::TryCommitAttack);
 	WaitForActivation->ReadyForActivation();

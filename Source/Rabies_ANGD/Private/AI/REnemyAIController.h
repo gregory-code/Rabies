@@ -22,6 +22,9 @@ public:
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
 
 private:
+	UPROPERTY()
+	class AREnemyBase* Enemy;
+
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	FName AIVisionSocketName = "head";
 
@@ -50,4 +53,6 @@ private:
 	void TargetForgotton(AActor* Target);
 
 	void PawnDeathStatusChanged(bool bIsDead);
+
+	void InitEnemyAbilities();
 };

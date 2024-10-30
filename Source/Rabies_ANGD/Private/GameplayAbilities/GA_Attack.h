@@ -20,6 +20,7 @@ private:
 	GENERATED_BODY()
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 	UFUNCTION()
 	void SendInputForHitScan(FGameplayEventData Payload);
@@ -44,4 +45,7 @@ private:
 
 	UFUNCTION()
 	void StopAttacking(FGameplayEventData Payload);
+
+	UPROPERTY()
+	class ARPlayerBase* Player;
 };

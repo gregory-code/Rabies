@@ -51,10 +51,10 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_Attack::StopAttacking);
 	WaitStopEvent->ReadyForActivation();
 
-	ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
-	if (player)
+	Player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
+	if (Player)
 	{
-		ClientHitScanHandle = player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
+		ClientHitScanHandle = Player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
 			{
 				RecieveAttackHitscan(hitActor, startPos, endPos);
 			});
@@ -63,14 +63,25 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	SetupWaitInputTask();
 }
 
+void UGA_Attack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+	UE_LOG(LogTemp, Error, TEXT("Attacking cancelled"));
+	if (ClientHitScanHandle.IsValid() && Player)
+	{
+		Player->ClientHitScan.Remove(ClientHitScanHandle);
+	}
+}
+
+
 void UGA_Attack::SendInputForHitScan(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
-		if (player)
+		if (Player)
 		{
-			player->Hitscan(2000);
+			Player->Hitscan(2000);
 			return;
 		}
 	}
@@ -80,10 +91,8 @@ void UGA_Attack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVecto
 {
 	if (K2_HasAuthority())
 	{
-		ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
-
 		if (hitActor == nullptr) return;
-		if (hitActor != player)
+		if (hitActor != Player)
 		{
 			FGameplayEventData Payload = FGameplayEventData();
 
@@ -117,6 +126,5 @@ void UGA_Attack::SetupWaitInputTask()
 
 void UGA_Attack::StopAttacking(FGameplayEventData Payload)
 {
-	UE_LOG(LogTemp, Error, TEXT("Attacking cancelled"));
 	K2_EndAbility();
 }

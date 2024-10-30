@@ -8,6 +8,7 @@
 #include "GameplayAbilities/GA_AbilityBase.h"
 
 #include "Character/RCharacterBase.h"
+#include "Enemy/REnemyBase.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
@@ -57,10 +58,11 @@ void AREnemyAIController::BeginPlay()
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AREnemyAIController::TargetPerceptionUpdated);
 	AIPerceptionComponent->OnTargetPerceptionForgotten.AddDynamic(this, &AREnemyAIController::TargetForgotton);
 
-	ARCharacterBase* PawnAsCharacter = Cast<ARCharacterBase>(GetPawn());
-	if (PawnAsCharacter)
+	Enemy = Cast<AREnemyBase>(GetPawn());
+	if (Enemy)
 	{
-		PawnAsCharacter->OnDeadStatusChanged.AddUObject(this, &AREnemyAIController::PawnDeathStatusChanged);
+		Enemy->OnDeadStatusChanged.AddUObject(this, &AREnemyAIController::PawnDeathStatusChanged);
+		InitEnemyAbilities();
 	}
 }
 
@@ -140,4 +142,10 @@ void AREnemyAIController::PawnDeathStatusChanged(bool bIsDead)
 	{
 		GetBrainComponent()->StartLogic();
 	}
+}
+
+void AREnemyAIController::InitEnemyAbilities()
+{
+	UE_LOG(LogTemp, Error, TEXT("Set Abilities"));
+	Enemy->GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
 }

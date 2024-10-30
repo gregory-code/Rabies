@@ -24,6 +24,9 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
 
+#include "Abilities/GameplayAbility.h"
+#include "Enemy/GA_EnemyMeleeAttack.h"
+
 AREnemyBase::AREnemyBase()
 {
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
@@ -37,8 +40,6 @@ AREnemyBase::AREnemyBase()
 void AREnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
 }
 
 void AREnemyBase::Tick(float DeltaTime)
