@@ -10,6 +10,8 @@
 #include "Character/RCharacterBase.h"
 #include "Enemy/REnemyBase.h"
 
+#include "Enemy/GA_EnemyMeleeAttack.h"
+
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
@@ -148,4 +150,6 @@ void AREnemyAIController::InitEnemyAbilities()
 {
 	UE_LOG(LogTemp, Error, TEXT("Set Abilities"));
 	Enemy->GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
+
+	Enemy->GetAbilitySystemComponent()->TryActivateAbilityByClass(UGA_EnemyMeleeAttack::StaticClass());
 }
