@@ -40,6 +40,8 @@ private:
 
 	void SetupWaitInputTask();
 
+	FDelegateHandle ClientHitScanHandle;
+
 	UFUNCTION()
 	void StopAttacking(FGameplayEventData Payload);
 };

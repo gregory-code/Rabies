@@ -52,6 +52,8 @@ public:
 public:
 	FORCEINLINE bool IsScoping() const { return bIsScoping; }
 	FORCEINLINE bool IsFlying() const { return bIsFlying; }
+	FORCEINLINE bool IsTakeOffDelay() const { return bTakeOffDelay; }
+	FORCEINLINE bool IsHoldingJump() const { return bHoldingJump; }
 
 private:
 
@@ -73,6 +75,14 @@ private:
 	void FlyingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 	virtual void FlyingTagChanged(bool bNewIsAiming) {/*empty in base*/ };
 	bool bIsFlying;
+
+	void TakeOffDelayTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
+	virtual void TakeOffDelayTagChanged(bool bNewIsAiming) {/*empty in base*/ };
+	bool bTakeOffDelay;
+
+	void HoldingJumpTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
+	virtual void HoldingJumpTagChanged(bool bNewIsAiming) {/*empty in base*/ };
+	bool bHoldingJump;
 
 	UPROPERTY(VisibleAnywhere, Category = "Gameplay Ability")
 	URAbilitySystemComponent* AbilitySystemComponent;

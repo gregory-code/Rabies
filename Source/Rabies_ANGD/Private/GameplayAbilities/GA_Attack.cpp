@@ -54,10 +54,10 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	ARPlayerBase* player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
 	if (player)
 	{
-		player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
-		{
+		ClientHitScanHandle = player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
+			{
 				RecieveAttackHitscan(hitActor, startPos, endPos);
-		});
+			});
 	}
 
 	SetupWaitInputTask();
