@@ -57,6 +57,7 @@ public:
 
 private:
 
+
 	void PlayMontage(UAnimMontage* MontageToPlay);
 
 	void StartDeath();

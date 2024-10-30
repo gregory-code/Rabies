@@ -22,6 +22,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void InitAbilities();
 
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "AI")
@@ -29,4 +31,15 @@ private:
 
 	UFUNCTION()
 	void HitDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION()
+	void DeadStatusUpdated(bool bIsDead);
+
+	FTimerHandle InitAbilitiesHandle;
+		
+	void InitAbilitiesDelay();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	TSubclassOf<class UGameplayAbility> AttackClass;
+
 };

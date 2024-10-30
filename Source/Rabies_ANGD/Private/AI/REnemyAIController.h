@@ -53,6 +53,4 @@ private:
 	void TargetForgotton(AActor* Target);
 
 	void PawnDeathStatusChanged(bool bIsDead);
-
-	void InitEnemyAbilities();
 };

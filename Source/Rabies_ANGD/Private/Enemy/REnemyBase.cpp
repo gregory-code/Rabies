@@ -40,6 +40,7 @@ AREnemyBase::AREnemyBase()
 void AREnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
+	OnDeadStatusChanged.AddUObject(this, &AREnemyBase::DeadStatusUpdated);
 }
 
 void AREnemyBase::Tick(float DeltaTime)
@@ -47,7 +48,33 @@ void AREnemyBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AREnemyBase::InitAbilities()
+{
+	GetWorldTimerManager().ClearTimer(InitAbilitiesHandle);
+	GetWorldTimerManager().SetTimer(InitAbilitiesHandle, FTimerDelegate::CreateUObject(this, &AREnemyBase::InitAbilitiesDelay), 3.0f, false);
+}
+
+void AREnemyBase::InitAbilitiesDelay()
+{
+	UE_LOG(LogTemp, Warning, TEXT("I am trying so bad"));
+	if (GetAbilitySystemComponent()->TryActivateAbilityByClass(AttackClass))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("yes"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("wrong"));
+	}
+	//GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
+}
+
+
 void AREnemyBase::HitDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	UAISense_Touch::ReportTouchEvent(this, OtherActor, this, GetActorLocation());
+}
+
+void AREnemyBase::DeadStatusUpdated(bool bIsDead)
+{
+	
 }

@@ -29,6 +29,7 @@ UGA_EnemyMeleeAttack::UGA_EnemyMeleeAttack()
 
 void UGA_EnemyMeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	UE_LOG(LogTemp, Error, TEXT("Set up attack"));
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		UE_LOG(LogTemp, Error, TEXT("Ending Attack no commitment"));
@@ -36,7 +37,6 @@ void UGA_EnemyMeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		return;
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("Set up attack"));
 
 	UAbilityTask_WaitGameplayEvent* WaitForActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetBasicAttackActivationTag());
 	WaitForActivation->EventReceived.AddDynamic(this, &UGA_EnemyMeleeAttack::TryCommitAttack);

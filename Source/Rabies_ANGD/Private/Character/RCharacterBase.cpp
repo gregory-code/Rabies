@@ -83,15 +83,15 @@ void ARCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	//SetupAbilitySystemComponent();
-	//InitAttributes();
-	//InitAbilities();
+	SetupAbilitySystemComponent();
+	InitAttributes();
+	InitAbilities();
 
 	if (NewController && NewController->IsPlayerController())
 	{
-		SetupAbilitySystemComponent();
-		InitAttributes();
-		InitAbilities();
+		//SetupAbilitySystemComponent();
+		//InitAttributes();
+		//InitAbilities();
 	}
 
 	if (HasAuthority() && Controller && Controller->IsPlayerController())
@@ -154,7 +154,6 @@ void ARCharacterBase::StartDeath()
 	AbilitySystemComponent->AddLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
 	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// change the AI perception
 	OnDeadStatusChanged.Broadcast(true);
 }
 

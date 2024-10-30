@@ -8,6 +8,8 @@
 #include "GameplayAbilities/GA_AbilityBase.h"
 
 #include "Character/RCharacterBase.h"
+#include "GameplayAbilities/GA_AbilityBase.h"
+
 #include "Enemy/REnemyBase.h"
 
 #include "Enemy/GA_EnemyMeleeAttack.h"
@@ -64,7 +66,6 @@ void AREnemyAIController::BeginPlay()
 	if (Enemy)
 	{
 		Enemy->OnDeadStatusChanged.AddUObject(this, &AREnemyAIController::PawnDeathStatusChanged);
-		InitEnemyAbilities();
 	}
 }
 
@@ -144,12 +145,4 @@ void AREnemyAIController::PawnDeathStatusChanged(bool bIsDead)
 	{
 		GetBrainComponent()->StartLogic();
 	}
-}
-
-void AREnemyAIController::InitEnemyAbilities()
-{
-	UE_LOG(LogTemp, Error, TEXT("Set Abilities"));
-	Enemy->GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::BasicAttack);
-
-	Enemy->GetAbilitySystemComponent()->TryActivateAbilityByClass(UGA_EnemyMeleeAttack::StaticClass());
 }
