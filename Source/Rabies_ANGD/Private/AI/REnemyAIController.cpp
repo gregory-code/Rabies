@@ -28,9 +28,9 @@ AREnemyAIController::AREnemyAIController()
 	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>("AI Perception Component");
 
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>("Sight Config");
-	SightConfig->PeripheralVisionAngleDegrees = 85.0f;
-	SightConfig->SightRadius = 850.0f;
-	SightConfig->LoseSightRadius = 1000.0f;
+	SightConfig->PeripheralVisionAngleDegrees = 90.0f;
+	SightConfig->SightRadius = 1850.0f;
+	SightConfig->LoseSightRadius = 2000.0f;
 	SightConfig->SetMaxAge(5.0f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = false;
@@ -61,12 +61,6 @@ void AREnemyAIController::BeginPlay()
 
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AREnemyAIController::TargetPerceptionUpdated);
 	AIPerceptionComponent->OnTargetPerceptionForgotten.AddDynamic(this, &AREnemyAIController::TargetForgotton);
-
-	Enemy = Cast<AREnemyBase>(GetPawn());
-	if (Enemy)
-	{
-		Enemy->OnDeadStatusChanged.AddUObject(this, &AREnemyAIController::PawnDeathStatusChanged);
-	}
 }
 
 void AREnemyAIController::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
@@ -80,6 +74,21 @@ void AREnemyAIController::GetActorEyesViewPoint(FVector& OutLocation, FRotator& 
 	else
 	{
 		Super::GetActorEyesViewPoint(OutLocation, OutRotation);
+	}
+}
+
+void AREnemyAIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	ARCharacterBase* character = Cast<ARCharacterBase>(InPawn);
+	if (character)
+	{
+		Enemy = Cast<AREnemyBase>(character);
+		if (Enemy)
+		{
+			Enemy->OnDeadStatusChanged.AddUObject(this, &AREnemyAIController::PawnDeathStatusChanged);
+		}
 	}
 }
 
@@ -139,6 +148,7 @@ void AREnemyAIController::PawnDeathStatusChanged(bool bIsDead)
 {
 	if (bIsDead)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Brain is dead"), *GetName());
 		GetBrainComponent()->StopLogic("Dead");
 	}
 	else

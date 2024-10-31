@@ -116,7 +116,7 @@ void ARCharacterBase::InitStatusHUD()
 
 	if (AttributeSet)
 	{
-		UE_LOG(LogTemp, Error, TEXT("health is: %d / %d"), AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
+		//UE_LOG(LogTemp, Error, TEXT("health is: %d / %d"), AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
 		HealthBar->SetHealth(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
 	}
 	else

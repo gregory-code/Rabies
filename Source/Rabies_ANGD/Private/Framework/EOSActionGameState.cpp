@@ -21,12 +21,12 @@ void AEOSActionGameState::BeginPlay()
 
     if (spawnLocations.Num() <= AmountOfChests) return;
 
-    /*for (int i = 0; i < AmountOfChests; i++)
+    for (int i = 0; i < AmountOfChests; i++)
     {
         float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
         SpawnChest(spawnLocations[randomSpawn]->GetActorLocation());
         spawnLocations.RemoveAt(randomSpawn);
-    }*/
+    }
 
     float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
     SpawnEnemy(0, spawnLocations[randomSpawn]->GetActorLocation());

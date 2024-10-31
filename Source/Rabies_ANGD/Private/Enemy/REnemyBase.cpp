@@ -56,5 +56,9 @@ void AREnemyBase::HitDetected(UPrimitiveComponent* HitComponent, AActor* OtherAc
 
 void AREnemyBase::DeadStatusUpdated(bool bIsDead)
 {
-	
+	UE_LOG(LogTemp, Error, TEXT("Dead"));
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AIPerceptionSourceComp->UnregisterFromPerceptionSystem();
 }
