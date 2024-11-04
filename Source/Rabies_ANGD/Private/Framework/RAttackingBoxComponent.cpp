@@ -3,7 +3,11 @@
 
 #include "Framework/RAttackingBoxComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Framework/EOSActionGameState.h"
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
+#include "Actors/ItemChest.h"
+#include "Kismet/GameplayStatics.h"
 #include "DisplayDebugHelpers.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
@@ -15,6 +19,7 @@ void URAttackingBoxComponent::StartDetection()
 
 void URAttackingBoxComponent::DoAttackCheck()
 {
+
 	TArray<FOverlapResult> outResult;
 	FCollisionShape detectionShape;
 	const FVector extend = GetScaledBoxExtent();
@@ -29,7 +34,9 @@ void URAttackingBoxComponent::DoAttackCheck()
 		{
 			AActor* overlappedActor = result.GetActor();
 			if (result.GetComponent() == overlappedActor->GetRootComponent())
+			{
 				TargetFound(overlappedActor);
+			}
 		}
 	}
 
@@ -52,5 +59,4 @@ void URAttackingBoxComponent::TargetFound(AActor* OverlappedActor)
 	FGameplayEventData data;
 	data.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(OverlappedActor);
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), URAbilityGenericTags::GetGenericTargetAquiredTag(), data);
-
 }

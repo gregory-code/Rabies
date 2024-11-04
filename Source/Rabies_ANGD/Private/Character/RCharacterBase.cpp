@@ -267,6 +267,11 @@ void ARCharacterBase::GravityUpdated(const FOnAttributeChangeData& ChangeData)
 	GetCharacterMovement()->GravityScale = ChangeData.NewValue;
 }
 
+void ARCharacterBase::ServerPlayAnimMontage_Implementation(UAnimMontage* montage)
+{
+	PlayAnimMontage(montage);
+}
+
 void ARCharacterBase::ClientPlayAnimMontage_Implementation(UAnimMontage* montage)
 {
 	if (!HasAuthority())

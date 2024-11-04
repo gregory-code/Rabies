@@ -112,6 +112,10 @@ private:
 	void GravityUpdated(const FOnAttributeChangeData& ChangeData);
 
 public:
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ServerPlayAnimMontage(UAnimMontage* montage);
+
 	UFUNCTION(NetMulticast, Unreliable)
 	void ClientPlayAnimMontage(UAnimMontage* montage);
 

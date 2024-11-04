@@ -100,6 +100,7 @@ void UGA_RangedGattlingAttack::RecieveAttackHitscan(AActor* hitActor, FVector st
 
 			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RangedGattlingDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
+			SignalDamageStimuliEvent(Payload.TargetData);
 		}
 	}
 }

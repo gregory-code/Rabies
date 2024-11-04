@@ -10,6 +10,8 @@
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "Framework/EOSActionGameState.h"
+
 #include "AbilitySystemBlueprintLibrary.h"
 
 #include "Enemy/REnemyBase.h"
@@ -49,11 +51,13 @@ void UGA_EnemyMeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 void UGA_EnemyMeleeAttack::TryCommitAttack(FGameplayEventData Payload)
 {
-	ARCharacterBase* character = Cast<ARCharacterBase>(GetOwningActorFromActorInfo());
-	if (character)
+	if (K2_HasAuthority())
 	{
-		character->ClientPlayAnimMontage(AttackAnim);
-		character->PlayAnimMontage(AttackAnim);
+		ARCharacterBase* character = Cast<ARCharacterBase>(GetOwningActorFromActorInfo());
+		if (character)
+		{
+			character->ServerPlayAnimMontage(AttackAnim);
+		}
 	}
 }
 
@@ -61,11 +65,9 @@ void UGA_EnemyMeleeAttack::HandleDamage(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Sending damage!!!!"));
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(AttackDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
-		
-		// Signal Damage Event stimuli
+		SignalDamageStimuliEvent(Payload.TargetData);
 
 	}
 }

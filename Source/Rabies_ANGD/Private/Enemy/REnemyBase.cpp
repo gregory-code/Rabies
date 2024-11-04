@@ -35,6 +35,8 @@ AREnemyBase::AREnemyBase()
 
 	AIPerceptionSourceComp = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>("AI Perception Souce Comp");
 	AIPerceptionSourceComp->RegisterForSense(UAISense_Sight::StaticClass());
+
+	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }
 
 void AREnemyBase::BeginPlay()
