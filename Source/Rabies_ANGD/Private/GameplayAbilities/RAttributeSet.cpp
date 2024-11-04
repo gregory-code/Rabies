@@ -87,6 +87,11 @@ void URAttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldValue)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(URAttributeSet, MovementSpeed, OldValue);
 }
 
+void URAttributeSet::OnRep_Scrap(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URAttributeSet, Scrap, OldValue);
+}
+
 void URAttributeSet::OnRep_Gravity(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(URAttributeSet, Gravity, OldValue);
@@ -195,6 +200,7 @@ void URAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 	DOREPLIFETIME_CONDITION_NOTIFY(URAttributeSet, UltimateCooldownReduction, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(URAttributeSet, MovementSpeed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(URAttributeSet, Scrap, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(URAttributeSet, Gravity, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(URAttributeSet, ReviveSpeed, COND_None, REPNOTIFY_Always);
 

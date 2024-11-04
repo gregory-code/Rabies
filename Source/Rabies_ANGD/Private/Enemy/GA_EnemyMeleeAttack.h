@@ -24,6 +24,9 @@ private:
 	UFUNCTION()
 	void TryCommitAttack(FGameplayEventData Payload);
 
+	UFUNCTION()
+	void HandleDamage(FGameplayEventData Payload);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> AttackDamage;
 

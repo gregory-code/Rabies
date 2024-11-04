@@ -19,6 +19,8 @@
 
 #include "Widgets/HealthBar.h"
 
+#include "Framework/RAttackingBoxComponent.h"
+
 #include "Net/UnrealNetwork.h"
 
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
@@ -48,6 +50,9 @@ ARCharacterBase::ARCharacterBase()
 
 	HealthBarWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Status Widget Comp");
 	HealthBarWidgetComp->SetupAttachment(GetRootComponent());
+
+	AttackingBoxComponent = CreateDefaultSubobject<URAttackingBoxComponent>("Attacking Box Component");
+	AttackingBoxComponent->SetupAttachment(GetMesh());
 }
 
 void ARCharacterBase::SetupAbilitySystemComponent()

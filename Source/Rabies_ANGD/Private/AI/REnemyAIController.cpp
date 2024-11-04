@@ -148,7 +148,6 @@ void AREnemyAIController::PawnDeathStatusChanged(bool bIsDead)
 {
 	if (bIsDead)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Brain is dead"), *GetName());
 		GetBrainComponent()->StopLogic("Dead");
 	}
 	else

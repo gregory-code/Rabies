@@ -64,6 +64,8 @@ public:
 
 private:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Attacking")
+	class URAttackingBoxComponent* AttackingBoxComponent;
 
 	void PlayMontage(UAnimMontage* MontageToPlay);
 

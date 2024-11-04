@@ -41,6 +41,10 @@ void UGA_EnemyMeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	UAbilityTask_WaitGameplayEvent* WaitForActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetBasicAttackActivationTag());
 	WaitForActivation->EventReceived.AddDynamic(this, &UGA_EnemyMeleeAttack::TryCommitAttack);
 	WaitForActivation->ReadyForActivation();
+
+	UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
+	WaitForDamage->EventReceived.AddDynamic(this, &UGA_EnemyMeleeAttack::HandleDamage);
+	WaitForDamage->ReadyForActivation();
 }
 
 void UGA_EnemyMeleeAttack::TryCommitAttack(FGameplayEventData Payload)
@@ -50,5 +54,18 @@ void UGA_EnemyMeleeAttack::TryCommitAttack(FGameplayEventData Payload)
 	{
 		character->ClientPlayAnimMontage(AttackAnim);
 		character->PlayAnimMontage(AttackAnim);
+	}
+}
+
+void UGA_EnemyMeleeAttack::HandleDamage(FGameplayEventData Payload)
+{
+	if (K2_HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Sending damage!!!!"));
+		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(AttackDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
+		
+		// Signal Damage Event stimuli
+
 	}
 }

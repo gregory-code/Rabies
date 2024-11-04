@@ -34,6 +34,7 @@ public:
 	ATTRIBUTE_ACCESSORS(URAttributeSet, AbilityCooldownReduction)
 	ATTRIBUTE_ACCESSORS(URAttributeSet, UltimateCooldownReduction)
 	ATTRIBUTE_ACCESSORS(URAttributeSet, MovementSpeed)
+	ATTRIBUTE_ACCESSORS(URAttributeSet, Scrap)
 	ATTRIBUTE_ACCESSORS(URAttributeSet, Gravity)
 	ATTRIBUTE_ACCESSORS(URAttributeSet, ReviveSpeed)
 	ATTRIBUTE_ACCESSORS(URAttributeSet, BasicAttackLifesteal)
@@ -88,6 +89,10 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_MovementSpeed)
 	FGameplayAttributeData MovementSpeed;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Scrap)
+	FGameplayAttributeData Scrap;
+
 
 	UPROPERTY(ReplicatedUsing = OnRep_Gravity)
 	FGameplayAttributeData Gravity;
@@ -175,6 +180,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_MovementSpeed(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_Scrap(const FGameplayAttributeData& OldValue);
 	UFUNCTION()
 	void OnRep_Gravity(const FGameplayAttributeData& OldValue);
 
