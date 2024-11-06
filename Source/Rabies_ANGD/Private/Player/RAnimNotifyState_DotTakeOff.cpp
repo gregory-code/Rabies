@@ -18,7 +18,8 @@ void URAnimNotifyState_DotTakeOff::NotifyBegin(USkeletalMeshComponent* MeshComp,
 	Player = Cast<ARPlayerBase>(MeshComp->GetOwner());
 	if (!Player) return;
 
-	Player->PleaseSaveMe();
+	FGameplayEventData eventData;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player, URAbilityGenericTags::GetApplyGravityJump(), eventData);
 }
 
 void URAnimNotifyState_DotTakeOff::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)

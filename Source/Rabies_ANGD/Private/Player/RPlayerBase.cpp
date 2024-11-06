@@ -396,24 +396,3 @@ void ARPlayerBase::SetPlayerState()
 		EOSPlayerState->Server_OnPossessPlayer(this);
 	}
 }
-
-void ARPlayerBase::PleaseSaveMe()
-{
-	PerformDotFly();
-}
-
-void ARPlayerBase::PerformDotFly_Implementation()
-{
-	if (EOSPlayerState)
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s God please"), *GetName());
-		//FGameplayEventData eventData;
-		//UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, URAbilityGenericTags::GetApplyGravityJump(), eventData);
-		EOSPlayerState->Server_ProcessDotFly();
-	}
-}
-
-bool ARPlayerBase::PerformDotFly_Validate()
-{
-	return true;
-}

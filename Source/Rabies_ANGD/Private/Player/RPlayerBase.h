@@ -56,12 +56,6 @@ public:
 	UFUNCTION()
 	void SetPlayerState();
 
-	UFUNCTION()
-	void PleaseSaveMe();
-
-	UFUNCTION(NetMulticast, Unreliable, WithValidation)
-	void PerformDotFly();
-
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "View")

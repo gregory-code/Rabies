@@ -82,14 +82,14 @@ void AEOSPlayerState::OnRep_SelectedCharacter()
 	OnSelectedCharacterReplicated.Broadcast(SelectedCharacter);
 }
 
-void AEOSPlayerState::Server_ProcessDotFly_Implementation()
+void AEOSPlayerState::Server_ProcessDotFly_Implementation(ARPlayerBase* player)
 {
-	UE_LOG(LogTemp, Error, TEXT("%s Gravity jump implementaiton"), *GetName());
 	FGameplayEventData eventData;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), URAbilityGenericTags::GetApplyGravityJump(), eventData);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(player, URAbilityGenericTags::GetApplyGravityJump(), eventData);
+	UE_LOG(LogTemp, Error, TEXT("%s Gravity jump implementaiton"), *GetName());
 }
 
-bool AEOSPlayerState::Server_ProcessDotFly_Validate()
+bool AEOSPlayerState::Server_ProcessDotFly_Validate(ARPlayerBase* player)
 {
 	return true;
 }
