@@ -5,6 +5,8 @@
 #include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayAbilities/RAbilitySystemComponent.h"
+#include "Framework/EOSPlayerState.h"
+#include "GameFramework/PlayerState.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
@@ -16,8 +18,7 @@ void URAnimNotifyState_DotTakeOff::NotifyBegin(USkeletalMeshComponent* MeshComp,
 	Player = Cast<ARPlayerBase>(MeshComp->GetOwner());
 	if (!Player) return;
 
-	FGameplayEventData eventData;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player, URAbilityGenericTags::GetApplyGravityJump(), eventData);
+	Player->PleaseSaveMe();
 }
 
 void URAnimNotifyState_DotTakeOff::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)

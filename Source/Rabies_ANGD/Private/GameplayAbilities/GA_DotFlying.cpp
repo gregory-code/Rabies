@@ -144,6 +144,7 @@ void UGA_DotFlying::ApplyGravityJump(FGameplayEventData Payload)
 	FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(GravityJumpClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 	GravityJumpEffectHandle = ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
 
+	UE_LOG(LogTemp, Warning, TEXT("Processing Gravity Jump"));
 	Player->Jump();
 }
 
