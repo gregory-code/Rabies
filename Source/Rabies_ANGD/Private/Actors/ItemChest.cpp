@@ -51,7 +51,7 @@ void AItemChest::Tick(float DeltaTime)
 
 void AItemChest::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ARPlayerBase* player = Cast<ARPlayerBase>(OtherActor); // save player
+	player = Cast<ARPlayerBase>(OtherActor);
 	if (!player)
 	{
 		return;
@@ -69,7 +69,7 @@ void AItemChest::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 
 void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ARPlayerBase* player = Cast<ARPlayerBase>(OtherActor);
+	player = Cast<ARPlayerBase>(OtherActor);
 	if (!player)
 	{
 		return;
@@ -80,8 +80,7 @@ void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 		SetUpUI(false);
 	}
 
-	//player->PlayerInteraction.Remove(FOnPlayerInteraction); // figure out how to remove UObject so that it doesn't interact when not in range.
-
+	player->PlayerInteraction.Clear();
 }
 
 void AItemChest::SetUpUI(bool SetInteraction)
@@ -103,6 +102,13 @@ void AItemChest::SetUpUI(bool SetInteraction)
 
 void AItemChest::Interact()
 {
+	if (ScrapRequired > 10)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Not Enough Scrap"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Thank you for your purchase"));
 	Destroy();
 	// this is where you'd check how much money they have and then if they have enough send the RPC to the server to get item
 }

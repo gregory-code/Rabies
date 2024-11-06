@@ -25,6 +25,16 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "ChestDetail")
 	class USphereComponent* SphereCollider;
 
+	UPROPERTY(EditDefaultsOnly, Category = "ChestDetail")
+	int ScrapRequired;
+
+	int PlayerScrap;
+
+	class ARPlayerBase* player;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<class UGameplayEffect> ScrapPrice;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
