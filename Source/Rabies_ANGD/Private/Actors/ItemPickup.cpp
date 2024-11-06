@@ -42,5 +42,6 @@ void AItemPickup::OnOverlapBegin(AActor* overlappedActor, AActor* otherActor)
 		return;
 	}
 
+	//GiveAbility Data Asset
 
 }

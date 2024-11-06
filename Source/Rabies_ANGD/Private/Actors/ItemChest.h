@@ -42,5 +42,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "InteractionWidget")
 	TSubclassOf<class UUserWidget> InteractionWidget;
 
-	UUserWidget* WidgetInstance;
+	UUserWidget* WidgetInstance = nullptr;
+
+	UFUNCTION()
+	void SetUpUI(bool SetInteraction);
+
+	UFUNCTION()
+	void Interact();
 };

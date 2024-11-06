@@ -13,6 +13,7 @@ class UInputMappingContext;
 class UInputAction;
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnClientHitScan, AActor* /*Hit Target*/, FVector /* Start Pos */, FVector /* End Pos */);
+DECLARE_MULTICAST_DELEGATE(FOnPlayerInteraction);
 /**
  * 
  */
@@ -26,6 +27,8 @@ public:
 
 public:
 	FOnClientHitScan ClientHitScan;
+
+	FOnPlayerInteraction PlayerInteraction;
 
 	UFUNCTION(NetMulticast, Unreliable, WithValidation)
 	void ClientHitScanResult(AActor* hitActor, FVector start, FVector end);
@@ -187,15 +190,7 @@ private:
 	float cameraClampMax;
 	bool bIsScoping;
 
-	/////////////////////////////////
-	/*          Interact           */
-	////////////////////////////////
-
-	bool canInteract;
-
 public:
-
-	void SetInteraction(bool setInteract);
 
 	/////////////////////////////////
 	/*          Pause	           */
