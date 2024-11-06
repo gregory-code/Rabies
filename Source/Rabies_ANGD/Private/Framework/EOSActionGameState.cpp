@@ -33,9 +33,9 @@ void AEOSActionGameState::BeginPlay()
         spawnLocations.RemoveAt(randomSpawn);
     }
 
-    float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
-    SpawnEnemy(0, spawnLocations[randomSpawn]->GetActorLocation());
-    spawnLocations.RemoveAt(randomSpawn);
+    //float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
+    //SpawnEnemy(0, spawnLocations[randomSpawn]->GetActorLocation());
+    //spawnLocations.RemoveAt(randomSpawn);
 }
 
 void AEOSActionGameState::SpawnChest_Implementation(FVector SpawnLocation)
@@ -44,8 +44,8 @@ void AEOSActionGameState::SpawnChest_Implementation(FVector SpawnLocation)
     {
         FActorSpawnParameters SpawnParams;
         AItemChest* newChest = GetWorld()->SpawnActor<AItemChest>(ItemChestClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+        newChest->SetOwner(this);
         AllChests.Add(newChest); // make sure that the chest has bReplicates to true
-        // You can do additional setup for NewActor if necessary
     }
 }
 
@@ -56,7 +56,21 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
         FActorSpawnParameters SpawnParams;
         AREnemyBase* newEnemy = GetWorld()->SpawnActor<AREnemyBase>(EnemyLibrary[EnemyIDToSpawn], SpawnLocation, FRotator::ZeroRotator, SpawnParams);
         AllEnemies.Add(newEnemy); // make sure that the enemies has bReplicates to true
-        // You can do additional setup for NewActor if necessary
+    }
+}
+
+void AEOSActionGameState::OpenedChest(AItemChest* openedChest)
+{
+    UE_LOG(LogTemp, Error, TEXT("Checking Auth"));
+    OpenedChestProcess();
+}
+
+void AEOSActionGameState::OpenedChestProcess_Implementation()
+{
+    if (HasAuthority()) // Ensure we're on the server
+    {
+        UE_LOG(LogTemp, Error, TEXT("Got auth"));
+        //openedChest->UpdateChestOpened();
     }
 }
 

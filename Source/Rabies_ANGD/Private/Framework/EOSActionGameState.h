@@ -6,6 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "EOSActionGameState.generated.h"
 
+class AItemChest;
+
 /**
  * 
  */
@@ -15,6 +17,9 @@ class AEOSActionGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION()
+	void OpenedChest(AItemChest* openedChest);
 
 private:
 
@@ -27,6 +32,9 @@ private:
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void SpawnEnemy(int EnemyIDToSpawn, FVector SpawnLocation);
 
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void OpenedChestProcess();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Chest")
 	TSubclassOf<class AItemChest> ItemChestClass;
 
@@ -34,7 +42,7 @@ private:
 	TArray<TSubclassOf<class AREnemyBase>> EnemyLibrary;
 
 	UPROPERTY(Replicated)
-	TArray<class AItemChest*> AllChests;
+	TArray<AItemChest*> AllChests;
 
 	UPROPERTY(Replicated)
 	TArray<class AREnemyBase*> AllEnemies;

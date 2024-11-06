@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "ItemChest.generated.h"
 
+
 UCLASS()
 class AItemChest : public AActor
 {
@@ -16,6 +17,7 @@ public:
 	AItemChest();
 
 private:
+
 	UPROPERTY(VisibleAnywhere, Category = "Chest Detail")
 	class UStaticMeshComponent* ChestBottomMesh;
 
@@ -25,15 +27,22 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "ChestDetail")
 	class USphereComponent* SphereCollider;
 
-	UPROPERTY(EditDefaultsOnly, Category = "ChestDetail")
-	int ScrapRequired;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	class UWidgetComponent* InteractWidgetComp;
+
+	UPROPERTY()
+	class UChestInteractUI* InteractWidget;
 
 	int PlayerScrap;
 
 	class ARPlayerBase* player;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	TSubclassOf<class UGameplayEffect> ScrapPrice;
+	TSubclassOf<class UGameplayEffect> ScrapPriceEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	int ScrapPrice;
 
 protected:
 	// Called when the game starts or when spawned
@@ -49,14 +58,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Chest Detail")
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UPROPERTY(EditDefaultsOnly, Category = "InteractionWidget")
-	TSubclassOf<class UUserWidget> InteractionWidget;
-
-	UUserWidget* WidgetInstance = nullptr;
-
 	UFUNCTION()
 	void SetUpUI(bool SetInteraction);
 
 	UFUNCTION()
+	void UpdateChestOpened();
+
+private:
+
+	UPROPERTY(Replicated)
+	bool bWasOpened;
+
+	UFUNCTION()
 	void Interact();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_OpenChest();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // need this when doing Replicated things
 };

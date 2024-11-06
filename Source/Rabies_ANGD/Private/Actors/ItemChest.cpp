@@ -8,11 +8,29 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Framework/EOSActionGameState.h"
+
+#include "GameplayAbilities/GA_AbilityBase.h"
+#include "GameplayAbilities/RAbilityGenericTags.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+
+#include "Abilities/GameplayAbility.h"
+
+#include "Net/UnrealNetwork.h"
+
+#include "ScalableFloat.h"
+#include "GameplayEffectTypes.h"
+#include "GameplayEffect.h"
+
+#include "Widgets/ChestInteractUI.h"
+#include "Components/WidgetComponent.h"
+
 // Sets default values
 AItemChest::AItemChest()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	bReplicates = true;
 
@@ -33,6 +51,9 @@ AItemChest::AItemChest()
 
 	SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &AItemChest::OnOverlapBegin);
 	SphereCollider->OnComponentEndOverlap.AddDynamic(this, &AItemChest::OnOverlapEnd);
+
+	InteractWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Status Widget Comp");
+	InteractWidgetComp->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
@@ -40,31 +61,28 @@ void AItemChest::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetUpUI(true);
 }
 
 // Called every frame
 void AItemChest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AItemChest::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	player = Cast<ARPlayerBase>(OtherActor);
-	if (!player)
+	if (!player || bWasOpened)
 	{
 		return;
 	}
-	//player->Attribute
+
+	Server_OpenChest();
+
 	player->PlayerInteraction.AddUObject(this, &AItemChest::Interact);
 
-
-	if (InteractionWidget)
-	{
-		SetUpUI(true);
-	}
-
+	InteractWidget->SetVisibility(ESlateVisibility::Visible);
 }
 
 void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -75,40 +93,69 @@ void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 		return;
 	}
 
-	if (InteractionWidget)
-	{
-		SetUpUI(false);
-	}
+	InteractWidget->SetVisibility(ESlateVisibility::Hidden);
 
 	player->PlayerInteraction.Clear();
 }
 
 void AItemChest::SetUpUI(bool SetInteraction)
 {
-	if (!WidgetInstance && InteractionWidget)
-	{
-		WidgetInstance = CreateWidget<UUserWidget>(GetWorld(), InteractionWidget);
-	}
-
-	if (WidgetInstance && SetInteraction)
-	{
-		WidgetInstance->AddToViewport();
-	}
-	else if (WidgetInstance && !SetInteraction)
-	{
-		WidgetInstance->RemoveFromParent();
-	}
+	InteractWidget = Cast<UChestInteractUI>(InteractWidgetComp->GetUserWidgetObject());
+	InteractWidget->SetCostText(ScrapPrice);
+	InteractWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AItemChest::Interact()
 {
-	if (ScrapRequired > 10)
+	if (bWasOpened)
+		return;
+
+	if (ScrapPrice > player->GetCurrentScrap())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Not Enough Scrap"));
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Thank you for your purchase"));
-	Destroy();
-	// this is where you'd check how much money they have and then if they have enough send the RPC to the server to get item
+	Server_OpenChest();
+	return;
+
+	UAbilitySystemComponent* ASC = player->GetAbilitySystemComponent();
+	if (ASC && ScrapPriceEffect)
+	{
+		FGameplayEffectContextHandle effectContext = ASC->MakeEffectContext();
+		FGameplayEffectSpecHandle effectSpecHandle = ASC->MakeOutgoingSpec(ScrapPriceEffect, 1.0f, effectContext);
+		ASC->ApplyGameplayEffectSpecToSelf(*effectSpecHandle.Data.Get());
+		AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
+		if (gameState == GetOwner())
+		{
+			//gameState->OpenedChest(this);
+		}
+	}
+}
+
+void AItemChest::Server_OpenChest_Implementation()
+{
+	UE_LOG(LogTemp, Error, TEXT("What the hell"));
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Actually on the server yo"));
+	}
+}
+
+bool AItemChest::Server_OpenChest_Validate()
+{
+	return true;
+}
+
+
+void AItemChest::UpdateChestOpened()
+{
+	InteractWidget->SetVisibility(ESlateVisibility::Hidden);
+	bWasOpened = true;
+}
+
+void AItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(AItemChest, bWasOpened, COND_None);
 }
