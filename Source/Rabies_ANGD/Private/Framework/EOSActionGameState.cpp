@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "DisplayDebugHelpers.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
+#include "Actors/ItemPickup.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Animation/AnimMontage.h"
 #include "GameplayAbilities/RAbilitySystemComponent.h"
@@ -59,18 +60,27 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
     }
 }
 
-void AEOSActionGameState::OpenedChest(AItemChest* openedChest)
+void AEOSActionGameState::SelectChest(AItemChest* openedChest)
 {
-    UE_LOG(LogTemp, Error, TEXT("Checking Auth"));
-    OpenedChestProcess();
+    for (int i = 0; i < AllChests.Num(); i++)
+    {
+        if (openedChest == AllChests[i])
+        {
+            OpenedChest(i);
+            return;
+        }
+    }
 }
 
-void AEOSActionGameState::OpenedChestProcess_Implementation()
+void AEOSActionGameState::OpenedChest_Implementation(int chestID)
 {
     if (HasAuthority()) // Ensure we're on the server
     {
-        UE_LOG(LogTemp, Error, TEXT("Got auth"));
-        //openedChest->UpdateChestOpened();
+        AllChests[chestID]->UpdateChestOpened();
+
+        FActorSpawnParameters SpawnParams;
+        AItemPickup* newitem = GetWorld()->SpawnActor<AItemPickup>(ItemPickupClass, AllChests[chestID]->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+        newitem->SetOwner(this);
     }
 }
 

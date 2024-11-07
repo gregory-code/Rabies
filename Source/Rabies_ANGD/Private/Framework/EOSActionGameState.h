@@ -19,7 +19,7 @@ class AEOSActionGameState : public AGameStateBase
 public:
 
 	UFUNCTION()
-	void OpenedChest(AItemChest* openedChest);
+	void SelectChest(AItemChest* openedChest);
 
 private:
 
@@ -33,10 +33,13 @@ private:
 	void SpawnEnemy(int EnemyIDToSpawn, FVector SpawnLocation);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void OpenedChestProcess();
+	void OpenedChest(int chestID);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chest")
 	TSubclassOf<class AItemChest> ItemChestClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chest")
+	TSubclassOf<class AItemPickup> ItemPickupClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
 	TArray<TSubclassOf<class AREnemyBase>> EnemyLibrary;

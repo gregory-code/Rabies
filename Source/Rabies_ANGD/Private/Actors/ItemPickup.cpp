@@ -4,6 +4,7 @@
 #include "Actors/ItemPickup.h"
 #include "Player/RPlayerBase.h"
 #include "Components/BoxComponent.h"
+#include "Framework/RItemDataAsset.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -36,6 +37,11 @@ void AItemPickup::Tick(float DeltaTime)
 
 }
 
+void AItemPickup::SetupItem(URItemDataAsset* itemAsset)
+{
+	
+}
+
 void AItemPickup::OnOverlapBegin(AActor* overlappedActor, AActor* otherActor)
 {
 	ARPlayerBase* player = Cast<ARPlayerBase>(otherActor);
@@ -43,6 +49,7 @@ void AItemPickup::OnOverlapBegin(AActor* overlappedActor, AActor* otherActor)
 	{
 		return;
 	}
+
 
 	//GiveAbility Data Asset
 

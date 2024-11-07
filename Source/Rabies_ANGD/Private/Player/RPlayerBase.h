@@ -56,6 +56,13 @@ public:
 	UFUNCTION()
 	void SetPlayerState();
 
+	UFUNCTION()
+	void SetInteractionChest(class AItemChest* chest);
+
+private:
+
+	class AItemChest* interactionChest;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "View")
@@ -222,4 +229,7 @@ private:
 
 	UPROPERTY()
 	class AEOSPlayerState* EOSPlayerState;
+
+	UFUNCTION(Server, Reliable)
+	void ServerRequestInteraction(class AItemChest* Chest);
 };

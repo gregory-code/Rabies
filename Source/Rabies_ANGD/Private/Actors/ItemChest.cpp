@@ -33,6 +33,7 @@ AItemChest::AItemChest()
 	PrimaryActorTick.bCanEverTick = false;
 
 	bReplicates = true;
+	SetReplicates(true);
 
 	ChestBottomMesh = CreateDefaultSubobject<UStaticMeshComponent>("Chest Bottom Mesh");
 	ChestBottomMesh->SetupAttachment(GetRootComponent());
@@ -68,6 +69,7 @@ void AItemChest::BeginPlay()
 void AItemChest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 void AItemChest::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -78,11 +80,11 @@ void AItemChest::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 		return;
 	}
 
-	Server_OpenChest();
+	bWithinInteraction = true;
+	InteractWidget->SetVisibility(ESlateVisibility::Visible);
 
 	player->PlayerInteraction.AddUObject(this, &AItemChest::Interact);
 
-	InteractWidget->SetVisibility(ESlateVisibility::Visible);
 }
 
 void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -93,6 +95,7 @@ void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 		return;
 	}
 
+	bWithinInteraction = false;
 	InteractWidget->SetVisibility(ESlateVisibility::Hidden);
 
 	player->PlayerInteraction.Clear();
@@ -116,10 +119,9 @@ void AItemChest::Interact()
 		return;
 	}
 
-	Server_OpenChest();
-	return;
+	player->SetInteractionChest(this);
 
-	UAbilitySystemComponent* ASC = player->GetAbilitySystemComponent();
+	/*UAbilitySystemComponent* ASC = player->GetAbilitySystemComponent();
 	if (ASC && ScrapPriceEffect)
 	{
 		FGameplayEffectContextHandle effectContext = ASC->MakeEffectContext();
@@ -130,26 +132,21 @@ void AItemChest::Interact()
 		{
 			//gameState->OpenedChest(this);
 		}
-	}
+	}*/
 }
 
 void AItemChest::Server_OpenChest_Implementation()
 {
-	UE_LOG(LogTemp, Error, TEXT("What the hell"));
 	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Actually on the server yo"));
+		Cast<AEOSActionGameState>(GetOwner())->SelectChest(this);
 	}
 }
 
-bool AItemChest::Server_OpenChest_Validate()
-{
-	return true;
-}
 
-
-void AItemChest::UpdateChestOpened()
+void AItemChest::UpdateChestOpened_Implementation()
 {
+	UE_LOG(LogTemp, Error, TEXT("Updated stuff"));
 	InteractWidget->SetVisibility(ESlateVisibility::Hidden);
 	bWasOpened = true;
 }

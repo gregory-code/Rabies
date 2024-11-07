@@ -12,6 +12,8 @@
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "Actors/ItemChest.h"
+
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Animation/AnimInstance.h"
@@ -298,15 +300,8 @@ void ARPlayerBase::CancelActionTriggered()
 
 void ARPlayerBase::Interact()
 {
-	//if (!canInteract)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("I cannot interact"));
-	//	return;
-	//}
-	
 	PlayerInteraction.Broadcast();
-
-	//UE_LOG(LogTemp, Warning, TEXT("I am interacting"));
+	ServerRequestInteraction(interactionChest); // if there's lag this might not work... Reconsider your options carefully
 }
 
 void ARPlayerBase::Pause()
@@ -388,6 +383,14 @@ void ARPlayerBase::SetPausetoFalse()
 	isPaused = false;
 }
 
+void ARPlayerBase::ServerRequestInteraction_Implementation(AItemChest* Chest)
+{
+	if (Chest)
+	{
+		Chest->Server_OpenChest();
+	}
+}
+
 void ARPlayerBase::SetPlayerState()
 {
 	EOSPlayerState = Cast<AEOSPlayerState>(GetPlayerState());
@@ -395,4 +398,9 @@ void ARPlayerBase::SetPlayerState()
 	{
 		EOSPlayerState->Server_OnPossessPlayer(this);
 	}
+}
+
+void ARPlayerBase::SetInteractionChest(AItemChest* chest)
+{
+	interactionChest = chest;
 }

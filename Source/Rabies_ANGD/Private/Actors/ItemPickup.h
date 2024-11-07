@@ -31,6 +31,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void SetupItem(class URItemDataAsset* itemAsset);
+
 	UFUNCTION(BlueprintCallable, Category = "Chest Detail")
 	void OnOverlapBegin(AActor* overlappedActor, AActor* otherActor);
 };

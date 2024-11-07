@@ -18,6 +18,9 @@ public:
 
 private:
 
+	bool bWithinInteraction;
+
+
 	UPROPERTY(VisibleAnywhere, Category = "Chest Detail")
 	class UStaticMeshComponent* ChestBottomMesh;
 
@@ -27,14 +30,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "ChestDetail")
 	class USphereComponent* SphereCollider;
 
-
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	class UWidgetComponent* InteractWidgetComp;
 
 	UPROPERTY()
 	class UChestInteractUI* InteractWidget;
-
-	int PlayerScrap;
 
 	class ARPlayerBase* player;
 
@@ -61,10 +61,11 @@ public:
 	UFUNCTION()
 	void SetUpUI(bool SetInteraction);
 
-	UFUNCTION()
+	UFUNCTION(NetMulticast, Unreliable)
 	void UpdateChestOpened();
 
 private:
+
 
 	UPROPERTY(Replicated)
 	bool bWasOpened;
@@ -72,8 +73,10 @@ private:
 	UFUNCTION()
 	void Interact();
 
-	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // need this when doing Replicated things
+
+public:
+	UFUNCTION(BlueprintCallable, Server, Unreliable)
 	void Server_OpenChest();
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // need this when doing Replicated things
 };
