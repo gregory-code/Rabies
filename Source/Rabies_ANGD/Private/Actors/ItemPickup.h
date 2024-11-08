@@ -24,16 +24,28 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Item Detail")
 	class UStaticMeshComponent* ItemMesh;
 
-	UPROPERTY(EditDefaultsOnly, Category = "ItemEffect")
-	TSubclassOf<class UGameplayEffect> ItemEffectClass;
+	UPROPERTY(VisibleAnywhere, Category = "ItemEffect")
+	class URItemDataAsset* ItemAsset;
+
+	UPROPERTY(VisibleAnywhere, Category = "ChestDetail")
+	class USphereComponent* SphereCollider;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Info")
+	UStaticMesh* NullMesh;
+
+	class ARPlayerBase* Player;
+
+public:
+	UFUNCTION(BlueprintCallable, Server, Unreliable)
+	void Server_PickupItem();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void PlayerPickupRequest(class ARPlayerBase* player);
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-	void SetupItem(class URItemDataAsset* itemAsset);
-
-	UFUNCTION(BlueprintCallable, Category = "Chest Detail")
-	void OnOverlapBegin(AActor* overlappedActor, AActor* otherActor);
+	UFUNCTION(NetMulticast, Unreliable)
+	void SetupItem(class URItemDataAsset* newItemAsset);
 };

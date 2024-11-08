@@ -59,9 +59,20 @@ public:
 	UFUNCTION()
 	void SetInteractionChest(class AItemChest* chest);
 
+	UFUNCTION()
+	void SetItemPickup(class AItemPickup* itemPickup, class URItemDataAsset* itemAsset);
+
 private:
 
+	UPROPERTY(VisibleAnywhere, Category = "Item Detail")
+	class USphereComponent* ItemPickupCollider;
+
 	class AItemChest* interactionChest;
+
+public:
+
+	UFUNCTION(BlueprintCallable, Category = "Item Detail")
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
 
@@ -232,4 +243,7 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRequestInteraction(class AItemChest* Chest);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRequestPickupItem(class AItemPickup* itemPickup, class URItemDataAsset* itemAsset);
 };

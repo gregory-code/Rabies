@@ -12,6 +12,9 @@
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "Framework/RItemDataAsset.h"
+
+
 #include "Actors/ItemChest.h"
 
 
@@ -25,7 +28,11 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Components/SphereComponent.h"
+
 #include "Net/UnrealNetwork.h"
+
+#include "Actors/ItemPickup.h"
 
 #include "Framework/RGameMode.h"
 
@@ -50,6 +57,13 @@ ARPlayerBase::ARPlayerBase()
 	GetCharacterMovement()->RotationRate = FRotator(1080.f);
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 2.0f;
+
+	// sphere radius
+	ItemPickupCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Item Collider"));
+	ItemPickupCollider->SetupAttachment(GetRootComponent());
+	ItemPickupCollider->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+
+	ItemPickupCollider->OnComponentBeginOverlap.AddDynamic(this, &ARPlayerBase::OnOverlapBegin);
 
 	cameraClampMax = 10;
 	cameraClampMin = -60;
@@ -383,6 +397,14 @@ void ARPlayerBase::SetPausetoFalse()
 	isPaused = false;
 }
 
+void ARPlayerBase::ServerRequestPickupItem_Implementation(AItemPickup* itemPickup, URItemDataAsset* itemAsset)
+{
+	if (itemPickup && itemAsset)
+	{
+		itemPickup->Server_PickupItem();
+	}
+}
+
 void ARPlayerBase::ServerRequestInteraction_Implementation(AItemChest* Chest)
 {
 	if (Chest)
@@ -403,4 +425,20 @@ void ARPlayerBase::SetPlayerState()
 void ARPlayerBase::SetInteractionChest(AItemChest* chest)
 {
 	interactionChest = chest;
+}
+
+void ARPlayerBase::SetItemPickup(AItemPickup* itemPickup, URItemDataAsset* itemAsset)
+{
+	ServerRequestPickupItem(itemPickup, itemAsset);
+}
+
+void ARPlayerBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Error, TEXT("Got le item overlap"));
+	AItemPickup* newItem = Cast<AItemPickup>(OtherActor);
+	if (newItem)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Sending le item erqurestus"));
+		newItem->PlayerPickupRequest(this);
+	}
 }

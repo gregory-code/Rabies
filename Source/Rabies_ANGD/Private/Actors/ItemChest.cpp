@@ -120,26 +120,24 @@ void AItemChest::Interact()
 	}
 
 	player->SetInteractionChest(this);
-
-	/*UAbilitySystemComponent* ASC = player->GetAbilitySystemComponent();
-	if (ASC && ScrapPriceEffect)
-	{
-		FGameplayEffectContextHandle effectContext = ASC->MakeEffectContext();
-		FGameplayEffectSpecHandle effectSpecHandle = ASC->MakeOutgoingSpec(ScrapPriceEffect, 1.0f, effectContext);
-		ASC->ApplyGameplayEffectSpecToSelf(*effectSpecHandle.Data.Get());
-		AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
-		if (gameState == GetOwner())
-		{
-			//gameState->OpenedChest(this);
-		}
-	}*/
 }
 
 void AItemChest::Server_OpenChest_Implementation()
 {
 	if (HasAuthority())
 	{
-		Cast<AEOSActionGameState>(GetOwner())->SelectChest(this);
+		UAbilitySystemComponent* ASC = player->GetAbilitySystemComponent();
+		if (ASC && ScrapPriceEffect)
+		{
+			FGameplayEffectContextHandle effectContext = ASC->MakeEffectContext();
+			FGameplayEffectSpecHandle effectSpecHandle = ASC->MakeOutgoingSpec(ScrapPriceEffect, 1.0f, effectContext);
+			ASC->ApplyGameplayEffectSpecToSelf(*effectSpecHandle.Data.Get());
+			AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
+			if (gameState == GetOwner())
+			{
+				gameState->SelectChest(this);
+			}
+		}
 	}
 }
 

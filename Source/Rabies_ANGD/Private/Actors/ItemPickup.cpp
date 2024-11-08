@@ -4,8 +4,21 @@
 #include "Actors/ItemPickup.h"
 #include "Player/RPlayerBase.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Framework/RItemDataAsset.h"
 #include "Kismet/GameplayStatics.h"
+#include "Abilities/GameplayAbility.h"
+
+#include "Blueprint/UserWidget.h"
+
+#include "Framework/EOSActionGameState.h"
+
+#include "GameplayAbilities/GA_AbilityBase.h"
+#include "GameplayAbilities/RAbilityGenericTags.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AItemPickup::AItemPickup()
@@ -17,7 +30,12 @@ AItemPickup::AItemPickup()
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>("Item Mesh");
 	ItemMesh->SetupAttachment(GetRootComponent());
-	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	// sphere radius
+	SphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider"));
+	SphereCollider->SetupAttachment(GetRootComponent());
+	SphereCollider->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
 	RootComponent = ItemMesh;
 }
@@ -26,8 +44,31 @@ AItemPickup::AItemPickup()
 void AItemPickup::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	OnActorBeginOverlap.AddDynamic(this, &AItemPickup::OnOverlapBegin);
+}
+
+void AItemPickup::Server_PickupItem_Implementation()
+{
+	if (HasAuthority())
+	{
+		UAbilitySystemComponent* ASC = Player->GetAbilitySystemComponent();
+		if (ASC && ItemAsset)
+		{
+			FGameplayEffectContextHandle effectContext = ASC->MakeEffectContext();
+			FGameplayEffectSpecHandle effectSpecHandle = ASC->MakeOutgoingSpec(ItemAsset->ItemEffect, 1.0f, effectContext);
+			ASC->ApplyGameplayEffectSpecToSelf(*effectSpecHandle.Data.Get());
+			AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
+			if (gameState == GetOwner())
+			{
+				gameState->SelectItem(this);
+			}
+		}
+	}
+}
+
+void AItemPickup::PlayerPickupRequest_Implementation(ARPlayerBase* player)
+{
+	Player = player;
+	Server_PickupItem();
 }
 
 // Called every frame
@@ -37,20 +78,18 @@ void AItemPickup::Tick(float DeltaTime)
 
 }
 
-void AItemPickup::SetupItem(URItemDataAsset* itemAsset)
+void AItemPickup::SetupItem_Implementation(URItemDataAsset* newItemAsset)
 {
-	
-}
+	ItemAsset = newItemAsset;
 
-void AItemPickup::OnOverlapBegin(AActor* overlappedActor, AActor* otherActor)
-{
-	ARPlayerBase* player = Cast<ARPlayerBase>(otherActor);
-	if (!player)
+	if (newItemAsset->ItemMesh == nullptr)
 	{
-		return;
+		ItemMesh->SetStaticMesh(NullMesh);
+	}
+	else
+	{
+		ItemMesh->SetStaticMesh(newItemAsset->ItemMesh);
 	}
 
-
-	//GiveAbility Data Asset
-
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 }

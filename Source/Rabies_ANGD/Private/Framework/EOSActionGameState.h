@@ -7,6 +7,8 @@
 #include "EOSActionGameState.generated.h"
 
 class AItemChest;
+class AItemPickup;
+class URItemDataAsset;
 
 /**
  * 
@@ -20,6 +22,9 @@ public:
 
 	UFUNCTION()
 	void SelectChest(AItemChest* openedChest);
+
+	UFUNCTION()
+	void SelectItem(AItemPickup* selectedItem);
 
 private:
 
@@ -35,17 +40,26 @@ private:
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void OpenedChest(int chestID);
 
-	UPROPERTY(EditDefaultsOnly, Category = "Chest")
-	TSubclassOf<class AItemChest> ItemChestClass;
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void PickedUpItem(int itemID);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chest")
-	TSubclassOf<class AItemPickup> ItemPickupClass;
+	TSubclassOf<AItemChest> ItemChestClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chest")
+	TSubclassOf<AItemPickup> ItemPickupClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
 	TArray<TSubclassOf<class AREnemyBase>> EnemyLibrary;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	TArray<URItemDataAsset*> ItemLibrary;
+
 	UPROPERTY(Replicated)
 	TArray<AItemChest*> AllChests;
+
+	UPROPERTY(Replicated)
+	TArray<AItemPickup*> AllItems;
 
 	UPROPERTY(Replicated)
 	TArray<class AREnemyBase*> AllEnemies;

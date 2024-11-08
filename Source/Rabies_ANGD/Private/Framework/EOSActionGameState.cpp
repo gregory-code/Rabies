@@ -72,15 +72,42 @@ void AEOSActionGameState::SelectChest(AItemChest* openedChest)
     }
 }
 
+void AEOSActionGameState::SelectItem(AItemPickup* selectedItem)
+{
+    for (int i = 0; i < AllItems.Num(); i++)
+    {
+        if (selectedItem == AllItems[i])
+        {
+            PickedUpItem(i);
+            return;
+        }
+    }
+}
+
+void AEOSActionGameState::PickedUpItem_Implementation(int itemID)
+{
+    if (HasAuthority()) // Ensure we're on the server
+    {
+        UE_LOG(LogTemp, Error, TEXT("Got le item I think"));
+        AllItems[itemID]->Destroy();
+        AllItems.RemoveAt(itemID);
+    }
+}
+
 void AEOSActionGameState::OpenedChest_Implementation(int chestID)
 {
     if (HasAuthority()) // Ensure we're on the server
     {
         AllChests[chestID]->UpdateChestOpened();
 
+        int32 randomIndex = FMath::RandRange(0, ItemLibrary.Num() - 1);
+        URItemDataAsset* newData = ItemLibrary[randomIndex];
+
         FActorSpawnParameters SpawnParams;
         AItemPickup* newitem = GetWorld()->SpawnActor<AItemPickup>(ItemPickupClass, AllChests[chestID]->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+        AllItems.Add(newitem); // make sure that the chest has bReplicates to true
         newitem->SetOwner(this);
+        newitem->SetupItem(newData);
     }
 }
 
@@ -90,4 +117,5 @@ void AEOSActionGameState::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 
     DOREPLIFETIME_CONDITION(AEOSActionGameState, AllChests, COND_None);
     DOREPLIFETIME_CONDITION(AEOSActionGameState, AllEnemies, COND_None);
+    DOREPLIFETIME_CONDITION(AEOSActionGameState, AllItems, COND_None);
 }
