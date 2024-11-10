@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "ItemPickup.generated.h"
 
+class URItemDataAsset;
+
 UCLASS()
 class AItemPickup : public AActor
 {
@@ -25,7 +27,7 @@ private:
 	class UStaticMeshComponent* ItemMesh;
 
 	UPROPERTY(VisibleAnywhere, Category = "ItemEffect")
-	class URItemDataAsset* ItemAsset;
+	URItemDataAsset* ItemAsset;
 
 	UPROPERTY(VisibleAnywhere, Category = "ChestDetail")
 	class USphereComponent* SphereCollider;
@@ -42,10 +44,13 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void PlayerPickupRequest(class ARPlayerBase* player);
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void UpdateItemPickedup();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void SetupItem(class URItemDataAsset* newItemAsset);
+	void SetupItem(URItemDataAsset* newItemAsset);
 };

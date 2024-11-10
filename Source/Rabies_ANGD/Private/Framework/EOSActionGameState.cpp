@@ -88,8 +88,7 @@ void AEOSActionGameState::PickedUpItem_Implementation(int itemID)
 {
     if (HasAuthority()) // Ensure we're on the server
     {
-        UE_LOG(LogTemp, Error, TEXT("Got le item I think"));
-        AllItems[itemID]->Destroy();
+        AllItems[itemID]->UpdateItemPickedup();
         AllItems.RemoveAt(itemID);
     }
 }

@@ -27,6 +27,9 @@ public:
 	UFUNCTION()
 	void ChangeTakeOffState(bool state, float charge);
 
+	UFUNCTION()
+	void AddItem(class URItemDataAsset* newItemAsset);
+
 private:
 	void PostPossessionSetup(APawn* NewPawn);
 

@@ -32,6 +32,8 @@ AItemPickup::AItemPickup()
 	ItemMesh->SetupAttachment(GetRootComponent());
 	ItemMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
+	RootComponent = ItemMesh;
+
 	// sphere radius
 	SphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider"));
 	SphereCollider->SetupAttachment(GetRootComponent());
@@ -69,6 +71,13 @@ void AItemPickup::PlayerPickupRequest_Implementation(ARPlayerBase* player)
 {
 	Player = player;
 	Server_PickupItem();
+}
+
+void AItemPickup::UpdateItemPickedup_Implementation()
+{
+	UE_LOG(LogTemp, Error, TEXT("Player picked up item"));
+	Player->AddItem(ItemAsset);
+	Destroy();
 }
 
 // Called every frame

@@ -6,6 +6,10 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 
+#include "Widgets/PlayerItemInventory.h"
+
+#include "Framework/RItemDataAsset.h"
+
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/Button.h"
@@ -66,6 +70,11 @@ void UGameplayUI::SetTakeOffBarState(bool state, float charge)
 	SuperJumpChargeBar->SetVisibility((state) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 
 	SuperJumpChargeBar->Charge(charge);
+}
+
+void UGameplayUI::AddItem(URItemDataAsset* itemAsset)
+{
+	PlayerItemInventory->AddItem(itemAsset);
 }
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)

@@ -113,12 +113,6 @@ void AItemChest::Interact()
 	if (bWasOpened)
 		return;
 
-	if (ScrapPrice > player->GetCurrentScrap())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Not Enough Scrap"));
-		return;
-	}
-
 	player->SetInteractionChest(this);
 }
 
@@ -126,6 +120,12 @@ void AItemChest::Server_OpenChest_Implementation()
 {
 	if (HasAuthority())
 	{
+		if (ScrapPrice > player->GetCurrentScrap())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Not Enough Scrap"));
+			return;
+		}
+
 		UAbilitySystemComponent* ASC = player->GetAbilitySystemComponent();
 		if (ASC && ScrapPriceEffect)
 		{
@@ -144,7 +144,6 @@ void AItemChest::Server_OpenChest_Implementation()
 
 void AItemChest::UpdateChestOpened_Implementation()
 {
-	UE_LOG(LogTemp, Error, TEXT("Updated stuff"));
 	InteractWidget->SetVisibility(ESlateVisibility::Hidden);
 	bWasOpened = true;
 }

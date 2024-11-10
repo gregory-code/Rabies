@@ -17,6 +17,7 @@
 
 #include "Actors/ItemChest.h"
 
+#include "Framework/RItemDataAsset.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Animation/AnimInstance.h"
@@ -61,7 +62,7 @@ ARPlayerBase::ARPlayerBase()
 	// sphere radius
 	ItemPickupCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Item Collider"));
 	ItemPickupCollider->SetupAttachment(GetRootComponent());
-	ItemPickupCollider->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+	ItemPickupCollider->SetCollisionProfileName(TEXT("OverlapAll"));
 
 	ItemPickupCollider->OnComponentBeginOverlap.AddDynamic(this, &ARPlayerBase::OnOverlapBegin);
 
@@ -432,13 +433,16 @@ void ARPlayerBase::SetItemPickup(AItemPickup* itemPickup, URItemDataAsset* itemA
 	ServerRequestPickupItem(itemPickup, itemAsset);
 }
 
+void ARPlayerBase::AddItem(URItemDataAsset* newItemAsset)
+{
+	playerController->AddItem(newItemAsset);
+}
+
 void ARPlayerBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Error, TEXT("Got le item overlap"));
 	AItemPickup* newItem = Cast<AItemPickup>(OtherActor);
 	if (newItem)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Sending le item erqurestus"));
 		newItem->PlayerPickupRequest(this);
 	}
 }

@@ -98,3 +98,13 @@ void ARPlayerController::ChangeTakeOffState(bool state, float charge)
 
 	GameplayUI->SetTakeOffBarState(state, charge);
 }
+
+void ARPlayerController::AddItem(URItemDataAsset* newItemAsset)
+{
+	UE_LOG(LogTemp, Error, TEXT("Player adding item"));
+	if (GameplayUI)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Player ACTUAL adding item"));
+		GameplayUI->AddItem(newItemAsset);
+	}
+}
