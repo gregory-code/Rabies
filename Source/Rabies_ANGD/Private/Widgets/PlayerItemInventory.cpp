@@ -18,6 +18,7 @@ void UPlayerItemInventory::AddItem(URItemDataAsset* itemAsset)
 		if (item->itemData->ItemName == itemAsset->ItemName)
 		{
 			playerItem = item;
+			break;
 		}
 	}
 

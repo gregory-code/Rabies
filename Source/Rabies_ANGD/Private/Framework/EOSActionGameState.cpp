@@ -5,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Actors/ItemChest.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/RPlayerBase.h"
 #include "DisplayDebugHelpers.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 #include "Actors/ItemPickup.h"
@@ -72,22 +73,23 @@ void AEOSActionGameState::SelectChest(AItemChest* openedChest)
     }
 }
 
-void AEOSActionGameState::SelectItem(AItemPickup* selectedItem)
+void AEOSActionGameState::SelectItem(AItemPickup* selectedItem, ARPlayerBase* targetingPlayer)
 {
     for (int i = 0; i < AllItems.Num(); i++)
     {
         if (selectedItem == AllItems[i])
         {
-            PickedUpItem(i);
+            PickedUpItem(i, targetingPlayer);
             return;
         }
     }
 }
 
-void AEOSActionGameState::PickedUpItem_Implementation(int itemID)
+void AEOSActionGameState::PickedUpItem_Implementation(int itemID, ARPlayerBase* targetingPlayer)
 {
     if (HasAuthority()) // Ensure we're on the server
     {
+        targetingPlayer->AddNewItem(AllItems[itemID]->ItemAsset);
         AllItems[itemID]->UpdateItemPickedup();
         AllItems.RemoveAt(itemID);
     }

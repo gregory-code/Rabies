@@ -74,7 +74,10 @@ void UGameplayUI::SetTakeOffBarState(bool state, float charge)
 
 void UGameplayUI::AddItem(URItemDataAsset* itemAsset)
 {
-	PlayerItemInventory->AddItem(itemAsset);
+	if (PlayerItemInventory)
+	{
+		PlayerItemInventory->AddItem(itemAsset);
+	}
 }
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)

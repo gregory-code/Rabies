@@ -24,7 +24,7 @@ public:
 	void SelectChest(AItemChest* openedChest);
 
 	UFUNCTION()
-	void SelectItem(AItemPickup* selectedItem);
+	void SelectItem(AItemPickup* selectedItem, class ARPlayerBase* targetingPlayer);
 
 private:
 
@@ -41,7 +41,7 @@ private:
 	void OpenedChest(int chestID);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void PickedUpItem(int itemID);
+	void PickedUpItem(int itemID, class ARPlayerBase* targetingPlayer);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chest")
 	TSubclassOf<AItemChest> ItemChestClass;

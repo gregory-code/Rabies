@@ -9,6 +9,8 @@
 
 void UPlayerItem::SetItem(URItemDataAsset* data)
 {
+	itemData = data;
+
 	amount++;
 
 	FSlateBrush brush;

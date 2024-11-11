@@ -61,7 +61,7 @@ void AItemPickup::Server_PickupItem_Implementation()
 			AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
 			if (gameState == GetOwner())
 			{
-				gameState->SelectItem(this);
+				gameState->SelectItem(this, Player);
 			}
 		}
 	}
@@ -76,7 +76,7 @@ void AItemPickup::PlayerPickupRequest_Implementation(ARPlayerBase* player)
 void AItemPickup::UpdateItemPickedup_Implementation()
 {
 	UE_LOG(LogTemp, Error, TEXT("Player picked up item"));
-	Player->AddItem(ItemAsset);
+	//Player->AddItem(ItemAsset);
 	Destroy();
 }
 

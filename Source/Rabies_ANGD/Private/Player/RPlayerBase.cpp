@@ -17,8 +17,6 @@
 
 #include "Actors/ItemChest.h"
 
-#include "Framework/RItemDataAsset.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Animation/AnimInstance.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -433,9 +431,9 @@ void ARPlayerBase::SetItemPickup(AItemPickup* itemPickup, URItemDataAsset* itemA
 	ServerRequestPickupItem(itemPickup, itemAsset);
 }
 
-void ARPlayerBase::AddItem(URItemDataAsset* newItemAsset)
+void ARPlayerBase::AddNewItem_Implementation(URItemDataAsset* newItemAsset)
 {
-	playerController->AddItem(newItemAsset);
+	playerController->AddNewItemToUI(newItemAsset);
 }
 
 void ARPlayerBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

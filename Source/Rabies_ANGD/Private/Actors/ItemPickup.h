@@ -26,9 +26,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Item Detail")
 	class UStaticMeshComponent* ItemMesh;
 
-	UPROPERTY(VisibleAnywhere, Category = "ItemEffect")
-	URItemDataAsset* ItemAsset;
-
 	UPROPERTY(VisibleAnywhere, Category = "ChestDetail")
 	class USphereComponent* SphereCollider;
 
@@ -46,6 +43,9 @@ public:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void UpdateItemPickedup();
+
+	UPROPERTY(VisibleAnywhere, Category = "ItemEffect")
+	URItemDataAsset* ItemAsset;
 
 public:	
 	// Called every frame

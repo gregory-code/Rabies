@@ -28,7 +28,7 @@ public:
 	void ChangeTakeOffState(bool state, float charge);
 
 	UFUNCTION()
-	void AddItem(class URItemDataAsset* newItemAsset);
+	void AddNewItemToUI(class URItemDataAsset* newItemAsset);
 
 private:
 	void PostPossessionSetup(APawn* NewPawn);
@@ -41,6 +41,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UGameplayUI> GameplayUIClass;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "UI")
 	UGameplayUI* GameplayUI;
 };

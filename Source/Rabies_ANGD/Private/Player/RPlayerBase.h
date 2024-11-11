@@ -62,9 +62,6 @@ public:
 	UFUNCTION()
 	void SetItemPickup(class AItemPickup* itemPickup, class URItemDataAsset* itemAsset);
 
-	UFUNCTION()
-	void AddItem(class URItemDataAsset* newItemAsset);
-
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Item Detail")
@@ -249,4 +246,9 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRequestPickupItem(class AItemPickup* itemPickup, class URItemDataAsset* itemAsset);
+
+	public:
+
+	UFUNCTION(Client, Reliable)
+	void AddNewItem(class URItemDataAsset* newItemAsset);
 };
