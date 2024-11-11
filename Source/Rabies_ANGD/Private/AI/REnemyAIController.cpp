@@ -96,6 +96,14 @@ void AREnemyAIController::TargetPerceptionUpdated(AActor* Target, FAIStimulus St
 {
 	if (!GetBlackboardComponent()) return;
 
+	/*IGenericTeamAgentInterface* teamInterface = Cast<IGenericTeamAgentInterface>(Target);
+	if (teamInterface)
+	{
+		FGenericTeamId perceivedActorTeam = GetGenericTeamId();
+		if (perceivedActorTeam.GetId() == GetGenericTeamId().GetId())
+			return;
+	}*/
+
 	if(Stimulus.WasSuccessfullySensed())
 	{
 		if (!GetBlackboardComponent()->GetValueAsObject(TargetBlackboardKeyName))

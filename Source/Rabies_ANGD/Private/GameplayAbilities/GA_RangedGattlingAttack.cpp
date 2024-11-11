@@ -3,6 +3,9 @@
 
 #include "GameplayAbilities/GA_RangedGattlingAttack.h"
 
+#include "GameplayAbilities/RAbilitySystemComponent.h"
+#include "GameplayAbilities/RAttributeSet.h"
+
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
@@ -60,6 +63,8 @@ void UGA_RangedGattlingAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 			});
 	}
 
+	RangedAttackHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_RangedGattlingAttack::ProcessAttackSpeed, 0.0f));
+
 	SetupWaitInputTask();
 }
 
@@ -77,14 +82,29 @@ void UGA_RangedGattlingAttack::EndAbility(const FGameplayAbilitySpecHandle Handl
 
 void UGA_RangedGattlingAttack::SendInputForHitScan(FGameplayEventData Payload)
 {
-	if (K2_HasAuthority())
+
+}
+
+void UGA_RangedGattlingAttack::ProcessAttackSpeed(float timeBetweenShots)
+{
+	const UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
+	float calculatedAttackSpeed = baseAttackSpeed * SourceASC->GetNumericAttributeBase(URAttributeSet::GetRangedAttackCooldownReductionAttribute());
+
+	timeBetweenShots += GetWorld()->GetDeltaSeconds();
+
+	if (timeBetweenShots >= calculatedAttackSpeed)
 	{
-		if (Player)
+		if (K2_HasAuthority())
 		{
-			Player->Hitscan(4000);
-			return;
+			if (Player)
+			{
+				timeBetweenShots = 0;
+				Player->Hitscan(4000);
+			}
 		}
 	}
+
+	RangedAttackHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_RangedGattlingAttack::ProcessAttackSpeed, timeBetweenShots));
 }
 
 void UGA_RangedGattlingAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
@@ -113,6 +133,7 @@ void UGA_RangedGattlingAttack::TryCommitAttack(FGameplayEventData Payload)
 
 void UGA_RangedGattlingAttack::AbilityInputPressed(float TimeWaited)
 {
+
 	SetupWaitInputTask();
 	TryCommitAttack(FGameplayEventData());
 }

@@ -21,8 +21,14 @@ private:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	float baseAttackSpeed;
+
 	UFUNCTION()
 	void SendInputForHitScan(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void ProcessAttackSpeed(float timeBetweenShots);
 
 	UFUNCTION()
 	void RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos);
@@ -47,4 +53,6 @@ private:
 
 	UPROPERTY()
 	class ARPlayerBase* Player;
+
+	FTimerHandle RangedAttackHandle;
 };

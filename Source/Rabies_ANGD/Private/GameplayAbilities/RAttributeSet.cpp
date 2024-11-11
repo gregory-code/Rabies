@@ -11,9 +11,24 @@ void URAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, flo
 		Health = FMath::Clamp(NewValue, 0, GetMaxHealth());
 	}
 
-	if (Attribute == GetMovementSpeedAttribute())
+	if (Attribute == GetAbilityCooldownReductionAttribute())
 	{
+		AbilityCooldownReduction = FMath::Clamp(NewValue, 0.1f, 1.0f);
+	}
 
+	if (Attribute == GetMeleeAttackCooldownReductionAttribute())
+	{
+		MeleeAttackCooldownReduction = FMath::Clamp(NewValue, 0.1f, 1.0f);
+	}
+
+	if (Attribute == GetRangedAttackCooldownReductionAttribute())
+	{
+		RangedAttackCooldownReduction = FMath::Clamp(NewValue, 0.1f, 1.0f);
+	}
+
+	if (Attribute == GetUltimateCooldownReductionAttribute())
+	{
+		UltimateCooldownReduction = FMath::Clamp(NewValue, 0.1f, 1.0f);
 	}
 }
 

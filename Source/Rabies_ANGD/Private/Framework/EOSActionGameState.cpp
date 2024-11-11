@@ -37,7 +37,7 @@ void AEOSActionGameState::BeginPlay()
     }
 
     WaveLevel = 1;
-    WaveTime = 15;
+    WaveTime = 2;
     WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
 }
 
@@ -91,7 +91,7 @@ void AEOSActionGameState::WaveSpawn(float timeToNextWave)
     if (timeToNextWave >= WaveTime)
     {
         WaveLevel++;
-        SpawnEnemyWave(3);
+        SpawnEnemyWave(1);
         WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
     }
     else
