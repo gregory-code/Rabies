@@ -18,6 +18,7 @@
 #include "Actors/ChestSpawnLocation.h"
 #include "Framework/EOSPlayerState.h"
 #include "Player/RPlayerController.h"
+#include "Actors/EnemySpawnLocation.h"
 
 void AEOSActionGameState::BeginPlay()
 {
@@ -35,9 +36,9 @@ void AEOSActionGameState::BeginPlay()
         spawnLocations.RemoveAt(randomSpawn);
     }
 
-    //float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
-    //SpawnEnemy(0, spawnLocations[randomSpawn]->GetActorLocation());
-    //spawnLocations.RemoveAt(randomSpawn);
+    WaveLevel = 1;
+    WaveTime = 15;
+    WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
 }
 
 void AEOSActionGameState::SpawnChest_Implementation(FVector SpawnLocation)
@@ -82,6 +83,34 @@ void AEOSActionGameState::SelectItem(AItemPickup* selectedItem, ARPlayerBase* ta
             PickedUpItem(i, targetingPlayer);
             return;
         }
+    }
+}
+
+void AEOSActionGameState::WaveSpawn(float timeToNextWave)
+{
+    if (timeToNextWave >= WaveTime)
+    {
+        WaveLevel++;
+        SpawnEnemyWave(3);
+        WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
+    }
+    else
+    {
+        timeToNextWave += GetWorld()->GetDeltaSeconds();
+        WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, timeToNextWave));
+    }
+}
+
+void AEOSActionGameState::SpawnEnemyWave(int amountOfEnemies)
+{
+    TArray<AActor*> spawnLocations;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemySpawnLocation::StaticClass(), spawnLocations);
+
+    for (int i = 0; i < amountOfEnemies; i++)
+    {
+        float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
+        SpawnEnemy(1, spawnLocations[randomSpawn]->GetActorLocation());
+        spawnLocations.RemoveAt(randomSpawn);
     }
 }
 

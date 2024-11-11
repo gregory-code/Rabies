@@ -13,12 +13,6 @@ void UHealthBar::NativePreConstruct()
 
 void UHealthBar::SetHealth(float NewHealth, float MaxHealth)
 {
-	if (NewHealth == 0)
-	{
-		//UE_LOG(LogTemp, Error, TEXT("Value Guage: %s is geting a max value of 0, cannot calcuate percent for progress bar"), *GetName());
-		return;
-	}
-
 	float Percent = NewHealth / MaxHealth;
 	ProgressBar->SetPercent(Percent);
 	ShaderBar->SetPercent(Percent);

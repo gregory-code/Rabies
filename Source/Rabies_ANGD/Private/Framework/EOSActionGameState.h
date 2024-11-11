@@ -28,6 +28,20 @@ public:
 
 private:
 
+	FTimerHandle WaveHandle;
+
+	UPROPERTY()
+	float WaveTime;
+
+	UPROPERTY()
+	int WaveLevel;
+
+	UFUNCTION()
+	void WaveSpawn(float timeToNextWave);
+
+	UFUNCTION()
+	void SpawnEnemyWave(int amountOfEnemies);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Chest")
 	int AmountOfChests;
 
