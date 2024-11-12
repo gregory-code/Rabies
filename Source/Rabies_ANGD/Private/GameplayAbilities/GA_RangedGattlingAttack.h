@@ -21,30 +21,19 @@ private:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	float baseAttackSpeed;
-
-	UFUNCTION()
-	void SendInputForHitScan(FGameplayEventData Payload);
-
-	UFUNCTION()
-	void ProcessAttackSpeed(float timeBetweenShots);
-
 	UFUNCTION()
 	void RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos);
 
-	UFUNCTION()
-	void TryCommitAttack(FGameplayEventData Payload);
+	void Fire(float TimeWaited);
+
+	const FGameplayAbilityActorInfo* actorInfo;
+
+	UPROPERTY()
+	FGameplayAbilitySpecHandle cooldownHandle;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> RangedGattlingDamage;
-
-	UFUNCTION()
-	void AbilityInputPressed(float TimeWaited);
-
-	bool bAttackCommitted;
-
-	void SetupWaitInputTask();
 
 	FDelegateHandle ClientHitScanHandle;
 

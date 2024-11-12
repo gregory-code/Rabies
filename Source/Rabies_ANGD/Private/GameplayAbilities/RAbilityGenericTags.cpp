@@ -23,6 +23,16 @@ FGameplayTag URAbilityGenericTags::GetBasicAttackActivationTag()
 	return FGameplayTag::RequestGameplayTag("ability.attack.activate");
 }
 
+FGameplayTag URAbilityGenericTags::GetMeleeAttackCooldown()
+{
+	return FGameplayTag::RequestGameplayTag("ability.attack.meleeAtkCooldown");
+}
+
+FGameplayTag URAbilityGenericTags::GetRangedAttackCooldown()
+{
+	return FGameplayTag::RequestGameplayTag("ability.attack.rangedAtkCooldown");
+}
+
 FGameplayTag URAbilityGenericTags::GetSpecialAttackActivationTag()
 {
 	return FGameplayTag::RequestGameplayTag("ability.special.activate");

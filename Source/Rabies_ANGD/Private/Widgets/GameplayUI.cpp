@@ -10,6 +10,9 @@
 
 #include "Framework/RItemDataAsset.h"
 
+#include "GameplayAbilities/GA_AbilityBase.h"
+#include "Widgets/PlayerAbilityGauge.h"
+
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/Button.h"
@@ -22,6 +25,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
+
 #include "GameplayAbilitySpec.h"
 
 #include "GameplayAbilities/RAttributeSet.h"
@@ -30,8 +36,6 @@
 void UGameplayUI::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	//quitButton->OnClicked.AddDynamic(this, &UGameplayUI::Quit);
 
 	UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
 	if (OwnerASC)
@@ -42,6 +46,20 @@ void UGameplayUI::NativeConstruct()
 	}
 
 	OwnerAbilitySystemComponent = OwnerASC;
+
+	AbilityHorizontalBox->ClearChildren();
+	const URAbilitySystemComponent* RAbilitySystemComp = Cast<URAbilitySystemComponent>(OwnerASC);
+	if (RAbilitySystemComp)
+	{
+		TArray<const UGA_AbilityBase*> GrantedAbilities = RAbilitySystemComp->GetNonGenericAbilityCDOs();
+		for (const UGA_AbilityBase* GrantedAbility : GrantedAbilities)
+		{
+			UPlayerAbilityGauge* newAbilityGague = CreateWidget<UPlayerAbilityGauge>(this, AbilityGaugeClass);
+			UHorizontalBoxSlot* AbilitySlot = AbilityHorizontalBox->AddChildToHorizontalBox(newAbilityGague);
+			newAbilityGague->SetupOwningAbilityCDO(GrantedAbility);
+			AbilitySlot->SetPadding(FMargin(5));
+		}
+	}
 
 	float playerHealth = GetAttributeValue(URAttributeSet::GetHealthAttribute());
 	float playerMaxHealth = GetAttributeValue(URAttributeSet::GetMaxHealthAttribute());
@@ -112,12 +130,3 @@ float UGameplayUI::GetAttributeValue(const FGameplayAttribute& Attribute) const
 
 	return -1;
 }
-
-//void UGameplayUI::Quit()
-//{
-//	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-//	if (PlayerController)
-//	{
-//		UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, true);
-//	}
-//}

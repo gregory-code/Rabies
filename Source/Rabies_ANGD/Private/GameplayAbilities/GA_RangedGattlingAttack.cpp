@@ -22,7 +22,6 @@
 UGA_RangedGattlingAttack::UGA_RangedGattlingAttack()
 {
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("ability.attack.activate"));
-	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("ability.attack.activate"));
 	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetAttackingTag());
 
 	FAbilityTriggerData TriggerData;
@@ -33,28 +32,25 @@ UGA_RangedGattlingAttack::UGA_RangedGattlingAttack()
 
 void UGA_RangedGattlingAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	//Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Ending Attack no commitment"));
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		return;
 	}
 
-	UAbilityTask_WaitGameplayEvent* WaitTargetAquiredEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
-	WaitTargetAquiredEvent->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::SendInputForHitScan);
-	WaitTargetAquiredEvent->ReadyForActivation();
+	cooldownHandle = Handle;
+	actorInfo = ActorInfo;
 
-	UAbilityTask_WaitGameplayEvent* WaitForActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetBasicAttackActivationTag());
-	WaitForActivation->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::TryCommitAttack);
-	WaitForActivation->ReadyForActivation();
+	Player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
+
+	UAbilityTask_WaitInputPress* waitInputPress = UAbilityTask_WaitInputPress::WaitInputPress(this);
+	waitInputPress->OnPress.AddDynamic(this, &UGA_RangedGattlingAttack::Fire);
+	waitInputPress->ReadyForActivation();
 
 	UAbilityTask_WaitGameplayEvent* WaitStopEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndAttackTag());
 	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::StopAttacking);
 	WaitStopEvent->ReadyForActivation();
 
-	Player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
 	if (Player)
 	{
 		ClientHitScanHandle = Player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
@@ -62,49 +58,31 @@ void UGA_RangedGattlingAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 				RecieveAttackHitscan(hitActor, startPos, endPos);
 			});
 	}
+}
 
-	RangedAttackHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_RangedGattlingAttack::ProcessAttackSpeed, 0.0f));
-
-	SetupWaitInputTask();
+void UGA_RangedGattlingAttack::Fire(float TimeWaited)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Firing"));
+	if (CheckCooldown(cooldownHandle, actorInfo))
+	{
+		if (K2_HasAuthority())
+		{
+			if (Player)
+			{
+				Player->Hitscan(4000);
+			}
+		}
+	}
 }
 
 void UGA_RangedGattlingAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
-	UE_LOG(LogTemp, Error, TEXT("Attacking cancelled"));
 	if (ClientHitScanHandle.IsValid() && Player)
 	{
 		Player->ClientHitScan.Remove(ClientHitScanHandle);
 	}
-}
-
-
-void UGA_RangedGattlingAttack::SendInputForHitScan(FGameplayEventData Payload)
-{
-
-}
-
-void UGA_RangedGattlingAttack::ProcessAttackSpeed(float timeBetweenShots)
-{
-	const UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
-	float calculatedAttackSpeed = baseAttackSpeed * SourceASC->GetNumericAttributeBase(URAttributeSet::GetRangedAttackCooldownReductionAttribute());
-
-	timeBetweenShots += GetWorld()->GetDeltaSeconds();
-
-	if (timeBetweenShots >= calculatedAttackSpeed)
-	{
-		if (K2_HasAuthority())
-		{
-			if (Player)
-			{
-				timeBetweenShots = 0;
-				Player->Hitscan(4000);
-			}
-		}
-	}
-
-	RangedAttackHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_RangedGattlingAttack::ProcessAttackSpeed, timeBetweenShots));
 }
 
 void UGA_RangedGattlingAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
@@ -123,26 +101,6 @@ void UGA_RangedGattlingAttack::RecieveAttackHitscan(AActor* hitActor, FVector st
 			SignalDamageStimuliEvent(Payload.TargetData);
 		}
 	}
-}
-
-void UGA_RangedGattlingAttack::TryCommitAttack(FGameplayEventData Payload)
-{
-	SendInputForHitScan(Payload);
-	bAttackCommitted = true;
-}
-
-void UGA_RangedGattlingAttack::AbilityInputPressed(float TimeWaited)
-{
-
-	SetupWaitInputTask();
-	TryCommitAttack(FGameplayEventData());
-}
-
-void UGA_RangedGattlingAttack::SetupWaitInputTask()
-{
-	UAbilityTask_WaitInputPress* WaitInputPress = UAbilityTask_WaitInputPress::WaitInputPress(this);
-	WaitInputPress->OnPress.AddDynamic(this, &UGA_RangedGattlingAttack::AbilityInputPressed);
-	WaitInputPress->ReadyForActivation();
 }
 
 void UGA_RangedGattlingAttack::StopAttacking(FGameplayEventData Payload)

@@ -21,6 +21,8 @@ public:
 	static FGameplayTag GetFullHealthTag();
 	static FGameplayTag GetDeadTag();
 	static FGameplayTag GetBasicAttackActivationTag();
+	static FGameplayTag GetMeleeAttackCooldown();
+	static FGameplayTag GetRangedAttackCooldown();
 	static FGameplayTag GetSpecialAttackActivationTag();
 	static FGameplayTag GetUltimateAttackActivationTag();
 	static FGameplayTag GetScopingTag();

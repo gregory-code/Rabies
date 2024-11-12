@@ -51,6 +51,12 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UPlayerItemInventory* PlayerItemInventory;
 
+	UPROPERTY(meta = (BindWidget))
+	class UHorizontalBox* AbilityHorizontalBox;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	TSubclassOf<class UPlayerAbilityGauge> AbilityGaugeClass;
+
 	bool crosshairState;
 
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
@@ -72,10 +78,4 @@ private:
 	//************************//
 	//     Test n' Online      //
 	//************************//
-
-	//UPROPERTY(meta = (BindWidget))
-	//class UButton* quitButton;
-
-	//UFUNCTION()
-	//void Quit();
 };
