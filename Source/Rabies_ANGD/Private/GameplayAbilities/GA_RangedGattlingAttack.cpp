@@ -40,12 +40,17 @@ void UGA_RangedGattlingAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 
 	cooldownHandle = Handle;
 	actorInfo = ActorInfo;
+	activationInfo = ActivationInfo;
 
 	Player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
 
-	UAbilityTask_WaitInputPress* waitInputPress = UAbilityTask_WaitInputPress::WaitInputPress(this);
-	waitInputPress->OnPress.AddDynamic(this, &UGA_RangedGattlingAttack::Fire);
-	waitInputPress->ReadyForActivation();
+	UAbilityTask_WaitGameplayEvent* WaitTargetAquiredEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
+	WaitTargetAquiredEvent->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::Fire);
+	WaitTargetAquiredEvent->ReadyForActivation();
+
+	UAbilityTask_WaitGameplayEvent* WaitForActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetBasicAttackActivationTag());
+	WaitForActivation->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::TryCommitAttack);
+	WaitForActivation->ReadyForActivation();
 
 	UAbilityTask_WaitGameplayEvent* WaitStopEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndAttackTag());
 	WaitStopEvent->EventReceived.AddDynamic(this, &UGA_RangedGattlingAttack::StopAttacking);
@@ -58,17 +63,19 @@ void UGA_RangedGattlingAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 				RecieveAttackHitscan(hitActor, startPos, endPos);
 			});
 	}
+
+	SetupWaitInputTask();
 }
 
-void UGA_RangedGattlingAttack::Fire(float TimeWaited)
+void UGA_RangedGattlingAttack::Fire(FGameplayEventData Payload)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Firing"));
 	if (CheckCooldown(cooldownHandle, actorInfo))
 	{
 		if (K2_HasAuthority())
 		{
 			if (Player)
 			{
+				ApplyCooldown(cooldownHandle, actorInfo, activationInfo);
 				Player->Hitscan(4000);
 			}
 		}
@@ -101,6 +108,24 @@ void UGA_RangedGattlingAttack::RecieveAttackHitscan(AActor* hitActor, FVector st
 			SignalDamageStimuliEvent(Payload.TargetData);
 		}
 	}
+}
+
+void UGA_RangedGattlingAttack::SetupWaitInputTask()
+{
+	UAbilityTask_WaitInputPress* WaitInputPress = UAbilityTask_WaitInputPress::WaitInputPress(this);
+	WaitInputPress->OnPress.AddDynamic(this, &UGA_RangedGattlingAttack::AbilityInputPressed);
+	WaitInputPress->ReadyForActivation();
+}
+
+void UGA_RangedGattlingAttack::AbilityInputPressed(float TimeWaited)
+{
+	SetupWaitInputTask();
+	TryCommitAttack(FGameplayEventData());
+}
+
+void UGA_RangedGattlingAttack::TryCommitAttack(FGameplayEventData Payload)
+{
+	Fire(Payload);
 }
 
 void UGA_RangedGattlingAttack::StopAttacking(FGameplayEventData Payload)

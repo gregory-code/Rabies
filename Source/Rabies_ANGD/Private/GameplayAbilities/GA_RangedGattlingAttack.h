@@ -24,9 +24,22 @@ private:
 	UFUNCTION()
 	void RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos);
 
-	void Fire(float TimeWaited);
+	UFUNCTION()
+	void Fire(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void TryCommitAttack(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void AbilityInputPressed(float TimeWaited);
+
+	UFUNCTION()
+	void SetupWaitInputTask();
 
 	const FGameplayAbilityActorInfo* actorInfo;
+
+	UPROPERTY()
+	FGameplayAbilityActivationInfo activationInfo;
 
 	UPROPERTY()
 	FGameplayAbilitySpecHandle cooldownHandle;
