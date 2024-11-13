@@ -10,6 +10,8 @@
 
 #include "Framework/RItemDataAsset.h"
 
+#include "Widgets/PlayerAttributeGauge.h"
+
 #include "GameplayAbilities/GA_AbilityBase.h"
 #include "Widgets/PlayerAbilityGauge.h"
 
@@ -43,6 +45,19 @@ void UGameplayUI::NativeConstruct()
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetHealthAttribute()).AddUObject(this, &UGameplayUI::HealthUpdated);
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &UGameplayUI::MaxHealthUpdated);
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetScrapAttribute()).AddUObject(this, &UGameplayUI::ScrapUpdated);
+
+		meleeStrength->SetDefaultValue(OwnerASC->GetNumericAttributeBase(URAttributeSet::GetMeleeAttackStrengthAttribute()));
+		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMeleeAttackStrengthAttribute()).AddUObject(meleeStrength, &UPlayerAttributeGauge::UpdateValue);
+		meleeAttackSpeed->SetDefaultValue(OwnerASC->GetNumericAttributeBase(URAttributeSet::GetMeleeAttackCooldownReductionAttribute()));
+		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMeleeAttackCooldownReductionAttribute()).AddUObject(meleeAttackSpeed, &UPlayerAttributeGauge::UpdateValue);
+
+		rangedStrength->SetDefaultValue(OwnerASC->GetNumericAttributeBase(URAttributeSet::GetRangedAttackStrengthAttribute()));
+		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetRangedAttackStrengthAttribute()).AddUObject(rangedStrength, &UPlayerAttributeGauge::UpdateValue);
+		rangedAttackSpeed->SetDefaultValue(OwnerASC->GetNumericAttributeBase(URAttributeSet::GetRangedAttackCooldownReductionAttribute()));
+		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetRangedAttackCooldownReductionAttribute()).AddUObject(rangedAttackSpeed, &UPlayerAttributeGauge::UpdateValue);
+
+		movementspeed->SetDefaultValue(OwnerASC->GetNumericAttributeBase(URAttributeSet::GetMovementSpeedAttribute()));
+		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMovementSpeedAttribute()).AddUObject(movementspeed, &UPlayerAttributeGauge::UpdateValue);
 	}
 
 	OwnerAbilitySystemComponent = OwnerASC;
@@ -56,7 +71,8 @@ void UGameplayUI::NativeConstruct()
 		{
 			UPlayerAbilityGauge* newAbilityGague = CreateWidget<UPlayerAbilityGauge>(this, AbilityGaugeClass);
 			UHorizontalBoxSlot* AbilitySlot = AbilityHorizontalBox->AddChildToHorizontalBox(newAbilityGague);
-			newAbilityGague->SetupOwningAbilityCDO(GrantedAbility);
+			newAbilityGague->SetupOwningAbilityCDO(GrantedAbility, OwnerASC);
+			OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetRangedAttackCooldownReductionAttribute()).AddUObject(newAbilityGague, &UPlayerAbilityGauge::CooldownUpdate);
 			AbilitySlot->SetPadding(FMargin(5));
 		}
 	}

@@ -213,7 +213,9 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 	}
 
 	if (HealthBar)
+	{
 		HealthBar->SetHealth(ChangeData.NewValue, AttributeSet->GetMaxHealth());
+	}
 
 	if (HasAuthority())
 	{

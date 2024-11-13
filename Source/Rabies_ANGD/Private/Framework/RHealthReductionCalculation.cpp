@@ -9,7 +9,7 @@
 
 float URHealthReductionCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
-    float BaseMagnitude = 5.0f;
+    float BaseMagnitude = 0.0f;
 
     const UAbilitySystemComponent* SourceASC = Spec.GetContext().GetOriginalInstigatorAbilitySystemComponent();
     const UAbilitySystemComponent* TargetASC = Cast<ARPlayerBase>(Spec.GetContext().GetEffectCauser())->GetAbilitySystemComponent();
@@ -25,7 +25,7 @@ float URHealthReductionCalculation::CalculateBaseMagnitude_Implementation(const 
 
         // Calculate the magnitude based on strength and defense
         BaseMagnitude = Strength - Defense;
-        BaseMagnitude = FMath::Max(BaseMagnitude, 0.0f); // Ensure the result deals at least 1 damage
+        BaseMagnitude = FMath::Max(BaseMagnitude, 1.0f); // Ensure the result deals at least 1 damage
     }
 
     return BaseMagnitude;

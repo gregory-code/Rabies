@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameplayEffectExecutionCalculation.h"
+
 #include "GameplayModMagnitudeCalculation.h"
 #include "RHealthReductionCalculation.generated.h"
 

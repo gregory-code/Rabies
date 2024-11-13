@@ -21,8 +21,9 @@ class UPlayerAbilityGauge : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void SetupOwningAbilityCDO(const UGA_AbilityBase* OwningAbilityCDO);
+	void SetupOwningAbilityCDO(const UGA_AbilityBase* OwningAbilityCDO, class UAbilitySystemComponent* OwnerASC);
 	void SetupAbilityDelegates();
+	void CooldownUpdate(const FOnAttributeChangeData& ChangeData);
 
 private:
 	void AbilityCommited(UGameplayAbility* Ability);
@@ -43,6 +44,9 @@ private:
 	FName IconTextureMaterialParamName = "Icon";
 
 	const UGA_AbilityBase* AbilityCDO;
+
+	class UAbilitySystemComponent* MyOwnerASC;
+
 	UMaterialInstanceDynamic* IconMat;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Cooldown")

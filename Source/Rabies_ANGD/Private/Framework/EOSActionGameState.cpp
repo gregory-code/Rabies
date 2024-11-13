@@ -37,7 +37,7 @@ void AEOSActionGameState::BeginPlay()
     }
 
     WaveLevel = 1;
-    WaveTime = 2;
+    WaveTime = 30;
     WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
 }
 

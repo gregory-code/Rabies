@@ -15,5 +15,5 @@ class URAbilitySystemBlueprintLibrary : public UAbilitySystemBlueprintLibrary
 	GENERATED_BODY()
 	
 public:
-	static float GetAbilityStaticCooldownDuration(const UGameplayAbility* AbilityCDO);
+	static float GetAbilityStaticCooldownDuration(const UGameplayAbility* AbilityCDO, class UAbilitySystemComponent* OwnerASC);
 };

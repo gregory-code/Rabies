@@ -13,9 +13,10 @@
 
 #include "GameplayAbilities/RAbilitySystemBlueprintLibrary.h"
 
-void UPlayerAbilityGauge::SetupOwningAbilityCDO(const UGA_AbilityBase* OwningAbilityCDO)
+void UPlayerAbilityGauge::SetupOwningAbilityCDO(const UGA_AbilityBase* OwningAbilityCDO, UAbilitySystemComponent* OwnerASC)
 {
 	AbilityCDO = OwningAbilityCDO;
+	MyOwnerASC = OwnerASC;
 	if (AbilityCDO)
 	{
 		UTexture2D* iconTex = AbilityCDO->GetIconTexture();
@@ -27,10 +28,11 @@ void UPlayerAbilityGauge::SetupOwningAbilityCDO(const UGA_AbilityBase* OwningAbi
 			IconMat->SetTextureParameterValue(IconTextureMaterialParamName, iconTex);
 		}
 
-		CooldownDuration = URAbilitySystemBlueprintLibrary::GetAbilityStaticCooldownDuration(AbilityCDO);
+		CooldownDuration = URAbilitySystemBlueprintLibrary::GetAbilityStaticCooldownDuration(AbilityCDO, OwnerASC);
+		UE_LOG(LogTemp, Error, TEXT("Setting up %f"), CooldownDuration);
 
 		FNumberFormattingOptions formattingOptions;
-		formattingOptions.MaximumFractionalDigits = 1;
+		formattingOptions.MaximumFractionalDigits = 2;
 		CooldownDurationText->SetText(FText::AsNumber(CooldownDuration, &formattingOptions));
 
 		CooldownCounterText->SetVisibility(ESlateVisibility::Hidden);
@@ -50,6 +52,15 @@ void UPlayerAbilityGauge::SetupAbilityDelegates()
 	}
 }
 
+void UPlayerAbilityGauge::CooldownUpdate(const FOnAttributeChangeData& ChangeData)
+{
+	CooldownDuration = URAbilitySystemBlueprintLibrary::GetAbilityStaticCooldownDuration(AbilityCDO, MyOwnerASC);
+
+	FNumberFormattingOptions formattingOptions;
+	formattingOptions.MaximumFractionalDigits = 2;
+	CooldownDurationText->SetText(FText::AsNumber(CooldownDuration, &formattingOptions));
+}
+
 void UPlayerAbilityGauge::AbilityCommited(UGameplayAbility* Ability)
 {
 	if (Ability->GetClass() == AbilityCDO->GetClass())
@@ -58,7 +69,7 @@ void UPlayerAbilityGauge::AbilityCommited(UGameplayAbility* Ability)
 		CooldownTimeRemaining = 0;
 		Ability->GetCooldownTimeRemainingAndDuration(Ability->GetCurrentAbilitySpecHandle(), Ability->GetCurrentActorInfo(), CooldownTimeRemaining, CooldownDuration);
 
-		UE_LOG(LogTemp, Warning, TEXT("Ability: %s Commited durtion: %f, cooldown remaining %f"), *Ability->GetName(), CooldownDuration, CooldownTimeRemaining);
+		//UE_LOG(LogTemp, Error, TEXT("Ability: %s Commited durtion: %f, cooldown remaining %f"), *Ability->GetName(), CooldownDuration, CooldownTimeRemaining);
 		GetWorld()->GetTimerManager().SetTimer(CooldownTickTimerHandle, this, &UPlayerAbilityGauge::TickCooldown, CooldownTickInterval, true);
 		FTimerHandle cooldownFinishedhandle;
 		GetWorld()->GetTimerManager().SetTimer(cooldownFinishedhandle, this, &UPlayerAbilityGauge::CooldownFinished, CooldownTimeRemaining, false);

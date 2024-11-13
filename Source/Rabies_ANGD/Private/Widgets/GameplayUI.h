@@ -32,6 +32,7 @@ public:
 	void AddItem(class URItemDataAsset* itemAsset);
 
 private:
+
 	//************************//
 	//        Health         //
 	//************************//
@@ -53,6 +54,21 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* AbilityHorizontalBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UPlayerAttributeGauge* meleeStrength;
+
+	UPROPERTY(meta = (BindWidget))
+	class UPlayerAttributeGauge* meleeAttackSpeed;
+
+	UPROPERTY(meta = (BindWidget))
+	class UPlayerAttributeGauge* rangedStrength;
+
+	UPROPERTY(meta = (BindWidget))
+	class UPlayerAttributeGauge* rangedAttackSpeed;
+
+	UPROPERTY(meta = (BindWidget))
+	class UPlayerAttributeGauge* movementspeed;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TSubclassOf<class UPlayerAbilityGauge> AbilityGaugeClass;
