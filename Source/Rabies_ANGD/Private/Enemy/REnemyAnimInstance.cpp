@@ -67,9 +67,18 @@ void UREnemyAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 		AREnemyAIController* aiController = Cast<AREnemyAIController>(OwnerCharacter->GetInstigatorController());
 		if (aiController)
 		{
-			UBlackboardComponent* blackboardComp = aiController->GetBlackboardComponent();
+			if (aiController->GetTarget() == nullptr)
+			{
+				TargetLocation = FVector(0, 0, 0);
+			}
+			else
+			{
+				TargetLocation = aiController->GetTarget()->GetActorLocation();
+			}
+			/*UBlackboardComponent* blackboardComp = aiController->GetBlackboardComponent();
 			if (blackboardComp)
 			{
+				
 				UObject* targetObj = blackboardComp->GetValueAsObject(TargetBlackboardKeyName);
 				if (targetObj == nullptr)
 				{
@@ -79,7 +88,7 @@ void UREnemyAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 				{
 					TargetLocation = Cast<AActor>(targetObj)->GetActorLocation();
 				}
-			}
+			}*/
 		}
 		// you betcha
 

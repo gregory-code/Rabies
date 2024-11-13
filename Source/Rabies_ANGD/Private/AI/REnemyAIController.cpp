@@ -7,6 +7,8 @@
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/GA_AbilityBase.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "Character/RCharacterBase.h"
 #include "GameplayAbilities/GA_AbilityBase.h"
 
@@ -77,6 +79,11 @@ void AREnemyAIController::GetActorEyesViewPoint(FVector& OutLocation, FRotator& 
 	}
 }
 
+AActor* AREnemyAIController::GetTarget()
+{
+	return AITarget;
+}
+
 void AREnemyAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
@@ -92,7 +99,7 @@ void AREnemyAIController::OnPossess(APawn* InPawn)
 	}
 }
 
-void AREnemyAIController::TargetPerceptionUpdated(AActor* Target, FAIStimulus Stimulus)
+void AREnemyAIController::TargetPerceptionUpdated_Implementation(AActor* Target, FAIStimulus Stimulus)
 {
 	if (!GetBlackboardComponent()) return;
 
@@ -104,11 +111,12 @@ void AREnemyAIController::TargetPerceptionUpdated(AActor* Target, FAIStimulus St
 			return;
 	}*/
 
-	if(Stimulus.WasSuccessfullySensed())
+	if (Stimulus.WasSuccessfullySensed())
 	{
 		if (!GetBlackboardComponent()->GetValueAsObject(TargetBlackboardKeyName))
 		{
 			GetBlackboardComponent()->SetValueAsObject(TargetBlackboardKeyName, Target);
+			AITarget = Target;
 		}
 	}
 	else
@@ -134,7 +142,7 @@ void AREnemyAIController::TargetPerceptionUpdated(AActor* Target, FAIStimulus St
 	}
 }
 
-void AREnemyAIController::TargetForgotton(AActor* Target)
+void AREnemyAIController::TargetForgotton_Implementation(AActor* Target)
 {
 	AActor* currentTarget = Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(TargetBlackboardKeyName));
 	if (currentTarget == Target)
@@ -143,10 +151,12 @@ void AREnemyAIController::TargetForgotton(AActor* Target)
 		PerceptionComponent->GetPerceivedHostileActors(OtherTargets);
 		if (OtherTargets.Num() != 0)
 		{
+			AITarget = OtherTargets[0];
 			GetBlackboardComponent()->SetValueAsObject(TargetBlackboardKeyName, OtherTargets[0]);
 		}
 		else
 		{
+			AITarget = nullptr;
 			GetBlackboardComponent()->ClearValue(TargetBlackboardKeyName);
 		}
 	}
@@ -162,4 +172,11 @@ void AREnemyAIController::PawnDeathStatusChanged(bool bIsDead)
 	{
 		GetBrainComponent()->StartLogic();
 	}
+}
+
+void AREnemyAIController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AREnemyAIController, AITarget, COND_None);
 }

@@ -20,6 +20,7 @@ public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	virtual void BeginPlay() override;
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const override;
+	AActor* GetTarget();
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
@@ -50,11 +51,19 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	FName TargetBlackboardKeyName = "Target";
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Server, Unreliable)
 	void TargetPerceptionUpdated(AActor* Target, FAIStimulus Stimulus);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Server, Unreliable)
 	void TargetForgotton(AActor* Target);
 
 	void PawnDeathStatusChanged(bool bIsDead);
+
+private:
+
+	UPROPERTY(Replicated)
+	AActor* AITarget;
+
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };

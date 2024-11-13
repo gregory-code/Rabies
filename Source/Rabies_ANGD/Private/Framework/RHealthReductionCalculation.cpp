@@ -6,13 +6,24 @@
 #include "GameplayEffectTypes.h"
 #include "Player/RPlayerBase.h"
 #include "GameplayAbilities/RAbilitySystemComponent.h"
+#include "Character/RCharacterBase.h"
 
 float URHealthReductionCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
     float BaseMagnitude = 0.0f;
 
     const UAbilitySystemComponent* SourceASC = Spec.GetContext().GetOriginalInstigatorAbilitySystemComponent();
-    const UAbilitySystemComponent* TargetASC = Cast<ARPlayerBase>(Spec.GetContext().GetEffectCauser())->GetAbilitySystemComponent();
+    const UAbilitySystemComponent* TargetASC = nullptr; // Cast<ARCharacterBase>(Spec.GetContext().GetEffectCauser())->GetAbilitySystemComponent(); // there is like no good way to get this sadly
+
+    if (Spec.GetContext().GetHitResult())
+    {
+        // Get the actor from the hit result
+        AActor* TargetActor = Spec.GetContext().GetHitResult()->GetActor();
+        if (TargetActor)
+        {
+            TargetASC = Cast<ARCharacterBase>(TargetActor)->GetAbilitySystemComponent();
+        }
+    }
 
     // Check if source and target exist
     if (SourceASC && TargetASC)
