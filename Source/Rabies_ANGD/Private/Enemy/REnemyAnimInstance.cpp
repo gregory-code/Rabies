@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "Character/RCharacterBase.h"
 #include "AI/REnemyAIController.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
@@ -64,33 +65,15 @@ void UREnemyAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 		FVector Velocity = OwnerCharacter->GetVelocity();
 
 		//  This is for getting the target
-		AREnemyAIController* aiController = Cast<AREnemyAIController>(OwnerCharacter->GetInstigatorController());
-		if (aiController)
+		ARCharacterBase* enemyCharacter = Cast<ARCharacterBase>(TryGetPawnOwner());
+		if (enemyCharacter->GetTarget() == nullptr)
 		{
-			if (aiController->GetTarget() == nullptr)
-			{
-				TargetLocation = FVector(0, 0, 0);
-			}
-			else
-			{
-				TargetLocation = aiController->GetTarget()->GetActorLocation();
-			}
-			/*UBlackboardComponent* blackboardComp = aiController->GetBlackboardComponent();
-			if (blackboardComp)
-			{
-				
-				UObject* targetObj = blackboardComp->GetValueAsObject(TargetBlackboardKeyName);
-				if (targetObj == nullptr)
-				{
-					TargetLocation = FVector(0, 0, 0);
-				}
-				else
-				{
-					TargetLocation = Cast<AActor>(targetObj)->GetActorLocation();
-				}
-			}*/
+			TargetLocation = FVector(0, 0, 0);
 		}
-		// you betcha
+		else
+		{
+			TargetLocation = enemyCharacter->GetTarget()->GetActorLocation();
+		}
 
 		FVector LookDir = lookRot.Vector();
 		LookDir.Z = 0;

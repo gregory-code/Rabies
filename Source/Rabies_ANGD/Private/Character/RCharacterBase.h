@@ -125,11 +125,19 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void ClientStopAnimMontage(UAnimMontage* montage);
 
+	UFUNCTION()
+	AActor* GetTarget();
+
+	UFUNCTION(BlueprintCallable, Server, Unreliable)
+	void UpdateAITarget(AActor* newTargetActor);
 
 private:
 
 	UPROPERTY(Replicated)
 	FGenericTeamId TeamId;
+
+	UPROPERTY(Replicated)
+	AActor* AITarget;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // need this when doing Replicated things
 

@@ -295,8 +295,19 @@ void ARCharacterBase::ClientStopAnimMontage_Implementation(UAnimMontage* montage
 	}
 }
 
+AActor* ARCharacterBase::GetTarget()
+{
+	return AITarget;
+}
+
+void ARCharacterBase::UpdateAITarget_Implementation(AActor* newTargetActor)
+{
+	AITarget = newTargetActor;
+}
+
 void ARCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ARCharacterBase, TeamId, COND_None);
+	DOREPLIFETIME_CONDITION(ARCharacterBase, AITarget, COND_None);
 }

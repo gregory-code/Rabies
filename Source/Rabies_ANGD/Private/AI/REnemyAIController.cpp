@@ -79,11 +79,6 @@ void AREnemyAIController::GetActorEyesViewPoint(FVector& OutLocation, FRotator& 
 	}
 }
 
-AActor* AREnemyAIController::GetTarget()
-{
-	return AITarget;
-}
-
 void AREnemyAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
@@ -99,7 +94,7 @@ void AREnemyAIController::OnPossess(APawn* InPawn)
 	}
 }
 
-void AREnemyAIController::TargetPerceptionUpdated_Implementation(AActor* Target, FAIStimulus Stimulus)
+void AREnemyAIController::TargetPerceptionUpdated(AActor* Target, FAIStimulus Stimulus)
 {
 	if (!GetBlackboardComponent()) return;
 
@@ -115,8 +110,8 @@ void AREnemyAIController::TargetPerceptionUpdated_Implementation(AActor* Target,
 	{
 		if (!GetBlackboardComponent()->GetValueAsObject(TargetBlackboardKeyName))
 		{
+			Enemy->UpdateAITarget(Target);
 			GetBlackboardComponent()->SetValueAsObject(TargetBlackboardKeyName, Target);
-			AITarget = Target;
 		}
 	}
 	else
@@ -142,7 +137,7 @@ void AREnemyAIController::TargetPerceptionUpdated_Implementation(AActor* Target,
 	}
 }
 
-void AREnemyAIController::TargetForgotton_Implementation(AActor* Target)
+void AREnemyAIController::TargetForgotton(AActor* Target)
 {
 	AActor* currentTarget = Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(TargetBlackboardKeyName));
 	if (currentTarget == Target)
@@ -151,12 +146,12 @@ void AREnemyAIController::TargetForgotton_Implementation(AActor* Target)
 		PerceptionComponent->GetPerceivedHostileActors(OtherTargets);
 		if (OtherTargets.Num() != 0)
 		{
-			AITarget = OtherTargets[0];
+			Enemy->UpdateAITarget(OtherTargets[0]);
 			GetBlackboardComponent()->SetValueAsObject(TargetBlackboardKeyName, OtherTargets[0]);
 		}
 		else
 		{
-			AITarget = nullptr;
+			Enemy->UpdateAITarget(nullptr);
 			GetBlackboardComponent()->ClearValue(TargetBlackboardKeyName);
 		}
 	}
@@ -172,11 +167,4 @@ void AREnemyAIController::PawnDeathStatusChanged(bool bIsDead)
 	{
 		GetBrainComponent()->StartLogic();
 	}
-}
-
-void AREnemyAIController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(AREnemyAIController, AITarget, COND_None);
 }
