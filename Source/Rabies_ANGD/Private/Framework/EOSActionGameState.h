@@ -45,6 +45,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Chest")
 	int AmountOfChests;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
+	int enemyInitalSpawnRate;
+
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void SpawnChest(FVector SpawnLocation);
 

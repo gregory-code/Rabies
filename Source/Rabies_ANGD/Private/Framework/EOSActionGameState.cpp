@@ -37,7 +37,7 @@ void AEOSActionGameState::BeginPlay()
     }
 
     WaveLevel = 1;
-    WaveTime = 30;
+    WaveTime = enemyInitalSpawnRate;
     WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
 }
 
@@ -58,6 +58,7 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
     {
         FActorSpawnParameters SpawnParams;
         AREnemyBase* newEnemy = GetWorld()->SpawnActor<AREnemyBase>(EnemyLibrary[EnemyIDToSpawn], SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+        newEnemy->SetOwner(this);
         AllEnemies.Add(newEnemy); // make sure that the enemies has bReplicates to true
     }
 }

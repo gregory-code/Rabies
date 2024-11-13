@@ -443,4 +443,10 @@ void ARPlayerBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 	{
 		newItem->PlayerPickupRequest(this);
 	}
+
+	ARPlayerBase* player = Cast<ARPlayerBase>(OtherActor);
+	if (player)
+	{
+		// do the revival prompt for the player here
+	}
 }
