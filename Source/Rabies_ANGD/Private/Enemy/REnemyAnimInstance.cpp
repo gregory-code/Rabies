@@ -11,6 +11,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "AI/REnemyAIController.h"
+
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BrainComponent.h"
+
 bool UREnemyAnimInstance::ShouldDoUpperBody() const
 {
 	return (IsMoving() || IsJumping());
@@ -57,6 +62,26 @@ void UREnemyAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 		YawSpeed = FMath::FInterpTo(YawSpeed, RotDelta.Yaw / DeltaSeconds, DeltaSeconds, 10.f);
 
 		FVector Velocity = OwnerCharacter->GetVelocity();
+
+		//  This is for getting the target
+		AREnemyAIController* aiController = Cast<AREnemyAIController>(OwnerCharacter->GetInstigatorController());
+		if (aiController)
+		{
+			UBlackboardComponent* blackboardComp = aiController->GetBlackboardComponent();
+			if (blackboardComp)
+			{
+				UObject* targetObj = blackboardComp->GetValueAsObject(TargetBlackboardKeyName);
+				if (targetObj == nullptr)
+				{
+					TargetLocation = FVector(0, 0, 0);
+				}
+				else
+				{
+					TargetLocation = Cast<AActor>(targetObj)->GetActorLocation();
+				}
+			}
+		}
+		// you betcha
 
 		FVector LookDir = lookRot.Vector();
 		LookDir.Z = 0;

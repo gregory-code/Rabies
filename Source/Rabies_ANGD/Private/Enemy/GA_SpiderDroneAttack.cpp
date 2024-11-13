@@ -105,7 +105,7 @@ void UGA_SpiderDroneAttack::AimAtTarget(float aimTime)
 	aimTime -= GetWorld()->GetDeltaSeconds();
 	if (aimTime > 0)
 	{
-		USkeletalMeshComponent* skeletalMesh = Character->GetMesh();
+		/*USkeletalMeshComponent* skeletalMesh = Character->GetMesh();
 		if (!skeletalMesh)
 			return;
 		
@@ -119,7 +119,7 @@ void UGA_SpiderDroneAttack::AimAtTarget(float aimTime)
 		// Refresh bone transforms to apply changes
 		skeletalMesh->RefreshBoneTransforms();
 
-		UE_LOG(LogTemp, Error, TEXT("Aiming"));
+		UE_LOG(LogTemp, Error, TEXT("Aiming"));*/
 
 		AimHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_SpiderDroneAttack::AimAtTarget, aimTime));
 	}

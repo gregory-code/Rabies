@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Animation", meta = (BlueprintThreadSafe))
 	float GetRightSpeed() const { return RightSpeed; }
 
+	UFUNCTION(BlueprintCallable, Category = "Animation", meta = (BlueprintThreadSafe))
+	FVector GetTargetLocation() const { return TargetLocation; }
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
@@ -73,6 +76,11 @@ private:
 	bool bIsJumping;
 	bool bHoldingJump;
 	FRotator LookOffset;
+
+	FVector TargetLocation;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	FName TargetBlackboardKeyName = "Target";
 
 	FRotator PrevRot;
 	float YawSpeed;
