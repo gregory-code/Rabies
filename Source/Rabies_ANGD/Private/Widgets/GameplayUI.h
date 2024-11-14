@@ -70,6 +70,9 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UPlayerAttributeGauge* movementspeed;
 
+	UPROPERTY(meta = (BindWidget))
+	class UPlayerAttributeGauge* damageReduction;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TSubclassOf<class UPlayerAbilityGauge> AbilityGaugeClass;
 

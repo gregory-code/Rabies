@@ -18,6 +18,7 @@ class URAttributeSet;
 class UGameplayEffect;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeadStatusChanged, bool /*bIsDead*/);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnClientHitScan, AActor* /*Hit Target*/, FVector /* Start Pos */, FVector /* End Pos */);
 
 UCLASS()
 class ARCharacterBase : public ACharacter, public IAbilitySystemInterface, /*public IRGameplayCueInterface,*/ public IGenericTeamAgentInterface
@@ -26,6 +27,8 @@ class ARCharacterBase : public ACharacter, public IAbilitySystemInterface, /*pub
 
 public:
 	FOnDeadStatusChanged OnDeadStatusChanged;
+
+	FOnClientHitScan ClientHitScan;
 
 	// Sets default values for this character's properties
 	ARCharacterBase();
@@ -40,6 +43,9 @@ public:
 	void InitAbilities();
 
 	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
+
+	UFUNCTION()
+	void Hitscan(float range, class AEOSPlayerState* requestedPlayerState);
 
 protected:
 
@@ -58,6 +64,9 @@ public:
 
 	UFUNCTION()
 	int GetCurrentScrap();
+
+	FName RangedAttackSocketName = TEXT("Ranged_Socket");
+	FName RootAimingSocketName = TEXT("RootAiming_Socket");
 
 public:
 	FORCEINLINE bool IsScoping() const { return bIsScoping; }
@@ -114,6 +123,8 @@ private:
 	void MovementSpeedUpdated(const FOnAttributeChangeData& ChangeData);
 	void GravityUpdated(const FOnAttributeChangeData& ChangeData);
 
+	FHitResult hitResult;
+
 public:
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -130,6 +141,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Server, Unreliable)
 	void UpdateAITarget(AActor* newTargetActor);
+
+	UFUNCTION(NetMulticast, Unreliable, WithValidation)
+	void ClientHitScanResult(AActor* hitActor, FVector start, FVector end);
 
 private:
 

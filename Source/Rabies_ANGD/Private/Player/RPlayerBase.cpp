@@ -14,7 +14,6 @@
 
 #include "Framework/RItemDataAsset.h"
 
-
 #include "Actors/ItemChest.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
@@ -38,8 +37,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SceneComponent.h"
-
-#define ECC_RangedAttack ECC_GameTraceChannel2
 
 ARPlayerBase::ARPlayerBase()
 {
@@ -181,34 +178,6 @@ void ARPlayerBase::SetRabiesPlayerController(ARPlayerController* newController)
 {
 	playerController = newController;
 
-}
-void ARPlayerBase::Hitscan(float range)
-{
-	FVector startPos = EOSPlayerState->GetRootAimingLocation() + EOSPlayerState->GetHitscanRotator().Vector();
-	FVector endPos = startPos + EOSPlayerState->GetHitscanRotator().Vector() * range;
-
-	FCollisionShape collisionShape = FCollisionShape::MakeSphere(1);
-	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startPos, endPos, FQuat::Identity, ECC_RangedAttack, collisionShape);
-	if (hit)
-	{
-		FVector weaponStart = EOSPlayerState->GetRangedLocation();
-		FVector hitEnd = hitResult.ImpactPoint;
-		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd);
-	}
-}
-
-void ARPlayerBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end)
-{
-	FString actorName = hitActor->GetName();
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
-	DrawDebugLine(GetWorld(), start, end, FColor::Green);
-	ClientHitScan.Broadcast(hitActor, start, end);
-}
-
-
-bool ARPlayerBase::ClientHitScanResult_Validate(AActor* hitActor, FVector start, FVector end)
-{
-	return true;
 }
 
 void ARPlayerBase::StartJump()
@@ -419,6 +388,11 @@ void ARPlayerBase::SetPlayerState()
 	{
 		EOSPlayerState->Server_OnPossessPlayer(this);
 	}
+}
+
+AEOSPlayerState* ARPlayerBase::GetPlayerBaseState()
+{
+	return EOSPlayerState;
 }
 
 void ARPlayerBase::SetInteractionChest(AItemChest* chest)

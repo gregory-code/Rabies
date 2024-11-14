@@ -7,6 +7,8 @@
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/GA_AbilityBase.h"
 
+#include "Player/RPlayerBase.h"
+
 #include "Net/UnrealNetwork.h"
 
 #include "Character/RCharacterBase.h"
@@ -58,6 +60,8 @@ void AREnemyAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetGenericTeamId(254);
+
 	if (BehaviorTree)
 		RunBehaviorTree(BehaviorTree);
 
@@ -98,13 +102,11 @@ void AREnemyAIController::TargetPerceptionUpdated(AActor* Target, FAIStimulus St
 {
 	if (!GetBlackboardComponent()) return;
 
-	/*IGenericTeamAgentInterface* teamInterface = Cast<IGenericTeamAgentInterface>(Target);
-	if (teamInterface)
+	ARPlayerBase* player = Cast<ARPlayerBase>(Target);
+	if (!player)
 	{
-		FGenericTeamId perceivedActorTeam = GetGenericTeamId();
-		if (perceivedActorTeam.GetId() == GetGenericTeamId().GetId())
-			return;
-	}*/
+		return;
+	}
 
 	if (Stimulus.WasSuccessfullySensed())
 	{

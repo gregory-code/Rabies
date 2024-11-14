@@ -76,7 +76,7 @@ void UGA_RangedGattlingAttack::Fire(FGameplayEventData Payload)
 			if (Player)
 			{
 				ApplyCooldown(cooldownHandle, actorInfo, activationInfo);
-				Player->Hitscan(4000);
+				Player->Hitscan(4000, Player->GetPlayerBaseState());
 			}
 		}
 	}

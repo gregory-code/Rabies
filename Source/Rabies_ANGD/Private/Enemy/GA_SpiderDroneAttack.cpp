@@ -60,13 +60,40 @@ void UGA_SpiderDroneAttack::ActivateAbility(const FGameplayAbilitySpecHandle Han
 	UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
 	WaitForDamage->EventReceived.AddDynamic(this, &UGA_SpiderDroneAttack::HandleDamage);
 	WaitForDamage->ReadyForActivation();
+
+	Character = Cast<ARCharacterBase>(GetOwningActorFromActorInfo());
+
+	if (Character)
+	{
+		ClientHitScanHandle = Character->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
+			{
+				RecieveAttackHitscan(hitActor, startPos, endPos);
+			});
+	}
+}
+
+void UGA_SpiderDroneAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
+{
+	if (K2_HasAuthority())
+	{
+		if (hitActor == nullptr) return;
+		if (hitActor != Character)
+		{
+			FGameplayEventData Payload = FGameplayEventData();
+
+			Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(hitActor);
+
+			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(AttackDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
+			SignalDamageStimuliEvent(Payload.TargetData);
+		}
+	}
 }
 
 void UGA_SpiderDroneAttack::TryCommitAttack(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		Character = Cast<ARCharacterBase>(GetOwningActorFromActorInfo());
 		AREnemyAIController* aiController = Cast<AREnemyAIController>(Character->GetInstigatorController());
 		if (aiController)
 		{
@@ -105,22 +132,12 @@ void UGA_SpiderDroneAttack::AimAtTarget(float aimTime)
 	aimTime -= GetWorld()->GetDeltaSeconds();
 	if (aimTime > 0)
 	{
-		/*USkeletalMeshComponent* skeletalMesh = Character->GetMesh();
-		if (!skeletalMesh)
-			return;
-		
-		FTransform gunTransform = skeletalMesh->GetBoneTransform(TargetGunName);
-		FVector TargetLocation = TargetActor->GetActorLocation();
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(gunTransform.GetLocation(), TargetLocation);
-
-		gunTransform.SetRotation(FQuat(LookAtRotation));
-		//skeletalMesh->SetBoneTran(TargetGunName, gunTransform, EBoneSpaces::ComponentSpace);
-
-		// Refresh bone transforms to apply changes
-		skeletalMesh->RefreshBoneTransforms();
-
-		UE_LOG(LogTemp, Error, TEXT("Aiming"));*/
-
 		AimHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_SpiderDroneAttack::AimAtTarget, aimTime));
+		return;
+	}
+
+	if (K2_HasAuthority())
+	{
+		Character->Hitscan(4000, nullptr);
 	}
 }

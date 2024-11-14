@@ -13,6 +13,8 @@
 #include "GameplayAbilities/RAttributeSet.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "Framework/EOSPlayerState.h"
+
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
@@ -26,6 +28,8 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "Perception/AISense_Touch.h"
+
+#define ECC_RangedAttack ECC_GameTraceChannel2
 
 // Sets default values
 ARCharacterBase::ARCharacterBase()
@@ -139,6 +143,48 @@ void ARCharacterBase::InitStatusHUD()
 int ARCharacterBase::GetCurrentScrap()
 {
 	return AttributeSet->GetScrap();
+}
+
+void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState)
+{
+	FVector startPos = FVector(0, 0, 0);
+	FVector endPos = FVector(0, 0, 0);
+
+	if (requestedPlayerState == nullptr) // it's an enemy request
+	{
+		FVector gunSocket = GetMesh()->GetSocketLocation(RangedAttackSocketName);
+		FRotator gunRotation = GetMesh()->GetSocketRotation(RangedAttackSocketName);
+		startPos = gunSocket + gunRotation.Vector();
+		endPos = startPos + gunRotation.Vector() * range;
+	}
+	else
+	{
+		startPos = requestedPlayerState->GetRootAimingLocation() + requestedPlayerState->GetHitscanRotator().Vector();
+		endPos = startPos + requestedPlayerState->GetHitscanRotator().Vector() * range;
+	}
+
+	FCollisionShape collisionShape = FCollisionShape::MakeSphere(1);
+	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startPos, endPos, FQuat::Identity, ECC_RangedAttack, collisionShape);
+	if (hit)
+	{
+		FVector weaponStart = (requestedPlayerState == nullptr) ? startPos : requestedPlayerState->GetRangedLocation();
+		FVector hitEnd = hitResult.ImpactPoint;
+		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd);
+	}
+}
+
+void ARCharacterBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end)
+{
+	FString actorName = hitActor->GetName();
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
+	DrawDebugLine(GetWorld(), start, end, FColor::Green);
+	ClientHitScan.Broadcast(hitActor, start, end);
+}
+
+
+bool ARCharacterBase::ClientHitScanResult_Validate(AActor* hitActor, FVector start, FVector end)
+{
+	return true;
 }
 
 UAbilitySystemComponent* ARCharacterBase::GetAbilitySystemComponent() const
