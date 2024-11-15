@@ -33,7 +33,7 @@ void UREnemyAnimInstance::NativeInitializeAnimation()
 		UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TryGetPawnOwner());
 		if (OwnerASC)
 		{
-			
+			OwnerASC->RegisterGameplayTagEvent(URAbilityGenericTags::GetScopingTag()).AddUObject(this, &UREnemyAnimInstance::ScopingTagChanged);
 		}
 	}
 
@@ -72,7 +72,7 @@ void UREnemyAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 		}
 		else
 		{
-			TargetLocation = enemyCharacter->GetTarget()->GetActorLocation();
+			TargetLocation = (bIsScoping) ? enemyCharacter->GetTarget()->GetActorLocation() : TargetLocation;
 		}
 
 		FVector LookDir = lookRot.Vector();
@@ -81,4 +81,9 @@ void UREnemyAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 		FwdSpeed = Velocity.Dot(LookDir);
 		RightSpeed = -Velocity.Dot(LookDir.Cross(FVector::UpVector));
 	}
+}
+
+void UREnemyAnimInstance::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
+{
+	bIsScoping = NewStackCount != 0;
 }

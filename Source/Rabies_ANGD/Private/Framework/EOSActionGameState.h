@@ -75,6 +75,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TArray<URItemDataAsset*> ItemLibrary;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	TArray<URItemDataAsset*> ItemSelection;
+
+
 	UPROPERTY(Replicated)
 	TArray<AItemChest*> AllChests;
 

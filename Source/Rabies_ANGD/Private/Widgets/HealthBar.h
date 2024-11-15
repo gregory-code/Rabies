@@ -21,6 +21,8 @@ public:
 	
 	void SetHealth(float NewHealth, float MaxHealth);
 
+	void SetLevel(int newLevel);
+
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Visual")
@@ -34,4 +36,7 @@ private:
 
 	UPROPERTY(VisibleDefaultsOnly, meta = (BindWidget))
 	class UTextBlock* DisplayText;
+
+	UPROPERTY(VisibleDefaultsOnly, meta = (BindWidget))
+	class UTextBlock* LevelText;
 };

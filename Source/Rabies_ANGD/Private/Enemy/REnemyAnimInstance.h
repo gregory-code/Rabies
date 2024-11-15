@@ -92,4 +92,6 @@ private:
 
 	bool bAttacking;
 	bool bFlying;
+
+	void ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 };

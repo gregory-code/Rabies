@@ -47,6 +47,10 @@ public:
 	UFUNCTION()
 	void Hitscan(float range, class AEOSPlayerState* requestedPlayerState);
 
+
+	UFUNCTION()
+	void SetLevelUIText(int level);
+
 protected:
 
 	virtual void BeginPlay() override;

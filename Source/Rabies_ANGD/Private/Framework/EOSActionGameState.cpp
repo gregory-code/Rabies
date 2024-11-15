@@ -38,7 +38,7 @@ void AEOSActionGameState::BeginPlay()
         spawnLocations.RemoveAt(randomSpawn);
     }
 
-    WaveLevel = 1;
+    WaveLevel = 0;
     WaveTime = enemyInitalSpawnRate;
     WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
 }
@@ -61,6 +61,7 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
         FActorSpawnParameters SpawnParams;
         AREnemyBase* newEnemy = GetWorld()->SpawnActor<AREnemyBase>(EnemyLibrary[EnemyIDToSpawn], SpawnLocation, FRotator::ZeroRotator, SpawnParams);
         newEnemy->SetOwner(this);
+        newEnemy->InitLevel(WaveLevel);
         AllEnemies.Add(newEnemy); // make sure that the enemies has bReplicates to true
     }
 }
@@ -151,8 +152,18 @@ void AEOSActionGameState::OpenedChest_Implementation(int chestID)
     {
         AllChests[chestID]->UpdateChestOpened();
 
-        int32 randomIndex = FMath::RandRange(0, ItemLibrary.Num() - 1);
-        URItemDataAsset* newData = ItemLibrary[randomIndex];
+        URItemDataAsset* newData = ItemLibrary[0];
+
+        if (ItemSelection.IsEmpty() == false)
+        {
+            int32 randomIndex = FMath::RandRange(0, ItemSelection.Num() - 1);
+            newData = ItemSelection[randomIndex];
+        }
+        else
+        {
+            int32 randomIndex = FMath::RandRange(0, ItemLibrary.Num() - 1);
+            newData = ItemLibrary[randomIndex];
+        }
 
         FActorSpawnParameters SpawnParams;
         AItemPickup* newitem = GetWorld()->SpawnActor<AItemPickup>(ItemPickupClass, AllChests[chestID]->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);

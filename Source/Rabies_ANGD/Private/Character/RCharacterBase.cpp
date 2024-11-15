@@ -147,6 +147,14 @@ void ARCharacterBase::InitStatusHUD()
 	}
 }
 
+void ARCharacterBase::SetLevelUIText(int level)
+{
+	if (HealthBar)
+	{
+		HealthBar->SetLevel(level);
+	}
+}
+
 int ARCharacterBase::GetCurrentScrap()
 {
 	return AttributeSet->GetScrap();

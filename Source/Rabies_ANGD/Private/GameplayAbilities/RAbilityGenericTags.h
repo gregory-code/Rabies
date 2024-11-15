@@ -28,6 +28,8 @@ public:
 	static FGameplayTag GetScopingTag();
 	static FGameplayTag GetEndScopingTag();
 	static FGameplayTag GetAttackingTag();
+	static FGameplayTag GetStartAimingTag();
+	static FGameplayTag GetEndAimingTag();
 	static FGameplayTag GetEndAttackTag();
 	static FGameplayTag GetUnActionableTag();
 	static FGameplayTag GetFlyingTag();
@@ -35,5 +37,6 @@ public:
 	static FGameplayTag GetEndTakeOffChargeTag();
 	static FGameplayTag GetApplyGravityJump();
 	static FGameplayTag GetHoldingJump();
+
 
 };

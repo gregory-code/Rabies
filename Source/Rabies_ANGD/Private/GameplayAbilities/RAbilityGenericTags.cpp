@@ -58,6 +58,16 @@ FGameplayTag URAbilityGenericTags::GetAttackingTag()
 	return FGameplayTag::RequestGameplayTag("ability.attack.attacking");
 }
 
+FGameplayTag URAbilityGenericTags::GetStartAimingTag()
+{
+	return FGameplayTag::RequestGameplayTag("ability.attack.startAiming");
+}
+
+FGameplayTag URAbilityGenericTags::GetEndAimingTag()
+{
+	return FGameplayTag::RequestGameplayTag("ability.attack.endAiming");
+}
+
 FGameplayTag URAbilityGenericTags::GetEndAttackTag()
 {
 	return FGameplayTag::RequestGameplayTag("ability.attack.endAttack");

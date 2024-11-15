@@ -10,6 +10,8 @@
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+
+#include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "AI/REnemyAIController.h"
 
 #include "Framework/EOSActionGameState.h"
@@ -57,11 +59,19 @@ void UGA_SpiderDroneAttack::ActivateAbility(const FGameplayAbilitySpecHandle Han
 	WaitForActivation->EventReceived.AddDynamic(this, &UGA_SpiderDroneAttack::TryCommitAttack);
 	WaitForActivation->ReadyForActivation();
 
+	UAbilityTask_WaitGameplayEvent* AimingActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetStartAimingTag());
+	AimingActivation->EventReceived.AddDynamic(this, &UGA_SpiderDroneAttack::StartAiming);
+	AimingActivation->ReadyForActivation();
+
+	UAbilityTask_WaitGameplayEvent* EndAimingActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetEndAimingTag());
+	EndAimingActivation->EventReceived.AddDynamic(this, &UGA_SpiderDroneAttack::EndAiming);
+	EndAimingActivation->ReadyForActivation();
+
 	UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
 	WaitForDamage->EventReceived.AddDynamic(this, &UGA_SpiderDroneAttack::HandleDamage);
 	WaitForDamage->ReadyForActivation();
 
-	Character = Cast<ARCharacterBase>(GetOwningActorFromActorInfo());
+	Character = Cast<AREnemyBase>(GetOwningActorFromActorInfo());
 
 	if (Character)
 	{
@@ -94,25 +104,7 @@ void UGA_SpiderDroneAttack::TryCommitAttack(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		AREnemyAIController* aiController = Cast<AREnemyAIController>(Character->GetInstigatorController());
-		if (aiController)
-		{
-			UBlackboardComponent* blackboardComp = aiController->GetBlackboardComponent();
-			if (blackboardComp)
-			{
-				UObject* targetObj = blackboardComp->GetValueAsObject(TargetBlackboardKeyName);
-				TargetActor = Cast<AActor>(targetObj);
-				if (TargetActor)
-				{
-					AimHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_SpiderDroneAttack::AimAtTarget, 2.0f));
-				}
-			}
-		}
-
-		if (Character)
-		{
-			//character->ServerPlayAnimMontage(AttackAnim);
-		}
+		Character->Hitscan(8000, nullptr);
 	}
 }
 
@@ -127,17 +119,32 @@ void UGA_SpiderDroneAttack::HandleDamage(FGameplayEventData Payload)
 	}
 }
 
-void UGA_SpiderDroneAttack::AimAtTarget(float aimTime)
+void UGA_SpiderDroneAttack::StartAiming(FGameplayEventData Payload)
 {
-	aimTime -= GetWorld()->GetDeltaSeconds();
-	if (aimTime > 0)
-	{
-		AimHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_SpiderDroneAttack::AimAtTarget, aimTime));
-		return;
-	}
+	Character->UpdateAimingTagChange(true);
+	
 
-	if (K2_HasAuthority())
+	/*if (K2_HasAuthority())
 	{
-		Character->Hitscan(4000, nullptr);
-	}
+		AREnemyAIController* aiController = Cast<AREnemyAIController>(Character->GetInstigatorController());
+		if (aiController)
+		{
+			UBlackboardComponent* blackboardComp = aiController->GetBlackboardComponent();
+			if (blackboardComp)
+			{
+				UObject* targetObj = blackboardComp->GetValueAsObject(TargetBlackboardKeyName);
+				TargetActor = Cast<AActor>(targetObj);
+			}
+		}
+	}*/
+}
+
+void UGA_SpiderDroneAttack::EndAiming(FGameplayEventData Payload)
+{
+	Character->UpdateAimingTagChange(false);
+
+	//if (Character)
+	//{
+		//character->ServerPlayAnimMontage(AttackAnim);
+	//}
 }

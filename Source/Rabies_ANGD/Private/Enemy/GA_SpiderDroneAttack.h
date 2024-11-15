@@ -30,6 +30,12 @@ private:
 	UFUNCTION()
 	void HandleDamage(FGameplayEventData Payload);
 
+	UFUNCTION()
+	void StartAiming(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void EndAiming(FGameplayEventData Payload);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> AttackDamage;
 
@@ -38,14 +44,9 @@ private:
 
 	FDelegateHandle ClientHitScanHandle;
 
-	FTimerHandle AimHandle;
-
-	class ARCharacterBase* Character;
+	class AREnemyBase* Character;
 
 	AActor* TargetActor;
-
-	UFUNCTION()
-	void AimAtTarget(float aimTime);
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	FName TargetBlackboardKeyName = "Target";

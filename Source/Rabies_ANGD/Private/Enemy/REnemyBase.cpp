@@ -50,6 +50,27 @@ void AREnemyBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AREnemyBase::InitLevel(int level)
+{
+	LevelHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AREnemyBase::CommitLevel, level));
+}
+
+void AREnemyBase::CommitLevel(int level)
+{
+
+}
+
+void AREnemyBase::UpdateAimingTagChange_Implementation(bool state)
+{
+	if (state)
+	{
+		GetAbilitySystemComponent()->AddLooseGameplayTag(URAbilityGenericTags::GetScopingTag());
+	}
+	else
+	{
+		GetAbilitySystemComponent()->RemoveLooseGameplayTag(URAbilityGenericTags::GetScopingTag());
+	}
+}
 
 void AREnemyBase::HitDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {

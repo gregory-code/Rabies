@@ -22,3 +22,9 @@ void UHealthBar::SetHealth(float NewHealth, float MaxHealth)
 	FText Text = FText::Format(FText::FromString("{0}/{1}"), FText::AsNumber((int)NewHealth), FText::AsNumber((int)MaxHealth));
 	DisplayText->SetText(Text);
 }
+
+void UHealthBar::SetLevel(int newLevel)
+{
+	FText Text = FText::Format(FText::FromString("Lv {0}"), FText::AsNumber((int)newLevel));
+	LevelText->SetText(Text);
+}
