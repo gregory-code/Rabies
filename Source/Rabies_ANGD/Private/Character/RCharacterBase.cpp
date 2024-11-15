@@ -212,7 +212,7 @@ void ARCharacterBase::PlayMontage(UAnimMontage* MontageToPlay)
 
 void ARCharacterBase::StartDeath()
 {
-	PlayMontage(DeathMontage);
+	//PlayMontage(DeathMontage);
 	//AbilitySystemComponent->ApplyGameplayEffect(DeathEffect);
 	AbilitySystemComponent->AddLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
 	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
@@ -224,7 +224,7 @@ void ARCharacterBase::DeathTagChanged(const FGameplayTag TagChanged, int32 NewSt
 {
 	if (NewStackCount == 0) // for getting revived
 	{
-		StopAnimMontage(DeathMontage);
+		//StopAnimMontage(DeathMontage);
 		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		AbilitySystemComponent->ApplyFullStat();
 		//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
