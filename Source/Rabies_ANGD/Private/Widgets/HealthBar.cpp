@@ -4,6 +4,8 @@
 #include "Widgets/HealthBar.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "GameplayAbilities/RAbilitySystemComponent.h"
+#include "GameplayAbilities/RAttributeSet.h"
 
 void UHealthBar::NativePreConstruct()
 {
@@ -16,7 +18,7 @@ void UHealthBar::SetHealth(float NewHealth, float MaxHealth)
 	float Percent = NewHealth / MaxHealth;
 	ProgressBar->SetPercent(Percent);
 	ShaderBar->SetPercent(Percent);
-
+	
 	FText Text = FText::Format(FText::FromString("{0}/{1}"), FText::AsNumber((int)NewHealth), FText::AsNumber((int)MaxHealth));
 	DisplayText->SetText(Text);
 }

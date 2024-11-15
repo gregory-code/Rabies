@@ -9,6 +9,8 @@
 
 #include "Framework/RGameMode.h"
 
+#include "Framework/EOSActionGameState.h"
+
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAttributeSet.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
@@ -114,7 +116,12 @@ void ARCharacterBase::PossessedBy(AController* NewController)
 
 void ARCharacterBase::InitStatusHUD()
 {
-	HealthBar = Cast<UHealthBar>(HealthBarWidgetComp->GetUserWidgetObject());
+	HealthBarWidgetComp->SetWidgetClass(HealthBarClass);
+	HealthBar = CreateWidget<UHealthBar>(GetWorld(), HealthBarWidgetComp->GetWidgetClass());
+	if (HealthBar)
+	{
+		HealthBarWidgetComp->SetWidget(HealthBar);
+	}
 	if (!HealthBar)
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s can't spawn health has the wrong widget setup"), *GetName());
@@ -278,9 +285,10 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 	if (ChangeData.NewValue <= 0)
 	{
 		StartDeath();
-		if (HasAuthority() && ChangeData.GEModData)
+		AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
+		if (HasAuthority() && ChangeData.GEModData && GetOwner() == gameState)
 		{
-
+			gameState->AwardEnemyKill(DeathEffect);
 		}
 	}
 }

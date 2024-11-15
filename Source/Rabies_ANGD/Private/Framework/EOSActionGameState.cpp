@@ -14,11 +14,13 @@
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "Math/UnrealMathUtility.h"
 #include "Enemy/REnemyBase.h"
+#include "GameFramework/PlayerState.h"
 #include "Character/RCharacterBase.h"
 #include "Actors/ChestSpawnLocation.h"
 #include "Framework/EOSPlayerState.h"
 #include "Player/RPlayerController.h"
 #include "Actors/EnemySpawnLocation.h"
+#include "GameplayAbilities/GA_AbilityBase.h"
 
 void AEOSActionGameState::BeginPlay()
 {
@@ -80,9 +82,27 @@ void AEOSActionGameState::SelectItem(AItemPickup* selectedItem, ARPlayerBase* ta
     for (int i = 0; i < AllItems.Num(); i++)
     {
         if (selectedItem == AllItems[i])
-        {
+        { 
             PickedUpItem(i, targetingPlayer);
             return;
+        }
+    }
+}
+
+void AEOSActionGameState::AwardEnemyKill_Implementation(TSubclassOf<class UGameplayEffect> rewardEffect)
+{
+    if (HasAuthority())
+    {
+        for (APlayerState* playerState : PlayerArray)
+        {
+            if (playerState && playerState->GetPawn())
+            {
+                ARPlayerBase* player = Cast<ARPlayerBase>(playerState->GetPawn());
+                if (player)
+                {
+                    player->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(rewardEffect.GetDefaultObject(), 1.0f, player->GetAbilitySystemComponent()->MakeEffectContext());
+                }
+            }
         }
     }
 }

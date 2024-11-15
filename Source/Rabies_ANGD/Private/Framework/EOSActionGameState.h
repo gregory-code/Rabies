@@ -26,6 +26,9 @@ public:
 	UFUNCTION()
 	void SelectItem(AItemPickup* selectedItem, class ARPlayerBase* targetingPlayer);
 
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void AwardEnemyKill(TSubclassOf<class UGameplayEffect> rewardEffect);
+
 private:
 
 	FTimerHandle WaveHandle;

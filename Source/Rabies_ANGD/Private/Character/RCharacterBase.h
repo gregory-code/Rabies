@@ -57,6 +57,7 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	UFUNCTION(BlueprintCallable)
 	void InitStatusHUD();
 
 	UFUNCTION(BlueprintCallable)
@@ -114,6 +115,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	class UWidgetComponent* HealthBarWidgetComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UHealthBar> HealthBarClass;
 
 	UPROPERTY()
 	class UHealthBar* HealthBar;

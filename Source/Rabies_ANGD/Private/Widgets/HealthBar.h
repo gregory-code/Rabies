@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+
 #include "HealthBar.generated.h"
 
+class URAbilitySystemComponent;
 /**
  * 
  */
@@ -20,6 +22,7 @@ public:
 	void SetHealth(float NewHealth, float MaxHealth);
 
 private:
+
 	UPROPERTY(EditAnywhere, Category = "Visual")
 	FLinearColor FillColor;
 
