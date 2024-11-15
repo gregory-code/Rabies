@@ -45,6 +45,7 @@ ARCharacterBase::ARCharacterBase()
 
 	AttributeSet = CreateDefaultSubobject<URAttributeSet>("Attribute Set");
 
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetLevelAttribute()).AddUObject(this, &ARCharacterBase::LevelUpdated);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetHealthAttribute()).AddUObject(this, &ARCharacterBase::HealthUpdated);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &ARCharacterBase::MaxHealthUpdated);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMovementSpeedAttribute()).AddUObject(this, &ARCharacterBase::MovementSpeedUpdated);
@@ -144,14 +145,6 @@ void ARCharacterBase::InitStatusHUD()
 	{
 		if (GetController() && GetController()->IsPlayerController())
 			HealthBar->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-
-void ARCharacterBase::SetLevelUIText(int level)
-{
-	if (HealthBar)
-	{
-		HealthBar->SetLevel(level);
 	}
 }
 
@@ -265,6 +258,22 @@ void ARCharacterBase::HoldingJumpTagChanged(const FGameplayTag TagChanged, int32
 	HoldingJumpTagChanged(bHoldingJump);
 }
 
+void ARCharacterBase::LevelUpdated(const FOnAttributeChangeData& ChangeData)
+{
+	if (!AttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s NO ATTRIBUTE SET"), *GetName());
+		return;
+	}
+
+	if (HealthBar)
+	{
+		HealthBar->SetLevel(ChangeData.NewValue);
+	}
+
+	onLevelUp.Broadcast(ChangeData.NewValue);
+}
+
 void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 {
 	if (!AttributeSet)
@@ -290,8 +299,9 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 		}
 	}
 
-	if (ChangeData.NewValue <= 0)
+	if (ChangeData.NewValue <= 0 && !bHasDied)
 	{
+		bHasDied = true;
 		StartDeath();
 		AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
 		if (HasAuthority() && ChangeData.GEModData && GetOwner() == gameState)
@@ -372,4 +382,5 @@ void ARCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ARCharacterBase, TeamId, COND_None);
 	DOREPLIFETIME_CONDITION(ARCharacterBase, AITarget, COND_None);
+	DOREPLIFETIME_CONDITION(ARCharacterBase, AILevel, COND_None);
 }

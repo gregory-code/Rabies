@@ -25,17 +25,31 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void UpdateAimingTagChange(bool state);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void InitLevel(int level);
 
 private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TSubclassOf<UGameplayEffect> WaveLevelUpgrade;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float HealthOnLevelUp = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float MeleeStrengthOnLevelUp = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float RangedStrengthOnLevelUp = 1;
+
+
 	UPROPERTY(VisibleDefaultsOnly, Category = "AI")
 	class UAIPerceptionStimuliSourceComponent* AIPerceptionSourceComp;
 
 	FTimerHandle LevelHandle;
 
-	UFUNCTION()
-	void CommitLevel(int level);
+	UFUNCTION(NetMulticast, Unreliable)
+	void CommitLevel();
 
 	UFUNCTION()
 	void HitDetected(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

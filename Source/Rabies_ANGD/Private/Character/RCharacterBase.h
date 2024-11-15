@@ -18,6 +18,7 @@ class URAttributeSet;
 class UGameplayEffect;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeadStatusChanged, bool /*bIsDead*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelUp, int /*new level*/);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnClientHitScan, AActor* /*Hit Target*/, FVector /* Start Pos */, FVector /* End Pos */);
 
 UCLASS()
@@ -29,6 +30,7 @@ public:
 	FOnDeadStatusChanged OnDeadStatusChanged;
 
 	FOnClientHitScan ClientHitScan;
+	FOnLevelUp onLevelUp;
 
 	// Sets default values for this character's properties
 	ARCharacterBase();
@@ -47,9 +49,6 @@ public:
 	UFUNCTION()
 	void Hitscan(float range, class AEOSPlayerState* requestedPlayerState);
 
-
-	UFUNCTION()
-	void SetLevelUIText(int level);
 
 protected:
 
@@ -80,6 +79,7 @@ public:
 	FORCEINLINE bool IsHoldingJump() const { return bHoldingJump; }
 
 private:
+	bool bHasDied;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attacking")
 	class URAttackingBoxComponent* AttackingBoxComponent;
@@ -126,6 +126,7 @@ private:
 	UPROPERTY()
 	class UHealthBar* HealthBar;
 
+	void LevelUpdated(const FOnAttributeChangeData& ChangeData);
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void MaxHealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void MovementSpeedUpdated(const FOnAttributeChangeData& ChangeData);
@@ -162,5 +163,10 @@ private:
 	AActor* AITarget;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // need this when doing Replicated things
+
+public:
+	UPROPERTY(Replicated)
+	int AILevel;
+
 
 };

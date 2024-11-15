@@ -61,6 +61,8 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
         FActorSpawnParameters SpawnParams;
         AREnemyBase* newEnemy = GetWorld()->SpawnActor<AREnemyBase>(EnemyLibrary[EnemyIDToSpawn], SpawnLocation, FRotator::ZeroRotator, SpawnParams);
         newEnemy->SetOwner(this);
+        UAbilitySystemComponent* ASC = newEnemy->GetAbilitySystemComponent();
+        ASC->SetOwnerActor(newEnemy);
         newEnemy->InitLevel(WaveLevel);
         AllEnemies.Add(newEnemy); // make sure that the enemies has bReplicates to true
     }

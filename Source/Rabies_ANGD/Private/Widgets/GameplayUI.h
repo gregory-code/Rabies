@@ -38,6 +38,11 @@ private:
 	//************************//
 
 	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* levelBar;
+
+	class UTextBlock* levelText;
+
+	UPROPERTY(meta = (BindWidget))
 	class UHealthBar* PlayerHealth;
 
 	UPROPERTY(meta = (BindWidget))
@@ -78,6 +83,7 @@ private:
 
 	bool crosshairState;
 
+	void LevelUpdated(const FOnAttributeChangeData& ChangeData);
 	void HealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void MaxHealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void ScrapUpdated(const FOnAttributeChangeData& ChangeData);

@@ -102,3 +102,28 @@ FGameplayTag URAbilityGenericTags::GetHoldingJump()
 {
 	return FGameplayTag::RequestGameplayTag("ability.passive.holdingJump");
 }
+
+FGameplayTag URAbilityGenericTags::GetLevelTag()
+{
+	return FGameplayTag::RequestGameplayTag("stat.level");
+}
+
+FGameplayTag URAbilityGenericTags::GetMaxHealthTag()
+{
+	return FGameplayTag::RequestGameplayTag("stat.maxHealth");
+}
+
+FGameplayTag URAbilityGenericTags::GetHealthTag()
+{
+	return FGameplayTag::RequestGameplayTag("stat.health");
+}
+
+FGameplayTag URAbilityGenericTags::GetMeleeAttackStrengthTag()
+{
+	return FGameplayTag::RequestGameplayTag("stat.meleeAttackStrength");
+}
+
+FGameplayTag URAbilityGenericTags::GetRangedAttackStrengthTag()
+{
+	return FGameplayTag::RequestGameplayTag("stat.rangedAttackStrength");
+}

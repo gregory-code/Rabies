@@ -42,6 +42,7 @@ void UGameplayUI::NativeConstruct()
 	UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
 	if (OwnerASC)
 	{
+		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetLevelAttribute()).AddUObject(this, &UGameplayUI::LevelUpdated);
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetHealthAttribute()).AddUObject(this, &UGameplayUI::HealthUpdated);
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &UGameplayUI::MaxHealthUpdated);
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetScrapAttribute()).AddUObject(this, &UGameplayUI::ScrapUpdated);
@@ -61,6 +62,7 @@ void UGameplayUI::NativeConstruct()
 
 		damageReduction->SetDefaultValue(OwnerASC->GetNumericAttributeBase(URAttributeSet::GetDamageReductionAttribute()));
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetDamageReductionAttribute()).AddUObject(damageReduction, &UPlayerAttributeGauge::UpdateValue);
+
 	}
 
 	OwnerAbilitySystemComponent = OwnerASC;
@@ -115,6 +117,12 @@ void UGameplayUI::AddItem(URItemDataAsset* itemAsset)
 	{
 		PlayerItemInventory->AddItem(itemAsset);
 	}
+}
+
+void UGameplayUI::LevelUpdated(const FOnAttributeChangeData& ChangeData)
+{
+	FText Text = FText::Format(FText::FromString("Lv {0}"), FText::AsNumber((int)ChangeData.NewValue));
+	levelText->SetText(Text);
 }
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)

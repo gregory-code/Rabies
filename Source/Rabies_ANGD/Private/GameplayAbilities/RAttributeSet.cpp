@@ -47,6 +47,11 @@ void URAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackD
 	}
 }
 
+void URAttributeSet::OnRep_Level(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URAttributeSet, Level, OldValue);
+}
+
 void URAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(URAttributeSet, Health, OldValue);
@@ -200,6 +205,8 @@ void URAttributeSet::OnRep_UraniumEffectChance(const FGameplayAttributeData& Old
 void URAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(URAttributeSet, Level, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(URAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(URAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
