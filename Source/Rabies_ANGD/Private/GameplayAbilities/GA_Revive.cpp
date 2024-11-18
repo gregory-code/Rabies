@@ -12,6 +12,8 @@
 #include "Player/RPlayerController.h"
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 
+#include "Framework/EOSPlayerState.h"
+
 #include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -73,6 +75,17 @@ void UGA_Revive::Hold(float timeRemaining)
 	else
 	{
 		TArray<ARPlayerBase*> playersRevived = Player->nearbyFaintedPlayers;
+		for (ARPlayerBase* player : playersRevived)
+		{
+			if (player)
+			{
+				AEOSPlayerState* playerState = player->GetPlayerState<AEOSPlayerState>();
+				if (playerState)
+				{
+					playerState->Server_RevivePlayer(player);
+				}
+			}
+		}
 		K2_EndAbility();
 		//process revive
 	}

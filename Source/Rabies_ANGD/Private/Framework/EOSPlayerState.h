@@ -36,6 +36,9 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_ProcessDotFly(ARPlayerBase* player);
 
+	UFUNCTION(Server, Reliable)
+	void Server_RevivePlayer(ARPlayerBase* player);
+
 	UFUNCTION()
 	FRotator GetHitscanRotator() { return hitscanRotation; }
 

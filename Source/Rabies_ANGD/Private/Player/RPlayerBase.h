@@ -59,6 +59,9 @@ public:
 	UPROPERTY()
 	TArray<ARPlayerBase*> nearbyFaintedPlayers;
 
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void ClientRevive();
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "PlayerDetail")

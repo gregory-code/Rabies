@@ -444,6 +444,23 @@ AEOSPlayerState* ARPlayerBase::GetPlayerBaseState()
 	return EOSPlayerState;
 }
 
+void ARPlayerBase::ClientRevive_Implementation()
+{
+	if (EOSPlayerState)
+	{
+		EOSPlayerState->Server_RevivePlayer(this);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No player state apparently?"));
+	}
+}
+
+bool ARPlayerBase::ClientRevive_Validate()
+{
+	return true;
+}
+
 void ARPlayerBase::SetInteractionChest(AItemChest* chest)
 {
 	interactionChest = chest;

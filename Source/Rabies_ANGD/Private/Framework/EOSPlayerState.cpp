@@ -20,6 +20,12 @@ AEOSPlayerState::AEOSPlayerState()
 
 }
 
+void AEOSPlayerState::Server_RevivePlayer_Implementation(ARPlayerBase* player)
+{
+	Player->GetAbilitySystemComponent()->RemoveLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
+}
+
+
 void AEOSPlayerState::Server_OnPossessPlayer_Implementation(ARPlayerBase* myPlayer)
 {
 	Player = myPlayer;
@@ -86,7 +92,7 @@ void AEOSPlayerState::Server_ProcessDotFly_Implementation(ARPlayerBase* player)
 {
 	FGameplayEventData eventData;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(player, URAbilityGenericTags::GetApplyGravityJump(), eventData);
-	UE_LOG(LogTemp, Error, TEXT("%s Gravity jump implementaiton"), *GetName());
+	//UE_LOG(LogTemp, Error, TEXT("%s Gravity jump implementaiton"), *GetName());
 }
 
 bool AEOSPlayerState::Server_ProcessDotFly_Validate(ARPlayerBase* player)
