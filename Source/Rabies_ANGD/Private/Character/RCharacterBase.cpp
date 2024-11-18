@@ -403,6 +403,38 @@ void ARCharacterBase::GravityUpdated(const FOnAttributeChangeData& ChangeData)
 	GetCharacterMovement()->GravityScale = ChangeData.NewValue;
 }
 
+void ARCharacterBase::LevelUpUpgrade(int level, bool setLevel)
+{
+	FGameplayEffectContextHandle contextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+	FGameplayEffectSpecHandle effectSpechandle = GetAbilitySystemComponent()->MakeOutgoingSpec(LevelupUpgradeEffect, 1.0f, contextHandle);
+
+	FGameplayEffectSpec* spec = effectSpechandle.Data.Get();
+	if (spec)
+	{
+		if (setLevel)
+		{
+			float levelScale = (float)level - 1;
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetLevelTag(), levelScale);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMaxHealthTag(), HealthOnLevelUp * levelScale);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetHealthTag(), HealthOnLevelUp * levelScale);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMeleeAttackStrengthTag(), MeleeStrengthOnLevelUp * levelScale);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetRangedAttackStrengthTag(), RangedStrengthOnLevelUp * levelScale);
+		}
+		else
+		{
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetLevelTag(), 0.0f);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMaxHealthTag(), HealthOnLevelUp);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetHealthTag(), HealthOnLevelUp);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMeleeAttackStrengthTag(), MeleeStrengthOnLevelUp);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetRangedAttackStrengthTag(), RangedStrengthOnLevelUp);
+		}
+
+		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+	}
+
+}
+
+
 void ARCharacterBase::ServerPlayAnimMontage_Implementation(UAnimMontage* montage)
 {
 	PlayAnimMontage(montage);
@@ -440,35 +472,4 @@ void ARCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION(ARCharacterBase, TeamId, COND_None);
 	DOREPLIFETIME_CONDITION(ARCharacterBase, AITarget, COND_None);
 	DOREPLIFETIME_CONDITION(ARCharacterBase, AILevel, COND_None);
-}
-
-void ARCharacterBase::LevelUpUpgrade(int level, bool setLevel)
-{
-	FGameplayEffectContextHandle contextHandle = GetAbilitySystemComponent()->MakeEffectContext();
-	FGameplayEffectSpecHandle effectSpechandle = GetAbilitySystemComponent()->MakeOutgoingSpec(LevelupUpgradeEffect, 1.0f, contextHandle);
-
-	FGameplayEffectSpec* spec = effectSpechandle.Data.Get();
-	if (spec)
-	{
-		if (setLevel)
-		{
-			float levelScale = (float)level - 1;
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetLevelTag(), levelScale);
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMaxHealthTag(), HealthOnLevelUp * levelScale);
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetHealthTag(), HealthOnLevelUp * levelScale);
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMeleeAttackStrengthTag(), MeleeStrengthOnLevelUp * levelScale);
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetRangedAttackStrengthTag(), RangedStrengthOnLevelUp * levelScale);
-		}
-		else
-		{
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetLevelTag(), 0.0f);
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMaxHealthTag(), HealthOnLevelUp);
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetHealthTag(), HealthOnLevelUp);
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMeleeAttackStrengthTag(), MeleeStrengthOnLevelUp);
-			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetRangedAttackStrengthTag(), RangedStrengthOnLevelUp);
-		}
-
-		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
-	}
-
 }

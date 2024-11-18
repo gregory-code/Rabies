@@ -29,6 +29,9 @@ public:
 	void SetTakeOffBarState(bool state, float charge);
 
 	UFUNCTION()
+	void SetRevivalBarState(bool state, float charge);
+
+	UFUNCTION()
 	void AddItem(class URItemDataAsset* itemAsset);
 
 private:
@@ -103,6 +106,9 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UChageBar* SuperJumpChargeBar;
+
+	UPROPERTY(meta = (BindWidget))
+	class UChageBar* ReviveChargeBar;
 
 	//************************//
 	//     Test n' Online      //

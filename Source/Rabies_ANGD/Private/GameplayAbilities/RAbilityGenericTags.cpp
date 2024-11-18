@@ -108,6 +108,16 @@ FGameplayTag URAbilityGenericTags::GetScrapTag()
 	return FGameplayTag::RequestGameplayTag("stat.scrap");
 }
 
+FGameplayTag URAbilityGenericTags::GetRevivingTag()
+{
+	return FGameplayTag::RequestGameplayTag("stat.reviving");
+}
+
+FGameplayTag URAbilityGenericTags::GetEndRevivingTag()
+{
+	return FGameplayTag::RequestGameplayTag("stat.endReviving");
+}
+
 FGameplayTag URAbilityGenericTags::GetLevelTag()
 {
 	return FGameplayTag::RequestGameplayTag("stat.level");

@@ -39,6 +39,8 @@ public:
 	static FGameplayTag GetHoldingJump();
 
 	static FGameplayTag GetScrapTag();
+	static FGameplayTag GetRevivingTag();
+	static FGameplayTag GetEndRevivingTag();
 
 	static FGameplayTag GetLevelTag();
 	static FGameplayTag GetExpTag();

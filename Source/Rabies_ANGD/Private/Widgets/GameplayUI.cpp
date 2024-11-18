@@ -114,6 +114,13 @@ void UGameplayUI::SetTakeOffBarState(bool state, float charge)
 	SuperJumpChargeBar->Charge(charge);
 }
 
+void UGameplayUI::SetRevivalBarState(bool state, float charge)
+{
+	ReviveChargeBar->SetVisibility((state) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+	ReviveChargeBar->Charge(charge);
+}
+
 void UGameplayUI::AddItem(URItemDataAsset* itemAsset)
 {
 	if (PlayerItemInventory)
