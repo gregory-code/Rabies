@@ -21,8 +21,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Escape")
 	class USphereComponent* SphereCollider;
 
-	UPROPERTY(VisibleAnywhere, Category = "Escaoe")
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "UI")
 	class UWidgetComponent* EscapeWidgetComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	class UCannotEscape* CannotEscapeWidgetUI;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	class UCanEscape* CanEscapeWidgetUI;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	class UGameWinUI* GameWinUI;
 
 	//UI for the false bHasBeatenBoss
 
@@ -52,11 +63,11 @@ public:
 	UFUNCTION()
 	void SetUpEndUI();
 
-
 	UFUNCTION()
-	void SetActivatingExit(bool bBossDefeated);
+	bool SetActivatingExit();
 
 	UFUNCTION()
 	void EndGame();
+
 
 };

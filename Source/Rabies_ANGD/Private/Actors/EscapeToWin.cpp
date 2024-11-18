@@ -5,6 +5,10 @@
 #include "Player/RPlayerBase.h"
 #include "Components/SphereComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/WidgetComponent.h"
+#include "Widgets/CanEscape.h"
+#include "Widgets/CannotEscape.h"
+#include "Widgets/GameWinUI.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -39,7 +43,14 @@ void AEscapeToWin::Tick(float DeltaTime)
 
 void AEscapeToWin::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
+	if (bHasBeatenBoss)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("You have defeated the boss! You can escape!"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Door is locked, defeat the boss."));
+	}
 }
 
 void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -49,19 +60,26 @@ void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 
 void AEscapeToWin::SetUpTrueUI()
 {
+	CanEscapeWidgetUI = Cast<UCanEscape>(EscapeWidgetComp->GetUserWidgetObject());
+	CanEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AEscapeToWin::SetUpFalseUI()
 {
+	CannotEscapeWidgetUI = Cast<UCannotEscape>(EscapeWidgetComp->GetUserWidgetObject());
+	CannotEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AEscapeToWin::SetUpEndUI()
 {
+	GameWinUI = Cast<UGameWinUI>(EscapeWidgetComp->GetUserWidgetObject());
+	GameWinUI->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void AEscapeToWin::SetActivatingExit(bool bBossDefeated)
+bool AEscapeToWin::SetActivatingExit()
 {
-
+	bHasBeatenBoss = true;
+	return bHasBeatenBoss;
 }
 
 void AEscapeToWin::EndGame()
