@@ -38,7 +38,12 @@ public:
 	static FGameplayTag GetApplyGravityJump();
 	static FGameplayTag GetHoldingJump();
 
+	static FGameplayTag GetScrapTag();
+
 	static FGameplayTag GetLevelTag();
+	static FGameplayTag GetExpTag();
+	static FGameplayTag GetNextLevelTag();
+	static FGameplayTag GetPrevLevelTag();
 	static FGameplayTag GetMaxHealthTag();
 	static FGameplayTag GetHealthTag();
 	static FGameplayTag GetMeleeAttackStrengthTag();
