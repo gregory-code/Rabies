@@ -43,19 +43,36 @@ void AEscapeToWin::Tick(float DeltaTime)
 
 void AEscapeToWin::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	player = Cast<ARPlayerBase>(OtherActor);
+
 	if (bHasBeatenBoss)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You have defeated the boss! You can escape!"));
+		CanEscapeWidgetUI->SetVisibility(ESlateVisibility::Visible);
+
+		//player->PlayerInteraction.AddUObject(this, &AEscapeToWin::EndGame);
+		
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Door is locked, defeat the boss."));
+		CannotEscapeWidgetUI->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
 void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	player = Cast<ARPlayerBase>(OtherActor);
 
+	if (bHasBeatenBoss)
+	{
+		CanEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
+		player->PlayerInteraction.Clear();
+	}
+	else
+	{
+		CannotEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void AEscapeToWin::SetUpTrueUI()
@@ -82,6 +99,11 @@ bool AEscapeToWin::SetActivatingExit()
 	return bHasBeatenBoss;
 }
 
-void AEscapeToWin::EndGame()
+void AEscapeToWin::EndGame(AActor* OtherActor)
 {
+	player = Cast<ARPlayerBase>(OtherActor);
+	//Stop the player from moving
+
+	GameWinUI->SetVisibility(ESlateVisibility::Visible);
+
 }

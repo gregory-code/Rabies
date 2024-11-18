@@ -67,7 +67,7 @@ public:
 	bool SetActivatingExit();
 
 	UFUNCTION()
-	void EndGame();
+	void EndGame(AActor* OtherActor);
 
 
 };
