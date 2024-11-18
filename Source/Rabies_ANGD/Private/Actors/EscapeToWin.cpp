@@ -24,14 +24,22 @@ AEscapeToWin::AEscapeToWin()
 	SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &AEscapeToWin::OnOverlapBegin);
 	SphereCollider->OnComponentEndOverlap.AddDynamic(this, &AEscapeToWin::OnOverlapEnd);
 
+	EndGameMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("End Game Mesh"));
+	EndGameMesh->SetupAttachment(GetRootComponent());
+	EndGameMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
+	EscapeWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Escape Widget Comp");
+	EscapeWidgetComp->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
 void AEscapeToWin::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	//SetUpTrueUI();
+	//SetUpFalseUI();
+	//SetUpEndUI();
 }
 
 // Called every frame
@@ -45,12 +53,17 @@ void AEscapeToWin::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	player = Cast<ARPlayerBase>(OtherActor);
 
+	if (bHasWonGame)
+	{
+		return;
+	}
+
 	if (bHasBeatenBoss)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You have defeated the boss! You can escape!"));
 		CanEscapeWidgetUI->SetVisibility(ESlateVisibility::Visible);
 
-		//player->PlayerInteraction.AddUObject(this, &AEscapeToWin::EndGame);
+		player->PlayerInteraction.AddUObject(this, &AEscapeToWin::EndGame);
 		
 	}
 	else
@@ -63,6 +76,11 @@ void AEscapeToWin::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	player = Cast<ARPlayerBase>(OtherActor);
+
+	if (bHasWonGame)
+	{
+		return;
+	}
 
 	if (bHasBeatenBoss)
 	{
@@ -78,19 +96,31 @@ void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 void AEscapeToWin::SetUpTrueUI()
 {
 	CanEscapeWidgetUI = Cast<UCanEscape>(EscapeWidgetComp->GetUserWidgetObject());
-	CanEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
+
+	//if (CanEscapeWidgetUI != nullptr)
+	//{
+	//	CanEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
+	//}
 }
 
 void AEscapeToWin::SetUpFalseUI()
 {
 	CannotEscapeWidgetUI = Cast<UCannotEscape>(EscapeWidgetComp->GetUserWidgetObject());
-	CannotEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
+
+	//if (CannotEscapeWidgetUI != nullptr)
+	//{
+	//	CannotEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
+	//}
 }
 
 void AEscapeToWin::SetUpEndUI()
 {
 	GameWinUI = Cast<UGameWinUI>(EscapeWidgetComp->GetUserWidgetObject());
-	GameWinUI->SetVisibility(ESlateVisibility::Hidden);
+
+	//if (GameWinUI != nullptr)
+	//{
+	//	GameWinUI->SetVisibility(ESlateVisibility::Hidden);
+	//}
 }
 
 bool AEscapeToWin::SetActivatingExit()
@@ -99,11 +129,12 @@ bool AEscapeToWin::SetActivatingExit()
 	return bHasBeatenBoss;
 }
 
-void AEscapeToWin::EndGame(AActor* OtherActor)
+void AEscapeToWin::EndGame()
 {
-	player = Cast<ARPlayerBase>(OtherActor);
-	//Stop the player from moving
+	bHasWonGame = true;
+
+	CanEscapeWidgetUI->SetVisibility(ESlateVisibility::Hidden);
+	player->PlayerInteraction.Clear();
 
 	GameWinUI->SetVisibility(ESlateVisibility::Visible);
-
 }

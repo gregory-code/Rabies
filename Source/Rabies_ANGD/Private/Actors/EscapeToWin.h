@@ -17,27 +17,27 @@ public:
 
 protected:
 	bool bHasBeatenBoss = false;
+	bool bHasWonGame = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Escape")
 	class USphereComponent* SphereCollider;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Escape")
+	class UStaticMeshComponent* EndGameMesh;
 
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	class UWidgetComponent* EscapeWidgetComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "UI")
+	UPROPERTY()
 	class UCannotEscape* CannotEscapeWidgetUI;
 
-	UPROPERTY(VisibleAnywhere, Category = "UI")
+	UPROPERTY()
 	class UCanEscape* CanEscapeWidgetUI;
 
-	UPROPERTY(VisibleAnywhere, Category = "UI")
+	UPROPERTY()
 	class UGameWinUI* GameWinUI;
-
-	//UI for the false bHasBeatenBoss
-
-	//UI for the true bHasBeatenBoss
 
 	class ARPlayerBase* player;
 
@@ -67,7 +67,7 @@ public:
 	bool SetActivatingExit();
 
 	UFUNCTION()
-	void EndGame(AActor* OtherActor);
+	void EndGame();
 
 
 };
