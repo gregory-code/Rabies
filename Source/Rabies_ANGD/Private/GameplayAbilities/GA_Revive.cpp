@@ -22,6 +22,7 @@
 UGA_Revive::UGA_Revive()
 {
 	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetRevivingTag());
+	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetUnActionableTag());
 }
 
 void UGA_Revive::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -71,6 +72,8 @@ void UGA_Revive::Hold(float timeRemaining)
 	}
 	else
 	{
+		TArray<ARPlayerBase*> playersRevived = Player->nearbyFaintedPlayers;
+		K2_EndAbility();
 		//process revive
 	}
 }

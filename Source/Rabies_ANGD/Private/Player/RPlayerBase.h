@@ -56,6 +56,8 @@ public:
 	UFUNCTION()
 	AEOSPlayerState* GetPlayerBaseState();
 
+	UPROPERTY()
+	TArray<ARPlayerBase*> nearbyFaintedPlayers;
 
 private:
 

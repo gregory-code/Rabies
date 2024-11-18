@@ -484,6 +484,9 @@ void ARPlayerBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 	ARPlayerBase* player = Cast<ARPlayerBase>(OtherActor);
 	if (player && player != this)
 	{
+		if (!nearbyFaintedPlayers.Contains(player))
+			nearbyFaintedPlayers.Add(player);
+
 		if (player->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 		{
 			bInRangeToRevive = true;
@@ -497,6 +500,9 @@ void ARPlayerBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 	ARPlayerBase* player = Cast<ARPlayerBase>(OtherActor);
 	if (player && player != this)
 	{
+		if (nearbyFaintedPlayers.Contains(player))
+			nearbyFaintedPlayers.Remove(player);
+
 		if (player->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 		{
 			bInRangeToRevive = false;
