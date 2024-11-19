@@ -20,12 +20,6 @@ AEOSPlayerState::AEOSPlayerState()
 
 }
 
-void AEOSPlayerState::Server_RevivePlayer_Implementation(ARPlayerBase* player)
-{
-	Player->GetAbilitySystemComponent()->RemoveLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
-}
-
-
 void AEOSPlayerState::Server_OnPossessPlayer_Implementation(ARPlayerBase* myPlayer)
 {
 	Player = myPlayer;

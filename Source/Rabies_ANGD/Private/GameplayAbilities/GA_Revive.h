@@ -27,6 +27,9 @@ private:
 
 	void Hold(float timeRemaining);
 
+	UPROPERTY(EditDefaultsOnly, Category = "Revive")
+	TSubclassOf<class UGameplayEffect> ReviveEffectClass;
+
 	UPROPERTY()
 	class ARPlayerBase* Player;
 

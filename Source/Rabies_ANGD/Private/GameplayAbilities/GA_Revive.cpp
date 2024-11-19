@@ -74,17 +74,16 @@ void UGA_Revive::Hold(float timeRemaining)
 	}
 	else
 	{
-		TArray<ARPlayerBase*> playersRevived = Player->nearbyFaintedPlayers;
-		for (ARPlayerBase* player : playersRevived)
+		TArray<AActor*> playersRevived = Player->nearbyFaintedActors;
+		for (AActor* player : playersRevived)
 		{
-			if (player)
-			{
-				AEOSPlayerState* playerState = player->GetPlayerState<AEOSPlayerState>();
-				if (playerState)
-				{
-					playerState->Server_RevivePlayer(player);
-				}
-			}
+			UE_LOG(LogTemp, Error, TEXT("%s Reviving"), *player->GetName());
+
+			FGameplayEventData Payload = FGameplayEventData();
+			Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(player);
+
+			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(ReviveEffectClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
 		}
 		K2_EndAbility();
 		//process revive

@@ -57,10 +57,7 @@ public:
 	AEOSPlayerState* GetPlayerBaseState();
 
 	UPROPERTY()
-	TArray<ARPlayerBase*> nearbyFaintedPlayers;
-
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	void ClientRevive();
+	TArray<AActor*> nearbyFaintedActors;
 
 private:
 

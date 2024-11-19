@@ -224,7 +224,8 @@ void ARCharacterBase::StartDeath()
 {
 	//PlayMontage(DeathMontage);
 	//AbilitySystemComponent->ApplyGameplayEffect(DeathEffect);
-	AbilitySystemComponent->AddLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
+	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::Dead);
+	//AbilitySystemComponent->AddLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
 	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 

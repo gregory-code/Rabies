@@ -444,23 +444,6 @@ AEOSPlayerState* ARPlayerBase::GetPlayerBaseState()
 	return EOSPlayerState;
 }
 
-void ARPlayerBase::ClientRevive_Implementation()
-{
-	if (EOSPlayerState)
-	{
-		EOSPlayerState->Server_RevivePlayer(this);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No player state apparently?"));
-	}
-}
-
-bool ARPlayerBase::ClientRevive_Validate()
-{
-	return true;
-}
-
 void ARPlayerBase::SetInteractionChest(AItemChest* chest)
 {
 	interactionChest = chest;
@@ -501,8 +484,8 @@ void ARPlayerBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 	ARPlayerBase* player = Cast<ARPlayerBase>(OtherActor);
 	if (player && player != this)
 	{
-		if (!nearbyFaintedPlayers.Contains(player))
-			nearbyFaintedPlayers.Add(player);
+		if (!nearbyFaintedActors.Contains(OtherActor))
+			nearbyFaintedActors.Add(OtherActor);
 
 		if (player->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 		{
@@ -517,8 +500,8 @@ void ARPlayerBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 	ARPlayerBase* player = Cast<ARPlayerBase>(OtherActor);
 	if (player && player != this)
 	{
-		if (nearbyFaintedPlayers.Contains(player))
-			nearbyFaintedPlayers.Remove(player);
+		if (nearbyFaintedActors.Contains(OtherActor))
+			nearbyFaintedActors.Remove(OtherActor);
 
 		if (player->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 		{
