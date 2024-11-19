@@ -30,14 +30,16 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	class UWidgetComponent* EscapeWidgetComp;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = "Escape")  //TSubclass of
 	class UCannotEscape* CannotEscapeWidgetUI;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = "Escape")
 	class UCanEscape* CanEscapeWidgetUI;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = "Escape")
 	class UGameWinUI* GameWinUI;
+
+	//Transient - Reference to the widget
 
 	class ARPlayerBase* player;
 
