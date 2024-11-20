@@ -162,6 +162,11 @@ int ARCharacterBase::GetCurrentScrap()
 	return AttributeSet->GetScrap();
 }
 
+int ARCharacterBase::GetReviveSpeed()
+{
+	return AttributeSet->GetReviveSpeed();
+}
+
 void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState)
 {
 	FVector startPos = FVector(0, 0, 0);
@@ -339,6 +344,11 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s NO ATTRIBUTE SET"), *GetName());
 		return;
+	}
+
+	if (ChangeData.OldValue >= 1)
+	{
+		bHasDied = false;
 	}
 
 	if (HealthBar)

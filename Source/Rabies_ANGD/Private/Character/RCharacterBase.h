@@ -73,6 +73,9 @@ public:
 	UFUNCTION()
 	int GetCurrentScrap();
 
+	UFUNCTION()
+	int GetReviveSpeed();
+
 	FName RangedAttackSocketName = TEXT("Ranged_Socket");
 	FName RootAimingSocketName = TEXT("RootAiming_Socket");
 
