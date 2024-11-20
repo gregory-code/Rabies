@@ -186,7 +186,7 @@ void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState
 	{
 		FVector weaponStart = (requestedPlayerState == nullptr) ? startPos : requestedPlayerState->GetRangedLocation();
 		FVector hitEnd = hitResult.ImpactPoint;
-		CharacterShootParticle(weaponStart, hitEnd);
+		CharacterShootParticle(weaponStart, hitEnd, GetMesh()->GetSocketRotation(RangedAttackSocketName));
 		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd);
 	}
 }
@@ -436,7 +436,7 @@ void ARCharacterBase::LevelUpUpgrade(int level, bool setLevel)
 
 }
 
-void ARCharacterBase::CharacterShootParticle_Implementation(FVector startPos, FVector endPos)
+void ARCharacterBase::CharacterShootParticle_Implementation(FVector startPos, FVector endPos, FRotator startForward)
 {
 	///
 }

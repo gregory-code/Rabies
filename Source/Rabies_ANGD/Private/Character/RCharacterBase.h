@@ -51,7 +51,7 @@ public:
 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void CharacterShootParticle(FVector startPos, FVector endPos);
+	void CharacterShootParticle(FVector startPos, FVector endPos, FRotator startForward);
 
 
 protected:
