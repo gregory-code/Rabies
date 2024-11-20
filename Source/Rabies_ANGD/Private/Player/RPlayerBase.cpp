@@ -406,7 +406,10 @@ void ARPlayerBase::ServerSetPlayerReviveState_Implementation(bool state)
 
 	if (state)
 	{
-		ReviveUI->SetVisibility(ESlateVisibility::Visible);
+		if (IsLocallyControlled() == false)
+		{
+			ReviveUI->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 	else 
 	{
