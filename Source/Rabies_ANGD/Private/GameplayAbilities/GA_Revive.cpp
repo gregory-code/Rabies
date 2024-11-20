@@ -77,13 +77,16 @@ void UGA_Revive::Hold(float timeRemaining)
 		TArray<AActor*> playersRevived = Player->nearbyFaintedActors;
 		for (AActor* player : playersRevived)
 		{
-			UE_LOG(LogTemp, Error, TEXT("%s Reviving"), *player->GetName());
 
 			FGameplayEventData Payload = FGameplayEventData();
 			Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(player);
 
+			FGameplayEffectSpecHandle EffectSpec2 = MakeOutgoingGameplayEffectSpec(ReviveEffectClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+			ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec2);
+
 			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(ReviveEffectClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
+			UE_LOG(LogTemp, Error, TEXT("%s Reviving"), *player->GetName());
 		}
 		K2_EndAbility();
 		//process revive

@@ -50,6 +50,10 @@ public:
 	void Hitscan(float range, class AEOSPlayerState* requestedPlayerState);
 
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CharacterShootParticle(FVector startPos, FVector endPos);
+
+
 protected:
 
 	virtual void BeginPlay() override;

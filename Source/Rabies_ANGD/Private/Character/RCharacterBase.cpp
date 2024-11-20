@@ -186,6 +186,7 @@ void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState
 	{
 		FVector weaponStart = (requestedPlayerState == nullptr) ? startPos : requestedPlayerState->GetRangedLocation();
 		FVector hitEnd = hitResult.ImpactPoint;
+		CharacterShootParticle(weaponStart, hitEnd);
 		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd);
 	}
 }
@@ -224,7 +225,7 @@ void ARCharacterBase::StartDeath()
 {
 	//PlayMontage(DeathMontage);
 	//AbilitySystemComponent->ApplyGameplayEffect(DeathEffect);
-	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::Dead);
+	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::Dead); // this does not apply the dead tag sadly to enemies I believe
 	//AbilitySystemComponent->AddLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
 	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	//GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -433,6 +434,11 @@ void ARCharacterBase::LevelUpUpgrade(int level, bool setLevel)
 		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
 	}
 
+}
+
+void ARCharacterBase::CharacterShootParticle_Implementation(FVector startPos, FVector endPos)
+{
+	///
 }
 
 

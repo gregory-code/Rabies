@@ -24,5 +24,5 @@ UGA_Death::UGA_Death()
 
 void UGA_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-
+	UE_LOG(LogTemp, Warning, TEXT("Applied Dead"));
 }
