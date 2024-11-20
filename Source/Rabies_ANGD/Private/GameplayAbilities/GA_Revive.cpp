@@ -65,6 +65,7 @@ void UGA_Revive::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGame
 
 void UGA_Revive::Hold(float timeRemaining)
 {
+
 	if (CurrentHoldDuration <= 5)
 	{
 		CurrentHoldDuration += GetWorld()->GetDeltaSeconds();
@@ -81,14 +82,11 @@ void UGA_Revive::Hold(float timeRemaining)
 			FGameplayEventData Payload = FGameplayEventData();
 			Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(player);
 
-			FGameplayEffectSpecHandle EffectSpec2 = MakeOutgoingGameplayEffectSpec(ReviveEffectClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-			ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec2);
-
 			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(ReviveEffectClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
 			UE_LOG(LogTemp, Error, TEXT("%s Reviving"), *player->GetName());
 		}
-		K2_EndAbility();
+		//K2_EndAbility();
 		//process revive
 	}
 }
