@@ -164,6 +164,15 @@ void UGameplayUI::DeadStatusUpdated(bool bIsDead)
 	}
 	else
 	{
+		if (PostProcessVolume)
+		{
+			FVector4 freshValue = FVector4(1.0f, 1.0f, 1.0f, 1.0f);
+			PostProcessVolume->Settings.ColorSaturation = freshValue;
+			PostProcessVolume->Settings.ColorContrast = freshValue;
+			PostProcessVolume->Settings.VignetteIntensity = 0;
+			PostProcessVolume->Settings.SceneFringeIntensity = 0;
+		}
+
 		GetWorld()->GetTimerManager().ClearTimer(DeathHandle);
 		DownTimeBox->SetVisibility(ESlateVisibility::Hidden);
 	}
@@ -173,7 +182,7 @@ void UGameplayUI::DeadTimer(float timeRemaining)
 {
 	if (CurrentDeathDuration > 0)
 	{
-		float rateOfChange = (0.0005f);
+		float rateOfChange = (0.0005f * GetAttributeValue(URAttributeSet::GetDownSurvivalTimeAttribute()));
 		float remainingTime = (CurrentDeathDuration / rateOfChange);
 		CurrentDeathDuration -= rateOfChange;
 		DownTimeSlider->SetValue(CurrentDeathDuration / 1.0f);
@@ -196,6 +205,7 @@ void UGameplayUI::DeadTimer(float timeRemaining)
 	else
 	{
 		DownTimeText->SetText(FText::Format(FText::FromString("{0}"), FText::AsNumber(0)));
+		DownTimeBox->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
