@@ -192,7 +192,7 @@ void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState
 	{
 		FVector weaponStart = (requestedPlayerState == nullptr) ? startPos : requestedPlayerState->GetRangedLocation();
 		FVector hitEnd = hitResult.ImpactPoint;
-		CharacterShootParticle(weaponStart, hitEnd, GetMesh()->GetSocketRotation(RangedAttackSocketName));
+		CharacterShootParticle(weaponStart, hitEnd, (hitEnd - weaponStart).GetSafeNormal().Rotation() + FRotator(0, -90, 0)); // this gets the point towards the hit
 		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd);
 	}
 }
@@ -200,7 +200,7 @@ void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState
 void ARCharacterBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end)
 {
 	FString actorName = hitActor->GetName();
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
+	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
 	DrawDebugLine(GetWorld(), start, end, FColor::Green);
 	ClientHitScan.Broadcast(hitActor, start, end);
 }

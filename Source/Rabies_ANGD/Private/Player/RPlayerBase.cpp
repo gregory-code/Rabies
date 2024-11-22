@@ -193,7 +193,9 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 
 	newRot.Pitch = FMath::ClampAngle(newRot.Pitch, cameraClampMin, cameraClampMax);
 
-	EOSPlayerState->Server_UpdateHitscanRotator(newRot);
+	if (EOSPlayerState) {
+		EOSPlayerState->Server_UpdateHitscanRotator(newRot);
+	}
 	viewPivot->SetWorldRotation(newRot);
 }
 
