@@ -40,6 +40,7 @@ public:
 
 	int GetPlayerID();
 
+
 private:
 	class ACineCameraActor* CineCamera;
 

@@ -95,6 +95,7 @@ void ARMainMenuController::BeginPlay()
 	GetGameInstance<UEOSGameInstance>()->SessionJoined.AddUObject(this, &ARMainMenuController::JoinedSession);
 
 	CreateMenuUI();
+	CreateLobbyUI();
 }
 
 void ARMainMenuController::ChangeOnlineMenuState(bool state)
@@ -201,8 +202,6 @@ void ARMainMenuController::CreateLobbyUI()
 
 void ARMainMenuController::OnSequenceEnd()
 {
-	CreateLobbyUI();
-
 	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
 	if (SequencePlayer)
 	{
