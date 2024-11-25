@@ -18,7 +18,8 @@ public:
 	bool bHasBeatenBoss = false;
 
 protected:
-	bool startGame = false;
+	bool bStartBoss = false;
+	bool bHasKeyCard = false;
 	bool bHasWonGame = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Escape")
@@ -29,29 +30,48 @@ protected:
 
 
 private:
+
+	/*	Widget Compositions	 */
 	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* CanEscapeWidgetComp;
+	class UWidgetComponent* ActivateWidgetComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* CannotEscapeWidgetComp;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* GameWinWidgetComp;
+	class UWidgetComponent* AcessDeniedWidgetComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	class UWidgetComponent* InitiateBossWidgetComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	class UWidgetComponent* ActivatingBossWidgetComp;
+
+	//UPROPERTY(VisibleAnywhere, Category = "UI")
+	//class UWidgetComponent* CannotEscapeWidgetComp;
+
+	//UPROPERTY(VisibleAnywhere, Category = "UI")
+	//class UWidgetComponent* CanEscapeWidgetComp;
+
+	//UPROPERTY(VisibleAnywhere, Category = "UI")
+	//class UWidgetComponent* GameWinWidgetComp;
+
+	/*	Widgets	 */
 	UPROPERTY()
-	class UCannotEscape* CannotEscapeWidgetUI;
+	class UActivationWidget* ActivationUI;
 
 	UPROPERTY()
-	class UCanEscape* CanEscapeWidgetUI;
+	class UAccessDeniedWidget* AccessDeniedUI;
 
 	UPROPERTY()
-	class UGameWinUI* GameWinUI;
+	class UInitiateBossFight* InitiateBossUI;
 
-	UPROPERTY()
-	class UInitiateBossFight* InitiateBossFightUI;
+	//UPROPERTY()
+	//class UCannotEscape* CannotEscapeWidgetUI;
+
+	//UPROPERTY()
+	//class UCanEscape* CanEscapeWidgetUI;
+
+	//UPROPERTY()
+	//class UGameWinUI* GameWinUI;
+
 	//Transient - Reference to the widget
 
 	class ARPlayerBase* player;
@@ -69,23 +89,36 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Chest Detail")
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	/*	UI Setup  */
 	UFUNCTION()
+	void SetUpActivation();
+
+	UFUNCTION()
+	void SetUpAcessDenied();
+
+	UFUNCTION()
+	void SetUpBossUI();
+
+	/*UFUNCTION()
 	void SetUpTrueUI();
 
 	UFUNCTION()
 	void SetUpFalseUI();
 
 	UFUNCTION()
-	void SetUpEndUI();
+	void SetUpEndUI();*/
 
 	UFUNCTION()
-	void SetUpBossUI();
+	void CheckKeyCard();
 
 	UFUNCTION()
-	bool SetActivatingExit();
+	void SpawnBoss();
 
-	UFUNCTION()
-	void EndGame();
+	//UFUNCTION()
+	//bool SetActivatingExit();
+
+	//UFUNCTION()
+	//void EndGame();
 
 
 };
