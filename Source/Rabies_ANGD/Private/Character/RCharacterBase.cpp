@@ -315,7 +315,7 @@ void ARCharacterBase::NextLevelExpUpdated(const FOnAttributeChangeData& ChangeDa
 	}
 }
 
-void ARCharacterBase::LevelUp(int carryOverEXP)
+void ARCharacterBase::LevelUp(int carryOverEXP) // Handles the player level up
 {
 	if (LevelUpEffect && GetAbilitySystemComponent())
 	{
