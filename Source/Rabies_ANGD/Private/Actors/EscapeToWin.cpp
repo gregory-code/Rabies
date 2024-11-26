@@ -118,13 +118,14 @@ void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 {
 	player = Cast<ARPlayerBase>(OtherActor);
 
-	if (!player)
+	if (!player || !player->IsLocallyControlled())
 	{
 		return;
 	}
 
-	if (!bStartBoss && player->IsLocallyControlled())
+	if (!bStartBoss)
 	{
+		//Collapsable Not hit visible
 		ActivationUI->SetVisibility(ESlateVisibility::Hidden);
 		AccessDeniedUI->SetVisibility(ESlateVisibility::Hidden);
 
@@ -152,6 +153,7 @@ void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 	//}
 }
 
+//Set up IsValid for these widgets
 void AEscapeToWin::SetUpActivation()
 {
 	ActivationUI = Cast<UActivationWidget>(ActivateWidgetComp->GetUserWidgetObject());
