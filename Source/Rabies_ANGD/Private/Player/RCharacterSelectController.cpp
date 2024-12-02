@@ -7,9 +7,19 @@
 #include "Framework/EOSGameState.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Camera/CameraActor.h"
+#include "Engine/World.h"
+#include "EngineUtils.h"
+#include "LevelSequenceActor.h"
+#include "CineCameraActor.h"
+#include "LevelSequence.h"
+#include "LevelSequenceCameraSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/GameStateBase.h"
 #include "Widgets/CharacterSelect.h"
+#include "Framework/RCharacterDefination.h"
+#include "LevelSequencePlayer.h"
+#include "MovieSceneSequence.h"
 #include "Framework/RCharacterDefination.h"
 
 void ARCharacterSelectController::OnRep_PlayerState()
@@ -46,6 +56,31 @@ void ARCharacterSelectController::BeginPlay()
 
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 	GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
+
+	for (TActorIterator<ACineCameraActor> It(GetWorld()); It; ++It)
+	{
+		CineCamera = *It;
+		break;
+	}
+
+	for (TActorIterator<ALevelSequenceActor> It(GetWorld()); It; ++It)
+	{
+		MainMenuSequence = *It;
+		break;
+	}
+
+	if (!CineCamera || !MainMenuSequence)
+		return;
+
+	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
+	if (SequencePlayer)
+	{
+		FMovieSceneSequencePlaybackParams playbackParams;
+		playbackParams.Time = 0;
+		SequencePlayer->SetPlaybackPosition(playbackParams);
+	}
+
+	SetViewTarget(CineCamera);
 
 	GameState = Cast<AEOSGameState>(UGameplayStatics::GetGameState(this));
 	if (!GameState)

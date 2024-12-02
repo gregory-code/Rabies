@@ -65,6 +65,9 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> GameLevel;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UWorld> SelectLevel;
+
 	FName SessionNameKey{ "SessionName" };
 
 	void LoadMapAndListen(TSoftObjectPtr<UWorld> levelToLoad);

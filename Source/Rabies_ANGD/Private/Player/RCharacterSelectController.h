@@ -36,6 +36,10 @@ public:
 	int GetPlayerID();
 
 private:
+	class ACineCameraActor* CineCamera;
+
+	class ALevelSequenceActor* MainMenuSequence;
+
 	void PostPossessionSetup(APawn* NewPawn);
 
 	void CreateCharacterSelectUI();

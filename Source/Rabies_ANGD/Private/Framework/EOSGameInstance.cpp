@@ -190,7 +190,7 @@ void UEOSGameInstance::CreateSessionCompleted(FName SessionName, bool bWasSucces
 	if (bWasSuccessful)
 	{
 		SessionJoined.Broadcast();
-		//LoadMapAndListen(CharacterSelctLevel); // Transition to the other screen now
+		LoadMapAndListen(SelectLevel); // Transition to the other screen now
 	}
 }
 
