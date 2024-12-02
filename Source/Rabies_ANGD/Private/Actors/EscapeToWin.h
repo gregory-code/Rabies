@@ -33,44 +33,17 @@ private:
 
 	/*	Widget Compositions	 */
 	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* ActivateWidgetComp;
+	class UWidgetComponent* GameWinWidgetComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* AcessDeniedWidgetComp;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* InitiateBossWidgetComp;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* ActivatingBossWidgetComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "UI")
-	//class UWidgetComponent* CannotEscapeWidgetComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "UI")
-	//class UWidgetComponent* CanEscapeWidgetComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "UI")
-	//class UWidgetComponent* GameWinWidgetComp;
+	class UWidgetComponent* EndGameWidgetComp;
 
 	/*	Widgets	 */
 	UPROPERTY()
-	class UActivationWidget* ActivationUI;
+	class UGameWinUI* GameWinUI;
 
 	UPROPERTY()
-	class UAccessDeniedWidget* AccessDeniedUI;
-
-	UPROPERTY()
-	class UInitiateBossFight* InitiateBossUI;
-
-	//UPROPERTY()
-	//class UCannotEscape* CannotEscapeWidgetUI;
-
-	//UPROPERTY()
-	//class UCanEscape* CanEscapeWidgetUI;
-
-	//UPROPERTY()
-	//class UGameWinUI* GameWinUI;
+	class UEndGameWidget* EndGameUI;
 
 	//Transient - Reference to the widget
 
@@ -91,22 +64,10 @@ public:
 
 	/*	UI Setup  */
 	UFUNCTION()
-	void SetUpActivation();
+	void SetUpEndUI();
 
 	UFUNCTION()
-	void SetUpAcessDenied();
-
-	UFUNCTION()
-	void SetUpBossUI();
-
-	/*UFUNCTION()
-	void SetUpTrueUI();
-
-	UFUNCTION()
-	void SetUpFalseUI();
-
-	UFUNCTION()
-	void SetUpEndUI();*/
+	void SetUpEndGame();
 
 	UFUNCTION()
 	void CheckKeyCard();
@@ -114,11 +75,14 @@ public:
 	UFUNCTION()
 	void SpawnBoss();
 
-	//UFUNCTION()
-	//bool SetActivatingExit();
+	UFUNCTION()
+	void UseKeycard();
 
-	//UFUNCTION()
-	//void EndGame();
+	UFUNCTION()
+	void SetActivatingExit();
+
+	UFUNCTION()
+	void EndGame();
 
 
 };
