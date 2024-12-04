@@ -6,12 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
-#include "Widgets/ActivationWidget.h"
-#include "Widgets/AccessDeniedWidget.h"
-#include "Widgets/InitiateBossFight.h"
-//#include "Widgets/CanEscape.h"
-//#include "Widgets/CannotEscape.h"
-//#include "Widgets/GameWinUI.h"
+#include "Widgets/EndGameWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -32,23 +27,8 @@ AEscapeToWin::AEscapeToWin()
 	EndGameMesh->SetupAttachment(GetRootComponent());
 	EndGameMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
-	ActivateWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Activation Widget Comp");
-	ActivateWidgetComp->SetupAttachment(GetRootComponent());
-
-	AcessDeniedWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Access Denied Widget Comp");
-	AcessDeniedWidgetComp->SetupAttachment(GetRootComponent());
-
-	InitiateBossWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Initiate Boss Widget Comp");
-	InitiateBossWidgetComp->SetupAttachment(GetRootComponent());
-
-	//CanEscapeWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Can Escape Widget Comp");
-	//CanEscapeWidgetComp->SetupAttachment(GetRootComponent());
-
-	//CannotEscapeWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Cannot Escape Widget Comp");
-	//CannotEscapeWidgetComp->SetupAttachment(GetRootComponent());
-
-	//GameWinWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Win Game Widget Comp");
-	//GameWinWidgetComp->SetupAttachment(GetRootComponent());
+	EndGameWidgetComp = CreateDefaultSubobject<UWidgetComponent>("End Game Widget Comp");
+	EndGameWidgetComp->SetupAttachment(GetRootComponent());
 
 }
 
@@ -57,127 +37,63 @@ void AEscapeToWin::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetUpActivation();
-	SetUpAcessDenied();
-	SetUpBossUI();
-	//SetUpTrueUI();
-	//SetUpFalseUI();
-	//SetUpEndUI();
+	SetUpEndGame();
 }
 
 // Called every frame
 void AEscapeToWin::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AEscapeToWin::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	player = Cast<ARPlayerBase>(OtherActor);
 
-	if (!player)
+	if (!player || !player->IsLocallyControlled() || bHasWonGame)
 	{
 		return;
 	}
 
-	if (!bStartBoss && player->IsLocallyControlled())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Try to Escape?"));
-		ActivationUI->SetVisibility(ESlateVisibility::Visible);
+	UE_LOG(LogTemp, Warning, TEXT("Try to Escape?"));
+	EndGameUI->SetVisibility(ESlateVisibility::Visible);
+	EndGameUI->UpdateText(FText::FromString("Insert Keycard?\n[F]"));
+	EndGameUI->UpdateTextColor(FLinearColor::White);
 
+	if (!bStartBoss)
+	{
 		player->PlayerInteraction.AddUObject(this, &AEscapeToWin::CheckKeyCard);
 		return;
 	}
-
-	//if (bHasKeyCard && player->IsLocallyControlled()) //Add a check if they have the keycard item
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("You want to escape?"));
-
-	//	player->PlayerInteraction.AddUObject(this, &AEscapeToWin::SpawnBoss);
-
-	//	return;
-	//}
-
-	//if (bHasBeatenBoss && player->IsLocallyControlled())
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("You have defeated the boss! You can escape!"));
-	//	CanEscapeWidgetComp->SetVisibility(true);
-
-	//	player->PlayerInteraction.AddUObject(this, &AEscapeToWin::EndGame);
-	//	
-	//}
-	//else if(player->IsLocallyControlled())
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("Door is locked, defeat the boss."));
-	//	CannotEscapeWidgetComp->SetVisibility(true);
-	//}
+	else
+	{
+		player->PlayerInteraction.AddUObject(this, &AEscapeToWin::UseKeycard);
+		return;
+	}
 }
 
 void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	player = Cast<ARPlayerBase>(OtherActor);
 
-	if (!player || !player->IsLocallyControlled())
+	if (!player || !player->IsLocallyControlled() || bHasWonGame)
 	{
 		return;
 	}
 
-	if (!bStartBoss)
-	{
-		//Collapsable Not hit visible
-		ActivationUI->SetVisibility(ESlateVisibility::Hidden);
-		AccessDeniedUI->SetVisibility(ESlateVisibility::Hidden);
-
-		player->PlayerInteraction.Clear();
-
-		return;
-	}
-
-	//if (bHasKeyCard && player->IsLocallyControlled())
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Find the key"));
-	//	player->PlayerInteraction.Clear();
-	//	return;
-	//}
-
-
-	//if (bHasBeatenBoss)
-	//{
-	//	CanEscapeWidgetComp->SetVisibility(false);
-	//	player->PlayerInteraction.Clear();
-	//}
-	//else
-	//{
-	//	CannotEscapeWidgetComp->SetVisibility(false);
-	//}
+	EndGameUI->SetVisibility(ESlateVisibility::Collapsed);
+	player->PlayerInteraction.Clear();
 }
 
-//Set up IsValid for these widgets
-void AEscapeToWin::SetUpActivation()
+void AEscapeToWin::SetUpEndGame()
 {
-	ActivationUI = Cast<UActivationWidget>(ActivateWidgetComp->GetUserWidgetObject());
-	ActivationUI->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void AEscapeToWin::SetUpAcessDenied()
-{
-	AccessDeniedUI = Cast<UAccessDeniedWidget>(AcessDeniedWidgetComp->GetUserWidgetObject());
-	AccessDeniedUI->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void AEscapeToWin::SetUpBossUI()
-{
-	InitiateBossUI = Cast<UInitiateBossFight>(InitiateBossWidgetComp->GetUserWidgetObject());
-	InitiateBossUI->SetVisibility(ESlateVisibility::Hidden);
+	EndGameUI = Cast<UEndGameWidget>(EndGameWidgetComp->GetUserWidgetObject());
+	EndGameUI->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void AEscapeToWin::CheckKeyCard()
 {
 	//Check to see if player has keycard
-	ActivationUI->SetVisibility(ESlateVisibility::Hidden);
-
-	bHasKeyCard = true;
 
 	if (bHasKeyCard == true)
 	{
@@ -185,7 +101,8 @@ void AEscapeToWin::CheckKeyCard()
 	}
 	else
 	{
-		AccessDeniedUI->SetVisibility(ESlateVisibility::Visible);
+		EndGameUI->UpdateText(FText::FromString("No Keycard Detected.\nAccessed Denied."));
+		EndGameUI->UpdateTextColor(FLinearColor::Red);
 	}
 }
 
@@ -196,44 +113,44 @@ void AEscapeToWin::SpawnBoss()
 
 	player->PlayerInteraction.Clear();
 
-	InitiateBossUI->SetVisibility(ESlateVisibility::Visible);
+	EndGameUI->UpdateText(FText::FromString("ERROR!\nAccess Overrided."));
+	EndGameUI->UpdateTextColor(FLinearColor::Red);
 	
 	//Spawn Boss into the world
 }
 
-//void AEscapeToWin::SetUpTrueUI()
-//{
-//	CanEscapeWidgetUI = Cast<UCanEscape>(CanEscapeWidgetComp->GetUserWidgetObject());
-//	CanEscapeWidgetComp->SetVisibility(false);
-//}
-//
-//void AEscapeToWin::SetUpFalseUI()
-//{
-//	CannotEscapeWidgetUI = Cast<UCannotEscape>(CannotEscapeWidgetComp->GetUserWidgetObject());
-//	CannotEscapeWidgetComp->SetVisibility(false);
-//}
-//
-//void AEscapeToWin::SetUpEndUI()
-//{
-//	GameWinUI = Cast<UGameWinUI>(GameWinWidgetComp->GetUserWidgetObject());
-//	GameWinWidgetComp->SetVisibility(false);
-//}
-//
-//
-//
-//bool AEscapeToWin::SetActivatingExit()
-//{
-//	bHasBeatenBoss = true;
-//	return bHasBeatenBoss;
-//}
-//
-//void AEscapeToWin::EndGame()
-//{
-//	UE_LOG(LogTemp, Error, TEXT("You Win!!!"));
-//	bHasWonGame = true;
-//
-//	CanEscapeWidgetComp->SetVisibility(false);
-//	player->PlayerInteraction.Clear();
-//
-//	GameWinWidgetComp->SetVisibility(true);
-//}
+void AEscapeToWin::UseKeycard()
+{
+	if (!bHasBeatenBoss)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Door is locked, defeat the boss."));
+		EndGameUI->UpdateText(FText::FromString("Access Denied.\nDeadlock Security - Online"));
+		EndGameUI->UpdateTextColor(FLinearColor::Red);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Door is opened, you escaped!"));
+		EndGameUI->UpdateText(FText::FromString("Access Granted.\nLeave the Facility?\n[F]"));
+		EndGameUI->UpdateTextColor(FLinearColor::Green);
+		
+		player->PlayerInteraction.Clear();
+		player->PlayerInteraction.AddUObject(this, &AEscapeToWin::EndGame);
+	}
+}
+
+void AEscapeToWin::SetActivatingExit()
+{
+	bHasBeatenBoss = true;
+}
+
+void AEscapeToWin::EndGame()
+{
+	UE_LOG(LogTemp, Error, TEXT("You Win!!!"));
+	bHasWonGame = true;
+
+	player->PlayerInteraction.Clear();
+
+	//Whatever needs to be done for the ending, I am not sure exactly what they want
+	EndGameUI->UpdateText(FText::FromString("CONGRATULATIONS!\nYou have beaten the game!"));
+	EndGameUI->UpdateTextColor(FLinearColor::White);
+}

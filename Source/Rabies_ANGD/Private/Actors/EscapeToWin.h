@@ -16,10 +16,10 @@ public:
 	AEscapeToWin();
 
 	bool bHasBeatenBoss = false;
+	bool bHasKeyCard = false;
 
 protected:
 	bool bStartBoss = false;
-	bool bHasKeyCard = false;
 	bool bHasWonGame = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Escape")
@@ -33,44 +33,11 @@ private:
 
 	/*	Widget Compositions	 */
 	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* ActivateWidgetComp;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* AcessDeniedWidgetComp;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* InitiateBossWidgetComp;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* ActivatingBossWidgetComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "UI")
-	//class UWidgetComponent* CannotEscapeWidgetComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "UI")
-	//class UWidgetComponent* CanEscapeWidgetComp;
-
-	//UPROPERTY(VisibleAnywhere, Category = "UI")
-	//class UWidgetComponent* GameWinWidgetComp;
+	class UWidgetComponent* EndGameWidgetComp;
 
 	/*	Widgets	 */
 	UPROPERTY()
-	class UActivationWidget* ActivationUI;
-
-	UPROPERTY()
-	class UAccessDeniedWidget* AccessDeniedUI;
-
-	UPROPERTY()
-	class UInitiateBossFight* InitiateBossUI;
-
-	//UPROPERTY()
-	//class UCannotEscape* CannotEscapeWidgetUI;
-
-	//UPROPERTY()
-	//class UCanEscape* CanEscapeWidgetUI;
-
-	//UPROPERTY()
-	//class UGameWinUI* GameWinUI;
+	class UEndGameWidget* EndGameUI;
 
 	//Transient - Reference to the widget
 
@@ -83,30 +50,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Chest Detail")
+	UFUNCTION(BlueprintCallable, Category = "Escape")
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION(BlueprintCallable, Category = "Chest Detail")
+	UFUNCTION(BlueprintCallable, Category = "Escape")
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	/*	UI Setup  */
 	UFUNCTION()
-	void SetUpActivation();
-
-	UFUNCTION()
-	void SetUpAcessDenied();
-
-	UFUNCTION()
-	void SetUpBossUI();
-
-	/*UFUNCTION()
-	void SetUpTrueUI();
-
-	UFUNCTION()
-	void SetUpFalseUI();
-
-	UFUNCTION()
-	void SetUpEndUI();*/
+	void SetUpEndGame();
 
 	UFUNCTION()
 	void CheckKeyCard();
@@ -114,11 +66,14 @@ public:
 	UFUNCTION()
 	void SpawnBoss();
 
-	//UFUNCTION()
-	//bool SetActivatingExit();
+	UFUNCTION()
+	void UseKeycard();
 
-	//UFUNCTION()
-	//void EndGame();
+	UFUNCTION()
+	void SetActivatingExit();
+
+	UFUNCTION()
+	void EndGame();
 
 
 };
