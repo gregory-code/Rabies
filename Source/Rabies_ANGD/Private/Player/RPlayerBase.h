@@ -153,6 +153,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* PausingInputAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* LoadDebugInputAction;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
@@ -206,6 +209,9 @@ private:
 
 	UFUNCTION()
 	void Pause();
+
+	UFUNCTION()
+	void LoadDebug();
 
 	FVector GetMoveFwdDir() const;
 	FVector GetMoveRightDir() const;
