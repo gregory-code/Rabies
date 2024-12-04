@@ -27,11 +27,10 @@ void ARCharacterSelectController::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	BP_OnRep_PlayerState();
-	
-	if (IsLocalPlayerController()) //maybe also check if they have authority?
+	if (IsLocalController() && CharacterSelectUI == nullptr) //maybe also check if they have authority?
 	{
-		myPlayerID = GetPlayerID();
 		CreateCharacterSelectUI();
+		myPlayerID = GetPlayerID();
 	}
 }
 
@@ -72,15 +71,17 @@ void ARCharacterSelectController::BeginPlay()
 	if (!CineCamera || !MainMenuSequence)
 		return;
 
+	SetViewTarget(CineCamera);
 	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
 	if (SequencePlayer)
 	{
 		FMovieSceneSequencePlaybackParams playbackParams;
 		playbackParams.Time = 0;
 		SequencePlayer->SetPlaybackPosition(playbackParams);
-	}
 
-	SetViewTarget(CineCamera);
+		SequencePlayer->Play();
+		SequencePlayer->OnFinished.AddDynamic(this, &ARCharacterSelectController::OnSequenceEnd);
+	}
 
 	GameState = Cast<AEOSGameState>(UGameplayStatics::GetGameState(this));
 	if (!GameState)
@@ -124,6 +125,11 @@ int ARCharacterSelectController::GetPlayerID()
 
 void ARCharacterSelectController::PostPossessionSetup(APawn* NewPawn)
 {
+	if (IsLocalController() && CharacterSelectUI == nullptr) //maybe also check if they have authority?
+	{
+		CreateCharacterSelectUI();
+		myPlayerID = GetPlayerID();
+	}
 }
 
 void ARCharacterSelectController::CreateCharacterSelectUI()
@@ -143,5 +149,19 @@ void ARCharacterSelectController::CreateCharacterSelectUI()
 	if (CharacterSelectUI)
 	{
 		CharacterSelectUI->AddToViewport();
+	}
+}
+
+void ARCharacterSelectController::OnSequenceEnd()
+{
+	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
+	if (SequencePlayer)
+	{
+		FMovieSceneSequencePlaybackParams playbackParams;
+		playbackParams.Frame = FFrameNumber(29);
+
+		SequencePlayer->SetPlaybackPosition(playbackParams);
+
+		//SequencePlayer->OnFinished.AddDynamic(this, &ARMainMenuController::OnSequenceEnd);
 	}
 }

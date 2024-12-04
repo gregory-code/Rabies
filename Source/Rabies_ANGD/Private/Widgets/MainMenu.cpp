@@ -36,7 +36,7 @@ void UMainMenu::NativeConstruct()
 	//GameInst->SessionJoined.AddUObject(this, &UMainMenu::MoveToCharacterSelect);
 
 	ChangeMainMenuState(true);
-	ChangeConnectMenuState(true);
+	ChangeConnectMenuState(false);
 	ChangeSettingsState(false);
 	ChangeCreditsState(false);
 }
@@ -51,15 +51,6 @@ void UMainMenu::ReturnFromSettings()
 {
 	ChangeMainMenuState(true);
 	ChangeSettingsState(false);
-}
-
-void UMainMenu::MoveToCharacterSelect()
-{
-	return;
-	ChangeMainMenuState(false);
-	ChangeConnectMenuState(false);
-	ChangeSettingsState(false);
-	ChangeCreditsState(false);
 }
 
 void UMainMenu::SingleplayerClicked()
@@ -90,18 +81,18 @@ void UMainMenu::CreditsClicked()
 
 void UMainMenu::ChangeMainMenuState(bool state)
 {
-	/*if (state)
+	if (state)
 		MainMenuOverlay->SetVisibility(ESlateVisibility::Visible);
 	else
-		MainMenuOverlay->SetVisibility(ESlateVisibility::Hidden);*/
+		MainMenuOverlay->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UMainMenu::ChangeConnectMenuState(bool state)
 {
-	/*if (state)
+	if (state)
 		OnlineMenuLobby->SetVisibility(ESlateVisibility::Visible);
 	else
-		OnlineMenuLobby->SetVisibility(ESlateVisibility::Hidden);*/
+		OnlineMenuLobby->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UMainMenu::ChangeSettingsState(bool state)

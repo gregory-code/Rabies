@@ -50,6 +50,9 @@ private:
 	UPROPERTY()
 	class URCharacterDefination* CurrentlyHoveredCharacter;
 
+	UFUNCTION()
+	void OnSequenceEnd();
+
 	UPROPERTY()
 	class AEOSGameState* GameState;
 
