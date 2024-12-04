@@ -147,6 +147,7 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(AbilityCancelAction, ETriggerEvent::Triggered, this, &ARPlayerBase::CancelActionTriggered);
 		enhancedInputComp->BindAction(InteractInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Interact);
 		enhancedInputComp->BindAction(PausingInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Pause);
+		enhancedInputComp->BindAction(LoadDebugInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::LoadDebug);
 	}
 }
 
@@ -334,6 +335,16 @@ void ARPlayerBase::Pause()
 		GameMode->PausingGame(isPaused);
 		//Return all controls to the characters when they are unpaused.
 	}*/
+}
+
+void ARPlayerBase::LoadDebug()
+{
+	UWorld* World = GetWorld();
+	
+	if (World)
+	{
+		UGameplayStatics::OpenLevel(World, TEXT("EndGameTestRoom"));
+	}
 }
 
 FVector ARPlayerBase::GetMoveFwdDir() const
