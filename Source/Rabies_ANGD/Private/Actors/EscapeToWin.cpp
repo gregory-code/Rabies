@@ -6,7 +6,6 @@
 #include "Components/SphereComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
-#include "Widgets/GameWinUI.h"
 #include "Widgets/EndGameWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -28,9 +27,6 @@ AEscapeToWin::AEscapeToWin()
 	EndGameMesh->SetupAttachment(GetRootComponent());
 	EndGameMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
-	GameWinWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Win Game Widget Comp");
-	GameWinWidgetComp->SetupAttachment(GetRootComponent());
-
 	EndGameWidgetComp = CreateDefaultSubobject<UWidgetComponent>("End Game Widget Comp");
 	EndGameWidgetComp->SetupAttachment(GetRootComponent());
 
@@ -42,15 +38,12 @@ void AEscapeToWin::BeginPlay()
 	Super::BeginPlay();
 
 	SetUpEndGame();
-
-	SetUpEndUI();
 }
 
 // Called every frame
 void AEscapeToWin::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AEscapeToWin::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -92,12 +85,6 @@ void AEscapeToWin::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 	player->PlayerInteraction.Clear();
 }
 
-void AEscapeToWin::SetUpEndUI()
-{
-	GameWinUI = Cast<UGameWinUI>(GameWinWidgetComp->GetUserWidgetObject());
-	GameWinUI->SetVisibility(ESlateVisibility::Collapsed);
-}
-
 void AEscapeToWin::SetUpEndGame()
 {
 	EndGameUI = Cast<UEndGameWidget>(EndGameWidgetComp->GetUserWidgetObject());
@@ -107,8 +94,6 @@ void AEscapeToWin::SetUpEndGame()
 void AEscapeToWin::CheckKeyCard()
 {
 	//Check to see if player has keycard
-
-	bHasKeyCard = true; //Remove later on
 
 	if (bHasKeyCard == true)
 	{
@@ -136,8 +121,6 @@ void AEscapeToWin::SpawnBoss()
 
 void AEscapeToWin::UseKeycard()
 {
-	bHasBeatenBoss = true; //Remove Later On
-
 	if (!bHasBeatenBoss)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Door is locked, defeat the boss."));
