@@ -28,7 +28,7 @@ public:
 	void Server_CharacterSelected(URCharacterDefination* newSelectedCharacterDefination);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_UpdateHitscanRotator(FRotator newRot);
+	void Server_UpdateHitscanRotator(FRotator newRot, FVector newLocation);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_UpdateSocketLocations(FVector rootAimingLoc, FVector rangedLoc);
@@ -56,8 +56,14 @@ private:
 	UFUNCTION()
 	void OnRep_SelectedCharacter();
 
+	UFUNCTION()
+	void OnRep_HitScanLocation();
+
 	UPROPERTY(Replicated)
 	FRotator hitscanRotation;
+	
+	UPROPERTY(replicatedUsing = OnRep_HitScanLocation)
+	FVector hitscanLocation;
 
 	UPROPERTY(Replicated)
 	FVector RootAiming_SocketLocation;

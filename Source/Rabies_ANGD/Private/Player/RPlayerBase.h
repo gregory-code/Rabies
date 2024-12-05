@@ -79,6 +79,8 @@ public:
 
 	bool bInRangeToRevive;
 	
+	UPROPERTY(VisibleAnywhere, Category = "View")
+	USceneComponent* viewPivot;
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")
@@ -89,9 +91,6 @@ private:
 
 	UPROPERTY()
 	class UReviveUI* ReviveUI;
-
-	UPROPERTY(VisibleAnywhere, Category = "View")
-	USceneComponent* viewPivot;
 
 	UPROPERTY(visibleAnywhere, Category = "View")
 	UCameraComponent* viewCamera;
