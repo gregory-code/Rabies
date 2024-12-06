@@ -36,6 +36,9 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_ProcessDotFly(ARPlayerBase* player);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Server_RevivePlayer();
+
 	UFUNCTION()
 	FRotator GetHitscanRotator() { return hitscanRotation; }
 
@@ -45,9 +48,12 @@ public:
 	UFUNCTION()
 	FVector GetRangedLocation() { return Ranged_SocketLocation; }
 
+	UFUNCTION()
+	class ARPlayerBase* GetPlayer();
+
 	
 private:
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	class ARPlayerBase* Player;
 
 	UPROPERTY(replicatedUsing = OnRep_SelectedCharacter)

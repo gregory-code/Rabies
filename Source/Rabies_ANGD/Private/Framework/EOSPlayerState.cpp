@@ -20,6 +20,16 @@ AEOSPlayerState::AEOSPlayerState()
 
 }
 
+void AEOSPlayerState::Server_RevivePlayer_Implementation()
+{
+	FGameplayEventData eventData;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player, URAbilityGenericTags::GetReviveTag(), eventData);
+
+	Player->ServerSetPlayerReviveState(false);
+	UE_LOG(LogTemp, Warning, TEXT("Getting revived"));
+}
+
+
 void AEOSPlayerState::Server_OnPossessPlayer_Implementation(ARPlayerBase* myPlayer)
 {
 	Player = myPlayer;
@@ -78,6 +88,11 @@ bool AEOSPlayerState::Server_UpdateSocketLocations_Validate(FVector rootAimingLo
 	return true;
 }
 
+ARPlayerBase* AEOSPlayerState::GetPlayer()
+{
+	return Player;
+}
+
 void AEOSPlayerState::OnRep_SelectedCharacter()
 {
 	OnSelectedCharacterReplicated.Broadcast(SelectedCharacter);
@@ -105,6 +120,8 @@ bool AEOSPlayerState::Server_ProcessDotFly_Validate(ARPlayerBase* player)
 void AEOSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AEOSPlayerState, Player, COND_None);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, SelectedCharacter, COND_None, REPNOTIFY_Always);
 

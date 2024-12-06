@@ -438,7 +438,7 @@ void ARPlayerBase::ServerSetPlayerReviveState_Implementation(bool state)
 	}
 	else 
 	{
-		ReviveUI->SetVisibility(ESlateVisibility::Hidden);// do collasped instead of hidden
+		ReviveUI->SetVisibility(ESlateVisibility::Collapsed);// do collasped instead of hidden
 	}
 }
 
@@ -467,7 +467,7 @@ void ARPlayerBase::SetPlayerState()
 	}
 }
 
-AEOSPlayerState* ARPlayerBase::GetPlayerBaseState()
+AEOSPlayerState* ARPlayerBase::GetPlayerBaseState() // this will crash if someone other than the player calls. Other players do not have this replicated.
 {
 	return EOSPlayerState;
 }
