@@ -80,13 +80,11 @@ void UGA_Revive::Hold(float timeRemaining)
 		TArray<AActor*> playersRevived = Player->nearbyFaintedActors;
 		EndHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_Revive::EndDelay));
 		AGameStateBase* GameState = GetWorld()->GetGameState<AGameStateBase>();
+
 		for (AActor* player : playersRevived)
 		{
-
-			FGameplayEventData Payload = FGameplayEventData();
-			Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(player);
-
-			//UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(player, URAbilityGenericTags::GetReviveTag(), FGameplayEventData());
+			//FGameplayEventData Payload = FGameplayEventData();
+			//Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(EOSPlayeState->GetPlayer());
 
 			//FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(ReviveEffectClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 			//ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
@@ -102,7 +100,7 @@ void UGA_Revive::Hold(float timeRemaining)
                 {
 					if (EOSPlayeState->GetPlayer() == playerBase)
 					{
-						EOSPlayeState->Server_RevivePlayer();
+						Player->playerController->Server_RequestRevive(EOSPlayeState);
 						UE_LOG(LogTemp, Error, TEXT("%s Reviving"), *player->GetName());
 					}
                 }
