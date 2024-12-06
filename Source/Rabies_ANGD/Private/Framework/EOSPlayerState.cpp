@@ -105,6 +105,21 @@ void AEOSPlayerState::OnRep_HitScanLocation()
 	Player->viewPivot->SetRelativeLocation(hitscanLocation);
 }
 
+void AEOSPlayerState::Server_ClampVelocity_Implementation(float clampZ)
+{
+	FVector currentVelocity = Player->GetVelocity();
+	currentVelocity.Z = FMath::Lerp(currentVelocity.Z, clampZ, 8 * GetWorld()->GetDeltaSeconds());
+	playerVelocity = currentVelocity;
+	Player->GetCharacterMovement()->Velocity = playerVelocity;
+}
+
+
+bool AEOSPlayerState::Server_ClampVelocity_Validate(float clampZ)
+{
+	return true;
+}
+
+
 void AEOSPlayerState::Server_ProcessDotFly_Implementation(ARPlayerBase* player)
 {
 	FGameplayEventData eventData;
@@ -122,6 +137,7 @@ void AEOSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AEOSPlayerState, Player, COND_None);
+	DOREPLIFETIME_CONDITION(AEOSPlayerState, playerVelocity, COND_None);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, SelectedCharacter, COND_None, REPNOTIFY_Always);
 

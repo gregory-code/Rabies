@@ -36,6 +36,9 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_ProcessDotFly(ARPlayerBase* player);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_ClampVelocity(float clampZ);
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Server_RevivePlayer();
 
@@ -70,6 +73,9 @@ private:
 	
 	UPROPERTY(replicatedUsing = OnRep_HitScanLocation)
 	FVector hitscanLocation;
+
+	UPROPERTY(Replicated)
+	FVector playerVelocity;
 
 	UPROPERTY(Replicated)
 	FVector RootAiming_SocketLocation;

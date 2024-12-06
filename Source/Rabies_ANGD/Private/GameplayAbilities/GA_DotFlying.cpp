@@ -8,7 +8,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
-
+#include "Framework/EOSPlayerState.h"
 #include "Player/RPlayerController.h"
 
 #include "Kismet/KismetSystemLibrary.h"
@@ -74,15 +74,30 @@ void UGA_DotFlying::ProcessFlying()
 {
 	if (bFlying)
 	{
+
 		if(Player->GetCharacterMovement()->IsFalling() == false && !Player->IsTakeOffDelay()) StopFlying();
 
-		if (Player->IsHoldingJump())
+		if (Player->IsHoldingJump() && CurrentGravityDuration >= 1)
 		{
 			FVector currentVelocity = Player->GetVelocity();
-			if (currentVelocity.Z <= 0)
+			if (currentVelocity.Z <= 0 && H)
 			{
-				currentVelocity.Z = FMath::Lerp(currentVelocity.Z, -0.0005f, 8 * GetWorld()->GetDeltaSeconds());
-				Player->GetCharacterMovement()->Velocity = currentVelocity;
+				if (CurrentHoldDuration > 0 && inFall == false)
+				{
+					Player->GetPlayerBaseState()->Server_ClampVelocity(10.0f);
+				}
+				else
+				{
+					Player->GetPlayerBaseState()->Server_ClampVelocity(-10.0f);
+					inFall = true;
+				}
+
+				FVector airVelocity = Player->GetVelocity();
+				airVelocity.Z = 0;
+
+				float multiplier = (airVelocity.Length() >= 300) ? 0.25f : 0.01f;
+				CurrentHoldDuration -= GetWorld()->GetDeltaSeconds() * multiplier;
+				Player->playerController->ChangeTakeOffState(true, CurrentHoldDuration);
 			}
 		}
 	}
@@ -171,5 +186,7 @@ void UGA_DotFlying::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	{
 		ASC->RemoveActiveGameplayEffect(FlyingSpeedEffectHandle);
 		ASC->RemoveActiveGameplayEffect(GravityJumpEffectHandle);
+		ASC->RemoveActiveGameplayEffect(GravitySlowFallEffectHandle);
+		ASC->RemoveActiveGameplayEffect(GravityFallEffectHandle);
 	}
 }
