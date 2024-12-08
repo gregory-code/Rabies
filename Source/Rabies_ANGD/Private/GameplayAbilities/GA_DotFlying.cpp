@@ -80,7 +80,7 @@ void UGA_DotFlying::ProcessFlying()
 		if (Player->IsHoldingJump() && CurrentGravityDuration >= 1)
 		{
 			FVector currentVelocity = Player->GetVelocity();
-			if (currentVelocity.Z <= 0 && H)
+			if (currentVelocity.Z <= 0)
 			{
 				if (CurrentHoldDuration > 0 && inFall == false)
 				{
