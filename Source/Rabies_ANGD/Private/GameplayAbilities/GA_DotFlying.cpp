@@ -55,13 +55,13 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	SlowFallHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_DotFlying::ProcessFlying));
 	
 	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
-	CurrentHoldDuration = 0;
+	CurrentHoldDuration = 0.0f;
 
 	if (!Player->GetCharacterMovement() || Player->GetCharacterMovement()->IsFalling()) return;
 
 	Player->GetAbilitySystemComponent()->AddLooseGameplayTag(URAbilityGenericTags::GetTakeOffDelayTag());
-	Player->playerController->ChangeTakeOffState(0, true);
-	Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(0);
+	Player->playerController->ChangeTakeOffState(true, CurrentHoldDuration);
+	Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(CurrentHoldDuration);
 
 	TakeOffHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_DotFlying::Hold, CurrentHoldDuration));
 }
@@ -92,7 +92,7 @@ void UGA_DotFlying::ProcessFlying()
 			if (currentVelocity.Z <= 0)
 			{
 				float currentGravity = Player->GetCharacterMovement()->GravityScale;
-				float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.4f : currentVelocity.Z * 0.075f;
+				float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.9f : currentVelocity.Z * 0.0095f; // these are fall gravity values, bigger means slower fall
 				float newGravity = FMath::Lerp(currentGravity, fallValue, 5 * GetWorld()->GetDeltaSeconds());
 
 				FGameplayEffectSpecHandle fallSpec = MakeOutgoingGameplayEffectSpec(GravityFallClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
@@ -103,6 +103,7 @@ void UGA_DotFlying::ProcessFlying()
 				currentVelocity.Z = 0;
 
 				float multiplier = (currentVelocity.Length() >= 300) ? 0.15f : 0.05f;
+
 				CurrentHoldDuration -= GetWorld()->GetDeltaSeconds() * multiplier;
 				Player->playerController->ChangeTakeOffState(true, CurrentHoldDuration);
 				Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(CurrentHoldDuration);

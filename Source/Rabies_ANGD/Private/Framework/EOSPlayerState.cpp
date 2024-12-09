@@ -122,6 +122,7 @@ bool AEOSPlayerState::Server_ProcessDotFly_Validate(ARPlayerBase* player)
 void AEOSPlayerState::Server_ProcessDotFlyingStamina_Implementation(float newValue)
 {
 	dotFlyStamina = newValue;
+	Player->DotFlyStamina = dotFlyStamina;
 }
 
 bool AEOSPlayerState::Server_ProcessDotFlyingStamina_Validate(float newValue)
@@ -132,7 +133,11 @@ bool AEOSPlayerState::Server_ProcessDotFlyingStamina_Validate(float newValue)
 void AEOSPlayerState::OnRep_DotFlyStamina()
 {
 	if (Player == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s Getting player"), *GetName());
+		Player = Cast<ARPlayerBase>(GetPawn());
 		return;
+	}
 
 	Player->DotFlyStamina = dotFlyStamina;
 }
