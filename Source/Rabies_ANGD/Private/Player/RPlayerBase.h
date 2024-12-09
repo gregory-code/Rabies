@@ -80,6 +80,9 @@ public:
 	bool bInRangeToRevive;
 
 	float DotFlyStamina = 1.0f;
+
+	UPROPERTY()
+	FVector PlayerVelocity;
 	
 	UPROPERTY(VisibleAnywhere, Category = "View")
 	USceneComponent* viewPivot;

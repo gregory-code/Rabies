@@ -39,6 +39,9 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_ProcessDotFlyingStamina(float newValue);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_UpdatePlayerVelocity(FVector velocity);
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Server_RevivePlayer();
 
@@ -70,6 +73,12 @@ private:
 
 	UPROPERTY(Replicated)
 	FRotator hitscanRotation;
+
+	UPROPERTY(replicatedUsing = OnRep_PlayerVelocity)
+	FVector playerVelocity;
+
+	UFUNCTION()
+	void OnRep_PlayerVelocity();
 	
 	UPROPERTY(replicatedUsing = OnRep_HitScanLocation)
 	FVector hitscanLocation;

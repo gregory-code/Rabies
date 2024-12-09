@@ -106,6 +106,11 @@ void AEOSPlayerState::OnRep_HitScanLocation()
 	Player->viewPivot->SetRelativeLocation(hitscanLocation);
 }
 
+void AEOSPlayerState::OnRep_PlayerVelocity()
+{
+	Player->PlayerVelocity = playerVelocity;
+}
+
 
 void AEOSPlayerState::Server_ProcessDotFly_Implementation(ARPlayerBase* player)
 {
@@ -142,11 +147,25 @@ void AEOSPlayerState::OnRep_DotFlyStamina()
 	Player->DotFlyStamina = dotFlyStamina;
 }
 
+void AEOSPlayerState::Server_UpdatePlayerVelocity_Implementation(FVector velocity)
+{
+	playerVelocity = velocity;
+	Player->PlayerVelocity = playerVelocity;
+}
+
+bool AEOSPlayerState::Server_UpdatePlayerVelocity_Validate(FVector velocity)
+{
+	return true;
+}
+
+
 void AEOSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AEOSPlayerState, Player, COND_None);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, playerVelocity, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, dotFlyStamina, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, SelectedCharacter, COND_None, REPNOTIFY_Always);

@@ -88,26 +88,26 @@ void UGA_DotFlying::ProcessFlying()
 
 		if (Player->IsHoldingJump() && CurrentGravityDuration >= 1)
 		{
-			FVector currentVelocity = Player->GetVelocity();
+			FVector currentVelocity = Player->PlayerVelocity;
 			if (currentVelocity.Z <= 0)
 			{
 				float currentGravity = Player->GetCharacterMovement()->GravityScale;
-				float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.9f : currentVelocity.Z * 0.0095f; // these are fall gravity values, bigger means slower fall
-				float newGravity = FMath::Lerp(currentGravity, fallValue, 5 * GetWorld()->GetDeltaSeconds());
+				float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.07f : (currentVelocity.Z * 0.001f) + 0.15f; // these are fall gravity values, bigger means slower fall
+				float newGravity = fallValue; //FMath::Lerp(currentGravity, fallValue, 20 * GetWorld()->GetDeltaSeconds());
 
 				FGameplayEffectSpecHandle fallSpec = MakeOutgoingGameplayEffectSpec(GravityFallClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 				fallSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), newGravity);
 
 				GravityFallEffectHandle = ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, fallSpec);
-
-				currentVelocity.Z = 0;
-
-				float multiplier = (currentVelocity.Length() >= 300) ? 0.15f : 0.05f;
-
-				CurrentHoldDuration -= GetWorld()->GetDeltaSeconds() * multiplier;
-				Player->playerController->ChangeTakeOffState(true, CurrentHoldDuration);
-				Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(CurrentHoldDuration);
 			}
+
+			currentVelocity.Z = 0;
+
+			float multiplier = (currentVelocity.Length() >= 300) ? 0.15f : 0.05f;
+
+			CurrentHoldDuration -= GetWorld()->GetDeltaSeconds() * multiplier;
+			Player->playerController->ChangeTakeOffState(true, CurrentHoldDuration);
+			Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(CurrentHoldDuration);
 		}
 	}
 

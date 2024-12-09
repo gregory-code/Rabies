@@ -78,6 +78,7 @@ void ARPlayerBase::Tick(float DeltaTime)
 	{
 		//UE_LOG(LogTemp, Error, TEXT(""), *GetName());
 		viewPivot->SetRelativeLocation(GetActorLocation()); // centers the pivot on the player without getting the players rotation
+		EOSPlayerState->Server_UpdatePlayerVelocity(GetCharacterMovement()->Velocity);
 		EOSPlayerState->Server_UpdateSocketLocations(GetMesh()->GetSocketLocation(RootAimingSocketName), GetMesh()->GetSocketLocation(RangedAttackSocketName));
 
 		if (bIsScoping)
