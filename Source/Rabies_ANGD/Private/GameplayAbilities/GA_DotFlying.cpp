@@ -92,7 +92,7 @@ void UGA_DotFlying::ProcessFlying()
 			if (currentVelocity.Z <= 0)
 			{
 				float currentGravity = Player->GetCharacterMovement()->GravityScale;
-				float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.07f : (currentVelocity.Z * 0.001f) + 0.15f; // these are fall gravity values, bigger means slower fall
+				float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.02f : (currentVelocity.Z * 0.001f) + 0.15f; // these are fall gravity values, bigger means slower fall
 				float newGravity = fallValue; //FMath::Lerp(currentGravity, fallValue, 20 * GetWorld()->GetDeltaSeconds());
 
 				FGameplayEffectSpecHandle fallSpec = MakeOutgoingGameplayEffectSpec(GravityFallClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
