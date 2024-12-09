@@ -9,6 +9,7 @@
 #include "Player/RPlayerBase.h"
 #include "DisplayDebugHelpers.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
+#include "Actors/EscapeToWin.h"
 #include "Actors/ItemPickup.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Animation/AnimMontage.h"
@@ -26,10 +27,20 @@ void AEOSActionGameState::BeginPlay()
 {
 	// this will be on server side
 
+    TArray<AActor*> EscapeToWin;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEscapeToWin::StaticClass(), EscapeToWin);
+    for (AActor* escape : EscapeToWin)
+    {
+        AEscapeToWin* escapeToWin = Cast<AEscapeToWin>(EscapeToWin[0]);
+        if (escapeToWin)
+            escapeToWin->SetOwner(this);
+    }
+
     TArray<AActor*> spawnLocations;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AChestSpawnLocation::StaticClass(), spawnLocations);
 
     if (spawnLocations.Num() <= AmountOfChests) return;
+    MaxChests = AmountOfChests;
 
     for (int i = 0; i < AmountOfChests; i++)
     {
@@ -37,6 +48,7 @@ void AEOSActionGameState::BeginPlay()
         SpawnChest(spawnLocations[randomSpawn]->GetActorLocation());
         spawnLocations.RemoveAt(randomSpawn);
     }
+
 
     WaveLevel = 0;
     WaveTime = enemyInitalSpawnRate;
@@ -130,7 +142,7 @@ void AEOSActionGameState::WaveSpawn(float timeToNextWave)
         WaveLevel += PlayerArray.Num();
         int enemiesToSpawn = WaveLevel;
         enemiesToSpawn = FMath::Clamp(enemiesToSpawn, 1, 12);
-        SpawnEnemyWave(WaveLevel);
+        SpawnEnemyWave(enemiesToSpawn);
         WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
     }
     else
@@ -147,7 +159,10 @@ void AEOSActionGameState::SpawnEnemyWave(int amountOfEnemies)
 
     for (int i = 0; i < amountOfEnemies; i++)
     {
-        float randomSpawn = FMath::RandRange(1, spawnLocations.Num() - 2);
+        if (AllEnemies.Num() >= enemyMax)
+            continue;
+
+        float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
         SpawnEnemy(1, spawnLocations[randomSpawn]->GetActorLocation());
         spawnLocations.RemoveAt(randomSpawn);
     }
@@ -166,7 +181,22 @@ void AEOSActionGameState::PickedUpItem_Implementation(int itemID, ARPlayerBase* 
 {
     if (HasAuthority()) // Ensure we're on the server
     {
-        targetingPlayer->AddNewItem(AllItems[itemID]->ItemAsset);
+        if (AllItems[itemID]->ItemAsset == KeyCard)
+        {
+            for (APlayerState* playerState : PlayerArray)
+            {
+                if (playerState && playerState->GetPawn())
+                {
+                    ARPlayerBase* player = Cast<ARPlayerBase>(playerState->GetPawn());
+                    if (player)
+                        player->AddNewItem(AllItems[itemID]->ItemAsset);
+                }
+            }
+        }
+        else
+        {
+            targetingPlayer->AddNewItem(AllItems[itemID]->ItemAsset);
+        }
         AllItems[itemID]->UpdateItemPickedup();
         AllItems.RemoveAt(itemID);
     }
@@ -191,12 +221,36 @@ void AEOSActionGameState::OpenedChest_Implementation(int chestID)
             newData = ItemLibrary[randomIndex];
         }
 
+        if (GetKeyCard())
+            newData = KeyCard;
+
         FActorSpawnParameters SpawnParams;
         AItemPickup* newitem = GetWorld()->SpawnActor<AItemPickup>(ItemPickupClass, AllChests[chestID]->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
         AllItems.Add(newitem); // make sure that the chest has bReplicates to true
         newitem->SetOwner(this);
         newitem->SetupItem(newData);
     }
+}
+
+bool AEOSActionGameState::GetKeyCard()
+{
+    if (MaxChests <= 0.0f)
+        return false;
+
+    if (bGottenKeyCard)
+        return false;
+
+    float percentage = (AllChests.Num() / MaxChests) * 100.0f;
+    if (AllChests.Num() <= MaxChests / 2.0f)
+        percentage = 100.0f - percentage;
+
+    if (FMath::RandRange(0, 100) <= percentage)
+    {
+        bGottenKeyCard = true;
+        return true;
+    }
+
+    return false;
 }
 
 void AEOSActionGameState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

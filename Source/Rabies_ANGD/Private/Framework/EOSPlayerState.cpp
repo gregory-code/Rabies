@@ -149,6 +149,9 @@ void AEOSPlayerState::OnRep_DotFlyStamina()
 
 void AEOSPlayerState::Server_UpdatePlayerVelocity_Implementation(FVector velocity)
 {
+	if (Player == nullptr)
+		return;
+
 	playerVelocity = velocity;
 	Player->PlayerVelocity = playerVelocity;
 }

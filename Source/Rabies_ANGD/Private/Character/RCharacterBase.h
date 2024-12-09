@@ -85,6 +85,12 @@ public:
 	FORCEINLINE bool IsTakeOffDelay() const { return bTakeOffDelay; }
 	FORCEINLINE bool IsHoldingJump() const { return bHoldingJump; }
 
+	UPROPERTY(EditDefaultsOnly, Category = "Death")
+	UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Death")
+	UAnimMontage* ReviveMontage;
+
 private:
 	bool bHasDied;
 
@@ -98,11 +104,6 @@ private:
 	void StartDeath();
 	void DeathTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 
-	UPROPERTY(EditDefaultsOnly, Category = "Death")
-	UAnimMontage* DeathMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Death")
-	UAnimMontage* ReviveMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damaged")
 	UAnimMontage* FlinchMontage;

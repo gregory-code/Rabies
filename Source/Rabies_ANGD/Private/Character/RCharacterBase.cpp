@@ -230,7 +230,6 @@ void ARCharacterBase::PlayMontage(UAnimMontage* MontageToPlay)
 
 void ARCharacterBase::StartDeath()
 {
-	//PlayMontage(DeathMontage);
 	//AbilitySystemComponent->ApplyGameplayEffect(DeathEffect);
 	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::Dead); // this does not apply the dead tag sadly to enemies I believe
 	//AbilitySystemComponent->AddLooseGameplayTag(URAbilityGenericTags::GetDeadTag());

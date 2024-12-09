@@ -55,6 +55,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
 	int enemyInitalSpawnRate;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
+	int enemyMax;
+
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void SpawnChest(FVector SpawnLocation);
 
@@ -85,9 +88,21 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TArray<URItemDataAsset*> ItemSelection;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	URItemDataAsset* KeyCard;
+
 
 	UPROPERTY(Replicated)
 	TArray<AItemChest*> AllChests;
+
+	UPROPERTY()
+	int MaxChests;
+
+	UPROPERTY()
+	bool bGottenKeyCard = false;
+
+	UFUNCTION()
+	bool GetKeyCard();
 
 	UPROPERTY(Replicated)
 	TArray<AItemPickup*> AllItems;

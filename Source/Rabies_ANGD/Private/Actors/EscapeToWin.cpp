@@ -9,6 +9,7 @@
 #include "Widgets/EndGameWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Framework/EOSActionGameState.h"
 
 // Sets default values
 AEscapeToWin::AEscapeToWin()
@@ -94,6 +95,11 @@ void AEscapeToWin::SetUpEndGame()
 void AEscapeToWin::CheckKeyCard()
 {
 	//Check to see if player has keycard
+	AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
+	if (!gameState)
+		return;
+
+
 
 	if (bHasKeyCard == true)
 	{
