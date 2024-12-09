@@ -78,6 +78,8 @@ public:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	bool bInRangeToRevive;
+
+	float DotFlyStamina = 1.0f;
 	
 	UPROPERTY(VisibleAnywhere, Category = "View")
 	USceneComponent* viewPivot;

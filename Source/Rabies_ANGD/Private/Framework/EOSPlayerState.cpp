@@ -5,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/RPlayerBase.h"
 #include "Framework/EOSGameState.h"
+#include "Player/RPlayerController.h"
 #include "Framework/RCharacterDefination.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayAbilities/RAbilitySystemComponent.h"
@@ -105,20 +106,6 @@ void AEOSPlayerState::OnRep_HitScanLocation()
 	Player->viewPivot->SetRelativeLocation(hitscanLocation);
 }
 
-void AEOSPlayerState::Server_ClampVelocity_Implementation(float clampZ)
-{
-	FVector currentVelocity = Player->GetVelocity();
-	currentVelocity.Z = FMath::Lerp(currentVelocity.Z, clampZ, 8 * GetWorld()->GetDeltaSeconds());
-	playerVelocity = currentVelocity;
-	Player->GetCharacterMovement()->Velocity = playerVelocity;
-}
-
-
-bool AEOSPlayerState::Server_ClampVelocity_Validate(float clampZ)
-{
-	return true;
-}
-
 
 void AEOSPlayerState::Server_ProcessDotFly_Implementation(ARPlayerBase* player)
 {
@@ -132,12 +119,30 @@ bool AEOSPlayerState::Server_ProcessDotFly_Validate(ARPlayerBase* player)
 	return true;
 }
 
+void AEOSPlayerState::Server_ProcessDotFlyingStamina_Implementation(float newValue)
+{
+	dotFlyStamina = newValue;
+}
+
+bool AEOSPlayerState::Server_ProcessDotFlyingStamina_Validate(float newValue)
+{
+	return true;
+}
+
+void AEOSPlayerState::OnRep_DotFlyStamina()
+{
+	if (Player == nullptr)
+		return;
+
+	Player->DotFlyStamina = dotFlyStamina;
+}
+
 void AEOSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AEOSPlayerState, Player, COND_None);
-	DOREPLIFETIME_CONDITION(AEOSPlayerState, playerVelocity, COND_None);
+	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, dotFlyStamina, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, SelectedCharacter, COND_None, REPNOTIFY_Always);
 

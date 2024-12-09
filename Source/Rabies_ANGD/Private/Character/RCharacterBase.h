@@ -104,6 +104,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Death")
 	UAnimMontage* ReviveMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Damaged")
+	UAnimMontage* FlinchMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damaged")
+	UAnimMontage* AirFlinchMontage;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Death")
 	TSubclassOf<UGameplayEffect> DeathEffect;
 

@@ -205,6 +205,7 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 void ARPlayerBase::SetRabiesPlayerController(ARPlayerController* newController)
 {
 	playerController = newController;
+	SetPlayerState();
 
 }
 

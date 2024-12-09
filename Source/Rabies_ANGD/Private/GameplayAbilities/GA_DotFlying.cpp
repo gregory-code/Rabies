@@ -4,11 +4,11 @@
 #include "GameplayAbilities/GA_DotFlying.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Framework/EOSPlayerState.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
-#include "Framework/EOSPlayerState.h"
 #include "Player/RPlayerController.h"
 
 #include "Kismet/KismetSystemLibrary.h"
@@ -60,7 +60,8 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	if (!Player->GetCharacterMovement() || Player->GetCharacterMovement()->IsFalling()) return;
 
 	Player->GetAbilitySystemComponent()->AddLooseGameplayTag(URAbilityGenericTags::GetTakeOffDelayTag());
-	Player->playerController->ChangeTakeOffState(true, 0);
+	Player->playerController->ChangeTakeOffState(0, true);
+	Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(0);
 
 	TakeOffHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_DotFlying::Hold, CurrentHoldDuration));
 }
@@ -74,30 +75,37 @@ void UGA_DotFlying::ProcessFlying()
 {
 	if (bFlying)
 	{
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+		if (ASC)
+		{
+			ASC->RemoveActiveGameplayEffect(GravityFallEffectHandle);
+		}
 
-		if(Player->GetCharacterMovement()->IsFalling() == false && !Player->IsTakeOffDelay()) StopFlying();
+		if (Player->GetCharacterMovement()->IsFalling() == false && Player->IsTakeOffDelay() == false)
+		{
+			StopFlying();
+		}
 
 		if (Player->IsHoldingJump() && CurrentGravityDuration >= 1)
 		{
 			FVector currentVelocity = Player->GetVelocity();
 			if (currentVelocity.Z <= 0)
 			{
-				if (CurrentHoldDuration > 0 && inFall == false)
-				{
-					Player->GetPlayerBaseState()->Server_ClampVelocity(10.0f);
-				}
-				else
-				{
-					Player->GetPlayerBaseState()->Server_ClampVelocity(-10.0f);
-					inFall = true;
-				}
+				float currentGravity = Player->GetCharacterMovement()->GravityScale;
+				float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.4f : currentVelocity.Z * 0.075f;
+				float newGravity = FMath::Lerp(currentGravity, fallValue, 5 * GetWorld()->GetDeltaSeconds());
 
-				FVector airVelocity = Player->GetVelocity();
-				airVelocity.Z = 0;
+				FGameplayEffectSpecHandle fallSpec = MakeOutgoingGameplayEffectSpec(GravityFallClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+				fallSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), newGravity);
 
-				float multiplier = (airVelocity.Length() >= 300) ? 0.25f : 0.01f;
+				GravityFallEffectHandle = ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, fallSpec);
+
+				currentVelocity.Z = 0;
+
+				float multiplier = (currentVelocity.Length() >= 300) ? 0.15f : 0.05f;
 				CurrentHoldDuration -= GetWorld()->GetDeltaSeconds() * multiplier;
 				Player->playerController->ChangeTakeOffState(true, CurrentHoldDuration);
+				Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(CurrentHoldDuration);
 			}
 		}
 	}
@@ -122,6 +130,7 @@ void UGA_DotFlying::Hold(float timeRemaining)
 		CurrentHoldDuration += GetWorld()->GetDeltaSeconds();
 		bool visible = (CurrentHoldDuration >= 1 / 8.0f) ? true : false;
 		Player->playerController->ChangeTakeOffState(visible, CurrentHoldDuration);
+		Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(CurrentHoldDuration);
 		TakeOffHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_DotFlying::Hold, CurrentHoldDuration));
 	}
 	else
@@ -172,7 +181,16 @@ void UGA_DotFlying::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+	if (ASC)
+	{
+		ASC->RemoveActiveGameplayEffect(FlyingSpeedEffectHandle);
+		ASC->RemoveActiveGameplayEffect(GravityJumpEffectHandle);
+		ASC->RemoveActiveGameplayEffect(GravityFallEffectHandle);
+	}
+
 	Player->playerController->ChangeTakeOffState(false, 0);
+	Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(1);
 	GetWorld()->GetTimerManager().ClearTimer(TakeOffHandle);
 
 	Player->GetAbilitySystemComponent()->RemoveLooseGameplayTag(URAbilityGenericTags::GetTakeOffDelayTag());
@@ -180,13 +198,4 @@ void UGA_DotFlying::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	Player->GetAbilitySystemComponent()->RemoveLooseGameplayTag(URAbilityGenericTags::GetUnActionableTag());
 
 	Player->ServerPlayAnimMontage(HardLandingMontage);
-
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-	if (ASC)
-	{
-		ASC->RemoveActiveGameplayEffect(FlyingSpeedEffectHandle);
-		ASC->RemoveActiveGameplayEffect(GravityJumpEffectHandle);
-		ASC->RemoveActiveGameplayEffect(GravitySlowFallEffectHandle);
-		ASC->RemoveActiveGameplayEffect(GravityFallEffectHandle);
-	}
 }

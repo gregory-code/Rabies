@@ -353,6 +353,18 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 		bHasDied = false;
 	}
 
+	if (ChangeData.NewValue > 0 && ChangeData.NewValue < ChangeData.OldValue && FlinchMontage != nullptr && AirFlinchMontage != nullptr)
+	{
+		if (bIsFlying)
+		{
+			ServerPlayAnimMontage(AirFlinchMontage);
+		}
+		else
+		{
+			ServerPlayAnimMontage(FlinchMontage);
+		}
+	}
+
 	if (HealthBar)
 	{
 		HealthBar->SetHealth(ChangeData.NewValue, AttributeSet->GetMaxHealth());
