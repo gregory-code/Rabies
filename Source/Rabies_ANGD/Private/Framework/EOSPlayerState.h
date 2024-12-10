@@ -42,8 +42,11 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_UpdatePlayerVelocity(FVector velocity);
 
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(Client, Reliable)
 	void Server_RevivePlayer();
+
+	UFUNCTION(Server, Reliable)
+	void Server_CreateBossHealth(int level, class AREnemyBase* enemy);
 
 	UFUNCTION()
 	FRotator GetHitscanRotator() { return hitscanRotation; }

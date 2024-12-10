@@ -53,6 +53,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CharacterShootParticle(FVector startPos, FVector endPos, FRotator startForward);
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	bool bBossHealthBar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	FName bBossName;
 
 protected:
 
@@ -75,6 +80,9 @@ public:
 
 	UFUNCTION()
 	int GetReviveSpeed();
+
+	UFUNCTION()
+	bool GetKeyCard();
 
 	FName RangedAttackSocketName = TEXT("Ranged_Socket");
 	FName RootAimingSocketName = TEXT("RootAiming_Socket");

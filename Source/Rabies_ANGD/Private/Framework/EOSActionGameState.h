@@ -22,7 +22,7 @@ class AEOSActionGameState : public AGameStateBase
 public:
 
 	UFUNCTION()
-	void SelectEnemy(AREnemyBase* selectedEnemy);
+	void SelectEnemy(AREnemyBase* selectedEnemy, bool isDeadlock);
 
 	UFUNCTION()
 	void SelectChest(AItemChest* openedChest);
@@ -32,6 +32,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void AwardEnemyKill(TSubclassOf<class UGameplayEffect> rewardEffect);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void StartBossFight(int enemyID);
 
 private:
 

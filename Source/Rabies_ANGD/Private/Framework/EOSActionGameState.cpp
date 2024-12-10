@@ -33,7 +33,9 @@ void AEOSActionGameState::BeginPlay()
     {
         AEscapeToWin* escapeToWin = Cast<AEscapeToWin>(EscapeToWin[0]);
         if (escapeToWin)
+        {
             escapeToWin->SetOwner(this);
+        }
     }
 
     TArray<AActor*> spawnLocations;
@@ -80,15 +82,23 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
     }
 }
 
-void AEOSActionGameState::SelectEnemy(AREnemyBase* selectedEnemy)
+void AEOSActionGameState::SelectEnemy(AREnemyBase* selectedEnemy, bool isDeadlock)
 {
+    FVector deadlockLoc = selectedEnemy->GetActorLocation();
+
     for (int i = 0; i < AllEnemies.Num(); i++)
     {
         if (selectedEnemy == AllEnemies[i])
         {
             RemoveEnemy(i);
-            return;
+            break;
         }
+    }
+
+    if (isDeadlock)
+    {
+        StartBossFight(1);
+        StartBossFight(2);
     }
 }
 
@@ -163,8 +173,21 @@ void AEOSActionGameState::SpawnEnemyWave(int amountOfEnemies)
             continue;
 
         float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
-        SpawnEnemy(1, spawnLocations[randomSpawn]->GetActorLocation());
+        SpawnEnemy(3, spawnLocations[randomSpawn]->GetActorLocation());
         spawnLocations.RemoveAt(randomSpawn);
+    }
+}
+
+void AEOSActionGameState::StartBossFight_Implementation(int enemyID)
+{
+    SpawnEnemy(enemyID, FVector(0, 0, 0));
+    
+    for (APlayerState* playerState : PlayerArray)
+    {
+        if (playerState/* && playerState->GetOwningController()*/)
+        {
+            Cast<AEOSPlayerState>(playerState)->Server_CreateBossHealth(WaveLevel, AllEnemies.Last());
+        }
     }
 }
 
@@ -226,7 +249,8 @@ void AEOSActionGameState::OpenedChest_Implementation(int chestID)
 
         FActorSpawnParameters SpawnParams;
         AItemPickup* newitem = GetWorld()->SpawnActor<AItemPickup>(ItemPickupClass, AllChests[chestID]->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
-        AllItems.Add(newitem); // make sure that the chest has bReplicates to true
+        AllItems.Add(newitem); // make sure that the chest has bReplicates to true]
+        AllChests.RemoveAt(chestID);
         newitem->SetOwner(this);
         newitem->SetupItem(newData);
     }
@@ -240,11 +264,9 @@ bool AEOSActionGameState::GetKeyCard()
     if (bGottenKeyCard)
         return false;
 
-    float percentage = (AllChests.Num() / MaxChests) * 100.0f;
-    if (AllChests.Num() <= MaxChests / 2.0f)
-        percentage = 100.0f - percentage;
+    float percentage = ((float)AllChests.Num() / (float)MaxChests) * 90.0f;
 
-    if (FMath::RandRange(0, 100) <= percentage)
+    if (FMath::RandRange(0, 100) >= percentage)
     {
         bGottenKeyCard = true;
         return true;

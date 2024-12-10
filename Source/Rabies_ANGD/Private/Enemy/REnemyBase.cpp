@@ -116,7 +116,7 @@ void AREnemyBase::DelayServerDeathRequest()
 		AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
 		if (gameState == GetOwner())
 		{
-			gameState->SelectEnemy(this);
+			gameState->SelectEnemy(this, bIsDeadlock);
 		}
 	}
 }

@@ -89,6 +89,19 @@ bool AEOSPlayerState::Server_UpdateSocketLocations_Validate(FVector rootAimingLo
 	return true;
 }
 
+void AEOSPlayerState::Server_CreateBossHealth_Implementation(int level, class AREnemyBase* enemy)
+{
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Has Auth"));
+		if (Player == nullptr)
+			return;
+
+		UE_LOG(LogTemp, Error, TEXT("Getting in"));
+		Player->playerController->AddBossEnemy(level, enemy);
+	}
+}
+
 ARPlayerBase* AEOSPlayerState::GetPlayer()
 {
 	return Player;
@@ -103,6 +116,7 @@ void AEOSPlayerState::OnRep_HitScanLocation()
 {
 	if (Player == nullptr)
 		return;
+
 	Player->viewPivot->SetRelativeLocation(hitscanLocation);
 }
 
@@ -126,6 +140,9 @@ bool AEOSPlayerState::Server_ProcessDotFly_Validate(ARPlayerBase* player)
 
 void AEOSPlayerState::Server_ProcessDotFlyingStamina_Implementation(float newValue)
 {
+	if (Player == nullptr)
+		return;
+
 	dotFlyStamina = newValue;
 	Player->DotFlyStamina = dotFlyStamina;
 }
