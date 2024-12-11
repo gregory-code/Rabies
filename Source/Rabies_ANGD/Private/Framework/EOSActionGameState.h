@@ -38,6 +38,9 @@ public:
 
 private:
 
+	UPROPERTY()
+	FVector deadlockPos;
+
 	FTimerHandle WaveHandle;
 
 	UPROPERTY()

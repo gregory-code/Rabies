@@ -74,6 +74,11 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
     {
         FActorSpawnParameters SpawnParams;
         AREnemyBase* newEnemy = GetWorld()->SpawnActor<AREnemyBase>(EnemyLibrary[EnemyIDToSpawn], SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+        if (newEnemy == nullptr || this == nullptr)
+        {
+            
+            return;
+        }
         newEnemy->SetOwner(this);             
         UAbilitySystemComponent* ASC = newEnemy->GetAbilitySystemComponent();
         ASC->SetOwnerActor(newEnemy);
@@ -84,7 +89,7 @@ void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector 
 
 void AEOSActionGameState::SelectEnemy(AREnemyBase* selectedEnemy, bool isDeadlock)
 {
-    FVector deadlockLoc = selectedEnemy->GetActorLocation();
+    deadlockPos = selectedEnemy->GetActorLocation();
 
     for (int i = 0; i < AllEnemies.Num(); i++)
     {
@@ -180,7 +185,7 @@ void AEOSActionGameState::SpawnEnemyWave(int amountOfEnemies)
 
 void AEOSActionGameState::StartBossFight_Implementation(int enemyID)
 {
-    SpawnEnemy(enemyID, FVector(0, 0, 0));
+    SpawnEnemy(enemyID, deadlockPos);
     
     for (APlayerState* playerState : PlayerArray)
     {
