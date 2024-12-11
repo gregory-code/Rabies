@@ -19,7 +19,7 @@ class UGameplayEffect;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeadStatusChanged, bool /*bIsDead*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelUp, int /*new level*/);
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnClientHitScan, AActor* /*Hit Target*/, FVector /* Start Pos */, FVector /* End Pos */);
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnClientHitScan, AActor* /*Hit Target*/, FVector /* Start Pos */, FVector /* End Pos */, bool /* enemy*/);
 
 UCLASS()
 class ARCharacterBase : public ACharacter, public IAbilitySystemInterface, /*public IRGameplayCueInterface,*/ public IGenericTeamAgentInterface
@@ -185,7 +185,7 @@ public:
 	void UpdateAITarget(AActor* newTargetActor);
 
 	UFUNCTION(NetMulticast, Unreliable, WithValidation)
-	void ClientHitScanResult(AActor* hitActor, FVector start, FVector end);
+	void ClientHitScanResult(AActor* hitActor, FVector start, FVector end, bool enemy);
 
 private:
 

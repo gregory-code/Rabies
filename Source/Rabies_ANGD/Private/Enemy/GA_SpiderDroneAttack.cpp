@@ -75,14 +75,14 @@ void UGA_SpiderDroneAttack::ActivateAbility(const FGameplayAbilitySpecHandle Han
 
 	if (Character)
 	{
-		ClientHitScanHandle = Character->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
+		ClientHitScanHandle = Character->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos, bool enemy)
 			{
-				RecieveAttackHitscan(hitActor, startPos, endPos);
+				RecieveAttackHitscan(hitActor, startPos, endPos, enemy);
 			});
 	}
 }
 
-void UGA_SpiderDroneAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
+void UGA_SpiderDroneAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos, bool enemy)
 {
 	if (K2_HasAuthority())
 	{

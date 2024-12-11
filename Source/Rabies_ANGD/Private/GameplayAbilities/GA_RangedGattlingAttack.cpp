@@ -58,9 +58,9 @@ void UGA_RangedGattlingAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 
 	if (Player)
 	{
-		ClientHitScanHandle = Player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
+		ClientHitScanHandle = Player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos, bool enemy)
 			{
-				RecieveAttackHitscan(hitActor, startPos, endPos);
+				RecieveAttackHitscan(hitActor, startPos, endPos, enemy);
 			});
 	}
 
@@ -92,7 +92,7 @@ void UGA_RangedGattlingAttack::EndAbility(const FGameplayAbilitySpecHandle Handl
 	}
 }
 
-void UGA_RangedGattlingAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
+void UGA_RangedGattlingAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos, bool enemy)
 {
 
 	if (K2_HasAuthority())

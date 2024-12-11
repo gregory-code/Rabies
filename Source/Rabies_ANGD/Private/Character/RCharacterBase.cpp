@@ -34,7 +34,8 @@
 #include "Perception/AISense_Sight.h"
 #include "Perception/AISense_Touch.h"
 
-#define ECC_RangedAttack ECC_GameTraceChannel2
+#define ECC_EnemyRangedAttack ECC_GameTraceChannel2
+#define ECC_AllyRangedAttack ECC_GameTraceChannel3
 
 // Sets default values
 ARCharacterBase::ARCharacterBase()
@@ -200,27 +201,29 @@ void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState
 	}
 
 	FCollisionShape collisionShape = FCollisionShape::MakeSphere(1);
-	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startPos, endPos, FQuat::Identity, ECC_RangedAttack, collisionShape);
+	ECollisionChannel collisionChannel = (requestedPlayerState) ? ECC_AllyRangedAttack : ECC_EnemyRangedAttack ;
+	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startPos, endPos, FQuat::Identity, collisionChannel, collisionShape);
 	if (hit)
 	{
 		FVector weaponStart = (requestedPlayerState == nullptr) ? startPos : requestedPlayerState->GetRangedLocation();
 		FVector hitEnd = hitResult.ImpactPoint;
 		CharacterShootParticle(weaponStart, hitEnd, (hitEnd - weaponStart).GetSafeNormal().Rotation() + FRotator(0, -90, 0)); // this gets the point towards the hit
-		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd);
+		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd, requestedPlayerState == nullptr);
 	}
 }
 
-void ARCharacterBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end)
+void ARCharacterBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end, bool enemy)
 {
 	FString actorName = hitActor->GetName();
 	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
 	//DrawDebugLine(GetWorld(), start, end, FColor::Green);
-	DrawDebugCylinder(GetWorld(), start, end, 1.0f, 32, FColor::Green, false, 1.0f, 0U, 1.0f);
-	ClientHitScan.Broadcast(hitActor, start, end);
+	FColor color = (enemy) ? FColor::Red : FColor::Green ;
+	DrawDebugCylinder(GetWorld(), start, end, 1.0f, 32, color, false, 1.0f, 0U, 1.0f);
+	ClientHitScan.Broadcast(hitActor, start, end, enemy);
 }
 
 
-bool ARCharacterBase::ClientHitScanResult_Validate(AActor* hitActor, FVector start, FVector end)
+bool ARCharacterBase::ClientHitScanResult_Validate(AActor* hitActor, FVector start, FVector end, bool enemy)
 {
 	return true;
 }
