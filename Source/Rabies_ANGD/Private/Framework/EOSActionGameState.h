@@ -22,7 +22,7 @@ class AEOSActionGameState : public AGameStateBase
 public:
 
 	UFUNCTION()
-	void SelectEnemy(AREnemyBase* selectedEnemy, bool isDeadlock);
+	void SelectEnemy(AREnemyBase* selectedEnemy, bool isDeadlock, bool bIsDeadlockComponent);
 
 	UFUNCTION()
 	void SelectChest(AItemChest* openedChest);
@@ -42,6 +42,9 @@ private:
 	FVector deadlockPos;
 
 	FTimerHandle WaveHandle;
+
+	UPROPERTY()
+	class AEscapeToWin* EscapeToWin;
 
 	UPROPERTY()
 	float WaveTime;
