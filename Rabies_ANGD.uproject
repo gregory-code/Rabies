@@ -52,10 +52,6 @@
 		{
 			"Name": "SocketSubsystemEOS",
 			"Enabled": true
-		},
-		{
-			"Name": "NiagaraFluids",
-			"Enabled": true
 		}
 	]
 }
