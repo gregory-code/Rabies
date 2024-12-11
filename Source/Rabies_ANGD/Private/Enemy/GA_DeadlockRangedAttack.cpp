@@ -72,14 +72,14 @@ void UGA_DeadlockRangedAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 
 	if (Character)
 	{
-		ClientHitScanHandle = Character->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos, bool enemy)
+		ClientHitScanHandle = Character->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
 			{
-				RecieveAttackHitscan(hitActor, startPos, endPos, enemy);
+				RecieveAttackHitscan(hitActor, startPos, endPos);
 			});
 	}
 }
 
-void UGA_DeadlockRangedAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos, bool enemy)
+void UGA_DeadlockRangedAttack::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
 {
 	if (K2_HasAuthority())
 	{
