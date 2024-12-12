@@ -131,6 +131,11 @@ void AEOSActionGameState::SelectItem(AItemPickup* selectedItem, ARPlayerBase* ta
     }
 }
 
+void AEOSActionGameState::LeaveLevel_Implementation()
+{
+    LoadMapAndListen(SelectLevel);
+}
+
 void AEOSActionGameState::AwardEnemyKill_Implementation(TSubclassOf<class UGameplayEffect> rewardEffect)
 {
     if (HasAuthority())
@@ -280,6 +285,20 @@ bool AEOSActionGameState::GetKeyCard()
     }
 
     return false;
+}
+
+void AEOSActionGameState::LoadMapAndListen(TSoftObjectPtr<UWorld> levelToLoad)
+{
+    if (!levelToLoad.IsValid())
+    {
+        levelToLoad.LoadSynchronous();
+    }
+
+    if (levelToLoad.IsValid())
+    {
+        const FName levelName = FName(*FPackageName::ObjectPathToPackageName(levelToLoad.ToString()));
+        GetWorld()->ServerTravel(levelName.ToString() + "?listen");
+    }
 }
 
 void AEOSActionGameState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
