@@ -159,8 +159,8 @@ void AEOSActionGameState::WaveSpawn(float timeToNextWave)
     if (timeToNextWave >= WaveTime)
     {
         WaveLevel += PlayerArray.Num();
-        int enemiesToSpawn = WaveLevel;
-        enemiesToSpawn = FMath::Clamp(enemiesToSpawn, 1, 12);
+        int enemiesToSpawn = WaveLevel * 3;
+        enemiesToSpawn = FMath::Clamp(enemiesToSpawn, 3, 6);
         SpawnEnemyWave(enemiesToSpawn);
         WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
     }
