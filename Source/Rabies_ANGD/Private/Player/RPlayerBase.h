@@ -109,6 +109,12 @@ private:
 	FVector AimCameraLocalOffset;
 
 	UPROPERTY(EditDefaultsOnly, Category = "View")
+	FVector AbilityCameraLocalOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = "View")
+	FVector UltimateCameraLocalOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = "View")
 	FVector DefaultCameraLocal;
 
 	UPROPERTY(EditDefaultsOnly, Category = "View")
@@ -205,10 +211,13 @@ private:
 	void TryActivateSpecialAttack();
 
 	UFUNCTION()
-	void TryActivateUltimateAttack();
+	void FinishSpecialAttack();
 
 	UFUNCTION()
-	void ConfirmActionTriggered();
+	void TryActivateUltimateAttack();
+	
+	UFUNCTION()
+	void FinishUltimateAttack();
 
 	UFUNCTION()
 	void CancelActionTriggered();

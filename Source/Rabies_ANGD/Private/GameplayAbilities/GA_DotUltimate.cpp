@@ -20,6 +20,7 @@ UGA_DotUltimate::UGA_DotUltimate()
 {
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("ability.ultimate.activate"));
 	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("ability.ultimate.activate"));
+	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetScopingTag());
 	//ActivationOwnedTags.AddTag(URAbilityGenericTags::GetAttackingTag());
 
 	/*FAbilityTriggerData TriggerData;
