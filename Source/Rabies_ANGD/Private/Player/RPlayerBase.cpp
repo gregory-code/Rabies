@@ -315,7 +315,7 @@ void ARPlayerBase::TryActivateSpecialAttack()
 
 void ARPlayerBase::FinishSpecialAttack()
 {
-	GetAbilitySystemComponent()->InputConfirm();
+	//GetAbilitySystemComponent()->InputConfirm();
 }
 
 void ARPlayerBase::TryActivateUltimateAttack()
@@ -325,7 +325,7 @@ void ARPlayerBase::TryActivateUltimateAttack()
 
 void ARPlayerBase::FinishUltimateAttack()
 {
-	GetAbilitySystemComponent()->InputConfirm();
+	//GetAbilitySystemComponent()->InputConfirm();
 
 	//GetAbilitySystemComponent()->InputCancel();
 }

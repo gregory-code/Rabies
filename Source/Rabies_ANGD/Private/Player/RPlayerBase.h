@@ -154,12 +154,6 @@ private:
 	UInputAction* ultimateAttackAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* AbilityConfirmAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* AbilityCancelAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* QuitOutAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -219,8 +213,6 @@ private:
 	UFUNCTION()
 	void FinishUltimateAttack();
 
-	UFUNCTION()
-	void CancelActionTriggered();
 
 	UFUNCTION()
 	void Interact();

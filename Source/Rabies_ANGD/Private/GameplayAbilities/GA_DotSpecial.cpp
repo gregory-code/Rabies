@@ -20,7 +20,7 @@ UGA_DotSpecial::UGA_DotSpecial()
 {
 	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("ability.speical.activate"));
 	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("ability.speical.activate"));
-	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetScopingTag());
+	//ActivationOwnedTags.AddTag(URAbilityGenericTags::GetScopingTag());
 
 	/*FAbilityTriggerData TriggerData;
 	TriggerData.TriggerTag = URAbilityGenericTags::GetBasicAttackActivationTag();
@@ -38,12 +38,12 @@ void UGA_DotSpecial::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 		return;
 	}
 
-	UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargettingMontage);
+	/*UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargettingMontage);
 	playTargettingMontageTask->OnBlendOut.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
 	playTargettingMontageTask->OnInterrupted.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
 	playTargettingMontageTask->OnCompleted.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
 	playTargettingMontageTask->OnCancelled.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
-	playTargettingMontageTask->ReadyForActivation();
+	playTargettingMontageTask->ReadyForActivation();*/
 
 	//UAbilityTask_WaitTargetData* waitTargetDataTask = UAbilityTask_WaitTargetData::WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, TargetActorClass);
 	/*waitTargetDataTask->ValidData.AddDynamic(this, &UGA_DotSpecial::TargetAquired);
@@ -67,7 +67,7 @@ void UGA_DotSpecial::TargetAquired(const FGameplayAbilityTargetDataHandle& Data)
 	{
 	}*/
 
-	if (!K2_CommitAbility())
+	/*if (!K2_CommitAbility())
 	{
 		K2_EndAbility();
 		return;
@@ -86,7 +86,7 @@ void UGA_DotSpecial::TargetAquired(const FGameplayAbilityTargetDataHandle& Data)
 		//ExecuteSpawnVFXCue();
 	}
 	GetOwningComponentFromActorInfo()->GetAnimInstance()->Montage_Play(CastingMontage);
-	K2_EndAbility();
+	K2_EndAbility();*/
 }
 
 void UGA_DotSpecial::TargetCancelled(const FGameplayAbilityTargetDataHandle& Data)
