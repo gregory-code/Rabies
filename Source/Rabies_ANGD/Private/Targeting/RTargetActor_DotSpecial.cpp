@@ -39,6 +39,7 @@ void ARTargetActor_DotSpecial::SetTargettingRange(float newTargettingRange)
 void ARTargetActor_DotSpecial::Tick(float DeltaSecond)
 {
 	Super::Tick(DeltaSecond);
+	UE_LOG(LogTemp, Error, TEXT("%s Getting TargetActor"), *GetName());
 	FHitResult playerView = GetPlayerView();
 	if (playerView.bBlockingHit)
 	{
@@ -76,21 +77,24 @@ void ARTargetActor_DotSpecial::ConfirmTargetingAndContinue()
 FHitResult ARTargetActor_DotSpecial::GetPlayerView() const
 {
 	FHitResult hitResult;
-	if (PrimaryPC)
+	if (HasAuthority())
 	{
-		FVector viewLoc;
-		FRotator viewRot;
-
-		PrimaryPC->GetPlayerViewPoint(viewLoc, viewRot);
-		FVector traceEnd = viewLoc + viewRot.Vector() * TargettingRange;
-
-		GetWorld()->LineTraceSingleByChannel(hitResult, viewLoc, traceEnd, ECC_Visibility);
-		if (!hitResult.bBlockingHit)
+		if (PrimaryPC)
 		{
-			GetWorld()->LineTraceSingleByChannel(hitResult, traceEnd, traceEnd + FVector::DownVector * TargettingRange, ECC_Visibility);
+			FVector viewLoc;
+			FRotator viewRot;
+
+			UE_LOG(LogTemp, Error, TEXT("%s Got Primary PC"), *GetName());
+			PrimaryPC->GetPlayerViewPoint(viewLoc, viewRot);
+			FVector traceEnd = viewLoc + viewRot.Vector() * TargettingRange;
+
+			GetWorld()->LineTraceSingleByChannel(hitResult, viewLoc, traceEnd, ECC_Visibility);
+			if (!hitResult.bBlockingHit)
+			{
+				GetWorld()->LineTraceSingleByChannel(hitResult, traceEnd, traceEnd + FVector::DownVector * TargettingRange, ECC_Visibility);
+			}
 		}
+
 	}
-
-
 	return hitResult;
 }
