@@ -11,6 +11,8 @@
 
 #include "Framework/EOSActionGameState.h"
 
+#include "Targeting/RTargetActor_DotSpecial.h"
+
 #include "AbilitySystemBlueprintLibrary.h"
 
 #include "Player/RPlayerBase.h"
@@ -18,9 +20,10 @@
 
 UGA_DotSpecial::UGA_DotSpecial()
 {
-	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("ability.speical.activate"));
-	BlockAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("ability.speical.activate"));
-	//ActivationOwnedTags.AddTag(URAbilityGenericTags::GetScopingTag());
+	AbilityTags.AddTag(URAbilityGenericTags::GetSpecialAttackActivationTag());
+	BlockAbilitiesWithTag.AddTag(URAbilityGenericTags::GetSpecialAttackActivationTag());
+	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetScopingTag());
+	ActivationOwnedTags.AddTag(URAbilityGenericTags::GetSpecialAttackAimingTag());
 
 	/*FAbilityTriggerData TriggerData;
 	TriggerData.TriggerTag = URAbilityGenericTags::GetBasicAttackActivationTag();
@@ -38,55 +41,56 @@ void UGA_DotSpecial::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 		return;
 	}
 
-	/*UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargettingMontage);
+
+	UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargettingMontage);
 	playTargettingMontageTask->OnBlendOut.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
 	playTargettingMontageTask->OnInterrupted.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
 	playTargettingMontageTask->OnCompleted.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
 	playTargettingMontageTask->OnCancelled.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
-	playTargettingMontageTask->ReadyForActivation();*/
+	playTargettingMontageTask->ReadyForActivation();
 
-	//UAbilityTask_WaitTargetData* waitTargetDataTask = UAbilityTask_WaitTargetData::WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, TargetActorClass);
-	/*waitTargetDataTask->ValidData.AddDynamic(this, &UGA_DotSpecial::TargetAquired);
+	UAbilityTask_WaitTargetData* waitTargetDataTask = UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, targetActorClass);
+	waitTargetDataTask->ValidData.AddDynamic(this, &UGA_DotSpecial::TargetAquired);
 	waitTargetDataTask->Cancelled.AddDynamic(this, &UGA_DotSpecial::TargetCancelled);
 	waitTargetDataTask->ReadyForActivation();
 
 	AGameplayAbilityTargetActor* spawnedTargetActor;
-	waitTargetDataTask->BeginSpawningActor(this, TargetActorClass, spawnedTargetActor);
+	waitTargetDataTask->BeginSpawningActor(this, targetActorClass, spawnedTargetActor);
 	ARTargetActor_DotSpecial* dotPickActor = Cast<ARTargetActor_DotSpecial>(spawnedTargetActor);
 	if (dotPickActor)
 	{
-		dotPickActor->SetTargettingRadius(500.0f);
+		dotPickActor->SetTargettingRadus(500.0f);
 		dotPickActor->SetTargettingRange(5000.0f);
 	}
-	waitTargetDataTask->FinishSpawningActor(this, dotPickActor);*/
+	waitTargetDataTask->FinishSpawningActor(this, dotPickActor);
 }
 
 void UGA_DotSpecial::TargetAquired(const FGameplayAbilityTargetDataHandle& Data)
 {
-	/*if (HasAuthorityOrPredictionKey(CurrentActorInfo, &CurrentActivationInfo))
+	if (HasAuthorityOrPredictionKey(CurrentActorInfo, &CurrentActivationInfo))
 	{
-	}*/
+		if (!K2_CommitAbility())
+		{
+			K2_EndAbility();
+			return;
+		}
 
-	/*if (!K2_CommitAbility())
-	{
-		K2_EndAbility();
-		return;
+		for (TSubclassOf<UGameplayEffect>& damageEffect : AttackDamages)
+		{
+			FGameplayEffectSpecHandle damageSpec = MakeOutgoingGameplayEffectSpec(damageEffect, GetCurrentAbilitySpec()->Level);
+			ApplyGameplayEffectSpecToTarget(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), damageSpec, Data);
+		}
+		SignalDamageStimuliEvent(Data);
 	}
-
-	for (TSubclassOf<UGameplayEffect>& damageEffect : AttackDamages)
-	{
-		FGameplayEffectSpecHandle damageSpec = MakeOutgoingGameplayEffectSpec(damageEffect, GetCurrentAbilitySpec()->Level);
-		ApplyGameplayEffectSpecToTarget(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), damageSpec, Data);
-	}
-	SignalDamageStimuliEvent(Data);
 
 	const FHitResult* blastLocationHitResult = Data.Get(1)->GetHitResult();
 	if (blastLocationHitResult)
 	{
 		//ExecuteSpawnVFXCue();
 	}
+	UE_LOG(LogTemp, Error, TEXT("Doing Anim"));
 	GetOwningComponentFromActorInfo()->GetAnimInstance()->Montage_Play(CastingMontage);
-	K2_EndAbility();*/
+	K2_EndAbility();
 }
 
 void UGA_DotSpecial::TargetCancelled(const FGameplayAbilityTargetDataHandle& Data)

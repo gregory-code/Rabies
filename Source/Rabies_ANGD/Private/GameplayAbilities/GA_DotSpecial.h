@@ -32,6 +32,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	UAnimMontage* CastingMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
+	TSubclassOf<class ARTargetActor_DotSpecial> targetActorClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TArray<TSubclassOf<class UGameplayEffect>> AttackDamages;

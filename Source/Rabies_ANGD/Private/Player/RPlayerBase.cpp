@@ -145,9 +145,9 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(scopeInputAction, ETriggerEvent::Completed, this, &ARPlayerBase::DisableScoping);
 		enhancedInputComp->BindAction(scrollInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Scroll);
 		enhancedInputComp->BindAction(specialAttackAction, ETriggerEvent::Started, this, &ARPlayerBase::TryActivateSpecialAttack);
-		enhancedInputComp->BindAction(specialAttackAction, ETriggerEvent::Completed, this, &ARPlayerBase::TryActivateSpecialAttack);
+		enhancedInputComp->BindAction(specialAttackAction, ETriggerEvent::Completed, this, &ARPlayerBase::FinishSpecialAttack);
 		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Started, this, &ARPlayerBase::TryActivateUltimateAttack);
-		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Completed, this, &ARPlayerBase::TryActivateUltimateAttack);
+		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Completed, this, &ARPlayerBase::FinishUltimateAttack);
 		enhancedInputComp->BindAction(InteractInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Interact);
 		enhancedInputComp->BindAction(PausingInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Pause);
 		enhancedInputComp->BindAction(LoadDebugInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::LoadDebug);
@@ -315,7 +315,7 @@ void ARPlayerBase::TryActivateSpecialAttack()
 
 void ARPlayerBase::FinishSpecialAttack()
 {
-	//GetAbilitySystemComponent()->InputConfirm();
+	GetAbilitySystemComponent()->InputConfirm();
 }
 
 void ARPlayerBase::TryActivateUltimateAttack()
@@ -325,7 +325,7 @@ void ARPlayerBase::TryActivateUltimateAttack()
 
 void ARPlayerBase::FinishUltimateAttack()
 {
-	//GetAbilitySystemComponent()->InputConfirm();
+	GetAbilitySystemComponent()->InputConfirm();
 
 	//GetAbilitySystemComponent()->InputCancel();
 }
