@@ -21,6 +21,8 @@ public:
 
 	void SetTargettingRange(float newTargettingRange);
 
+	void SetOwningPlayerControler(class ARPlayerController* myController);
+
 	void Tick(float DeltaSecond) override;
 
 	virtual bool IsConfirmTargetingAllowed() override;
@@ -34,6 +36,8 @@ private:
 	class UDecalComponent* TargetDecal;
 
 	float TargettingRange;
+
+	class ARPlayerController* MyPlayerController;
 
 	FHitResult GetPlayerView() const;
 };

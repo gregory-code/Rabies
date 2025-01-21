@@ -41,4 +41,13 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Anim")
 	UAnimMontage* Anim;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	TSubclassOf<class ARDot_SpecialProj> DotProjectile;
+
+	UFUNCTION()
+	void SendOffAttack(FGameplayEventData Payload);
+
+	UPROPERTY()
+	class ARPlayerBase* Player;
 };

@@ -4,6 +4,7 @@
 #include "Targeting/RTargetActor_DotSpecial.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Player/RPlayerController.h"
 #include "Components/SphereComponent.h"
 #include "Components/DecalComponent.h"
 
@@ -36,10 +37,14 @@ void ARTargetActor_DotSpecial::SetTargettingRange(float newTargettingRange)
 	TargettingRange = newTargettingRange;
 }
 
+void ARTargetActor_DotSpecial::SetOwningPlayerControler(class ARPlayerController* myController)
+{
+	MyPlayerController = myController;
+}
+
 void ARTargetActor_DotSpecial::Tick(float DeltaSecond)
 {
 	Super::Tick(DeltaSecond);
-	UE_LOG(LogTemp, Error, TEXT("%s Getting TargetActor"), *GetName());
 	FHitResult playerView = GetPlayerView();
 	if (playerView.bBlockingHit)
 	{
@@ -54,13 +59,17 @@ bool ARTargetActor_DotSpecial::IsConfirmTargetingAllowed()
 
 void ARTargetActor_DotSpecial::ConfirmTargetingAndContinue()
 {
+
+	if (MyPlayerController == nullptr)
+		return;
+
 	TSet<AActor*> currentActorsInRange;
 	TargetSphere->GetOverlappingActors(currentActorsInRange, APawn::StaticClass());
 
 	TArray<AActor*> targets;
 	for (AActor* actorInRange : currentActorsInRange)
 	{
-		if (actorInRange != PrimaryPC->GetPawn())
+		if (actorInRange != MyPlayerController->GetPawn())
 			targets.Add(actorInRange);
 	}
 
@@ -77,24 +86,19 @@ void ARTargetActor_DotSpecial::ConfirmTargetingAndContinue()
 FHitResult ARTargetActor_DotSpecial::GetPlayerView() const
 {
 	FHitResult hitResult;
-	if (HasAuthority())
+	if (MyPlayerController)
 	{
-		if (PrimaryPC)
+		FVector viewLoc;
+		FRotator viewRot;
+
+		MyPlayerController->GetPlayerViewPoint(viewLoc, viewRot);
+		FVector traceEnd = viewLoc + viewRot.Vector() * TargettingRange;
+
+		GetWorld()->LineTraceSingleByChannel(hitResult, viewLoc, traceEnd, ECC_Visibility);
+		if (!hitResult.bBlockingHit)
 		{
-			FVector viewLoc;
-			FRotator viewRot;
-
-			UE_LOG(LogTemp, Error, TEXT("%s Got Primary PC"), *GetName());
-			PrimaryPC->GetPlayerViewPoint(viewLoc, viewRot);
-			FVector traceEnd = viewLoc + viewRot.Vector() * TargettingRange;
-
-			GetWorld()->LineTraceSingleByChannel(hitResult, viewLoc, traceEnd, ECC_Visibility);
-			if (!hitResult.bBlockingHit)
-			{
-				GetWorld()->LineTraceSingleByChannel(hitResult, traceEnd, traceEnd + FVector::DownVector * TargettingRange, ECC_Visibility);
-			}
+			GetWorld()->LineTraceSingleByChannel(hitResult, traceEnd, traceEnd + FVector::DownVector * TargettingRange, ECC_Visibility);
 		}
-
 	}
 	return hitResult;
 }

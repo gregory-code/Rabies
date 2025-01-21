@@ -320,12 +320,14 @@ void ARPlayerBase::FinishSpecialAttack()
 
 void ARPlayerBase::TryActivateUltimateAttack()
 {
-	GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::UltimateAttack);
+	UE_LOG(LogTemp, Warning, TEXT("stopping special attack"));
+	GetAbilitySystemComponent()->InputCancel();
+	//GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::UltimateAttack);
 }
 
 void ARPlayerBase::FinishUltimateAttack()
 {
-	GetAbilitySystemComponent()->InputConfirm();
+	//GetAbilitySystemComponent()->InputConfirm();
 
 	//GetAbilitySystemComponent()->InputCancel();
 }
