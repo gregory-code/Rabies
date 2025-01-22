@@ -41,10 +41,6 @@ AItemPickup::AItemPickup()
 	SphereCollider->SetupAttachment(GetRootComponent());
 	SphereCollider->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
-	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
-	AudioComp->SetupAttachment(GetRootComponent());
-	AudioComp->bAutoActivate = false;
-
 	RootComponent = ItemMesh;
 }
 
@@ -82,12 +78,14 @@ void AItemPickup::PlayerPickupRequest_Implementation(ARPlayerBase* player)
 void AItemPickup::UpdateItemPickedup_Implementation()
 {
 	UE_LOG(LogTemp, Error, TEXT("Player picked up item"));
-	//Need to rework incase the sound gets killed by the item being deleted
-	if (AudioComp && PickupAudio)
+	
+	Player->PickupAudio = ItemAsset->ItemAudio;
+
+	if (Player->PickupAudio)
 	{
-		AudioComp->SetSound(PickupAudio);
-		AudioComp->Play();
+		Player->PlayPickupAudio();
 	}
+
 	//Player->AddItem(ItemAsset);
 	Destroy();
 }

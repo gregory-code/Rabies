@@ -30,5 +30,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	class USoundCue* AbilityAudio;
 
+	UPROPERTY(VisibleAnywhere, Category = "Audio")
+	class UAudioComponent* AudioComp;
+
 
 };

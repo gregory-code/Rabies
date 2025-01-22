@@ -5,7 +5,7 @@
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
 #include "AbilitySystemComponent.h"
-#include "Framework/RGattlingAttackSpeedCalculation.h"
+#include "Framework/CooldownMagnitudeCalculation.h"
 
 float URAbilitySystemBlueprintLibrary::GetAbilityStaticCooldownDuration(const UGameplayAbility* AbilityCDO, UAbilitySystemComponent* OwnerASC)
 {
@@ -19,7 +19,7 @@ float URAbilitySystemBlueprintLibrary::GetAbilityStaticCooldownDuration(const UG
 			const TSubclassOf<UGameplayModMagnitudeCalculation> customClass = cooldownEffect->DurationMagnitude.GetCustomMagnitudeCalculationClass();
 			if (customClass)
 			{
-				URGattlingAttackSpeedCalculation* customModCalc = NewObject<URGattlingAttackSpeedCalculation>(customClass);
+				UCooldownMagnitudeCalculation* customModCalc = NewObject<UCooldownMagnitudeCalculation>(customClass);
 				if (customModCalc)
 				{
 					FGameplayEffectContextHandle EffectContext = OwnerASC->MakeEffectContext();

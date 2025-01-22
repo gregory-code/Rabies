@@ -438,6 +438,14 @@ void ARPlayerBase::SetPausetoFalse()
 	isPaused = false;
 }
 
+void ARPlayerBase::PlayPickupAudio()
+{
+	if (AudioComp && PickupAudio)
+	{
+		AudioComp->Play();
+	}
+}
+
 void ARPlayerBase::ServerSetPlayerReviveState_Implementation(bool state)
 {
 	if (ReviveUI == nullptr)

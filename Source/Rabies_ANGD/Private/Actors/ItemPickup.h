@@ -29,12 +29,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "ChestDetail")
 	class USphereComponent* SphereCollider;
 
-	UPROPERTY(VisibleAnywhere, Category = "Audio")
-	class UAudioComponent* AudioComp;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Audio")
-	class USoundCue* PickupAudio;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Info")
 	UStaticMesh* NullMesh;
 

@@ -291,4 +291,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	class USoundCue* JumpAudio;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	class USoundCue* PickupAudio;
+
+	void PlayPickupAudio();
+
 };

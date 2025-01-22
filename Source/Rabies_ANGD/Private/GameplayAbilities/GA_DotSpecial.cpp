@@ -51,11 +51,11 @@ void UGA_DotSpecial::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 	sendOffAttack->EventReceived.AddDynamic(this, &UGA_DotSpecial::SendOffAttack);
 	sendOffAttack->ReadyForActivation();
 
-	UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargettingMontage);
-	//playTargettingMontageTask->OnBlendOut.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
-	//playTargettingMontageTask->OnInterrupted.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
-	//playTargettingMontageTask->OnCompleted.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
-	//playTargettingMontageTask->OnCancelled.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
+	playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargettingMontage);
+	playTargettingMontageTask->OnBlendOut.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
+	playTargettingMontageTask->OnInterrupted.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
+	playTargettingMontageTask->OnCompleted.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
+	playTargettingMontageTask->OnCancelled.AddDynamic(this, &UGA_DotSpecial::K2_EndAbility);
 	playTargettingMontageTask->ReadyForActivation();
 	//playTargettingMontageTask->Activate();
 
@@ -65,8 +65,8 @@ void UGA_DotSpecial::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 	waitTargetDataTask->ReadyForActivation();
 
 	Player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
-	if (Player == nullptr)
-		return;
+	//if (Player == nullptr)
+	//	return;
 
 	AGameplayAbilityTargetActor* spawnedTargetActor;
 	waitTargetDataTask->BeginSpawningActor(this, targetActorClass, spawnedTargetActor);
@@ -82,6 +82,14 @@ void UGA_DotSpecial::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 
 void UGA_DotSpecial::TargetAquired(const FGameplayAbilityTargetDataHandle& Data)
 {
+	if (playTargettingMontageTask)
+	{
+		playTargettingMontageTask->OnBlendOut.RemoveAll(this);
+		playTargettingMontageTask->OnInterrupted.RemoveAll(this);
+		playTargettingMontageTask->OnCompleted.RemoveAll(this);
+		playTargettingMontageTask->OnCancelled.RemoveAll(this);
+	}
+
 	UE_LOG(LogTemp, Error, TEXT("Target aquired!"));
 	if (HasAuthorityOrPredictionKey(CurrentActorInfo, &CurrentActivationInfo))
 	{
