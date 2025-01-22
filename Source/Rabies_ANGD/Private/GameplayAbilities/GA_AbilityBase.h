@@ -18,6 +18,7 @@ public:
 	UGA_AbilityBase();
 
 	UTexture2D* GetIconTexture() const { return IconTexture; }
+	USoundCue* GetAbilityAudio() const { return AbilityAudio; }
 
 protected:
 	void SignalDamageStimuliEvent(FGameplayAbilityTargetDataHandle TargetHandle);
@@ -25,6 +26,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Visual")
 	UTexture2D* IconTexture;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	class USoundCue* AbilityAudio;
 
 
 };
