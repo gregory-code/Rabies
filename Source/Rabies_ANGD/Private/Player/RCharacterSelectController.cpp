@@ -30,7 +30,6 @@ void ARCharacterSelectController::OnRep_PlayerState()
 	if (IsLocalController() && CharacterSelectUI == nullptr) //maybe also check if they have authority?
 	{
 		CreateCharacterSelectUI();
-		myPlayerID = GetPlayerID();
 	}
 }
 
@@ -56,7 +55,7 @@ void ARCharacterSelectController::BeginPlay()
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 	GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
 
-	for (TActorIterator<ACineCameraActor> It(GetWorld()); It; ++It)
+	/*for (TActorIterator<ACineCameraActor> It(GetWorld()); It; ++It)
 	{
 		CineCamera = *It;
 		break;
@@ -81,7 +80,7 @@ void ARCharacterSelectController::BeginPlay()
 
 		SequencePlayer->Play();
 		SequencePlayer->OnFinished.AddDynamic(this, &ARCharacterSelectController::OnSequenceEnd);
-	}
+	}*/
 
 	GameState = Cast<AEOSGameState>(UGameplayStatics::GetGameState(this));
 	if (!GameState)
@@ -106,21 +105,7 @@ void ARCharacterSelectController::ConfirmCharacterChoice()
 		}
 		return;
 	}
-	playerState->Server_CharacterSelected(CurrentlyHoveredCharacter);
-}
-
-int ARCharacterSelectController::GetPlayerID()
-{
-	for (int i = 0; i < GameState->PlayerArray.Num(); i++)
-	{
-		//AEOSPlayerState* currentPlayer = Cast<AEOSPlayerState>(GameState->PlayerArray[i]);
-		//if (myPlayerID == GameState->PlayerArray[i].)
-		//{
-		//	return i;
-		//}
-	}
-
-	return 1;
+	playerState->Server_IssueCharacterPick_Implementation(CurrentlyHoveredCharacter);
 }
 
 void ARCharacterSelectController::PostPossessionSetup(APawn* NewPawn)
@@ -128,7 +113,6 @@ void ARCharacterSelectController::PostPossessionSetup(APawn* NewPawn)
 	if (IsLocalController() && CharacterSelectUI == nullptr) //maybe also check if they have authority?
 	{
 		CreateCharacterSelectUI();
-		myPlayerID = GetPlayerID();
 	}
 }
 
@@ -154,7 +138,7 @@ void ARCharacterSelectController::CreateCharacterSelectUI()
 
 void ARCharacterSelectController::OnSequenceEnd()
 {
-	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
+	/*ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
 	if (SequencePlayer)
 	{
 		FMovieSceneSequencePlaybackParams playbackParams;
@@ -163,5 +147,5 @@ void ARCharacterSelectController::OnSequenceEnd()
 		SequencePlayer->SetPlaybackPosition(playbackParams);
 
 		//SequencePlayer->OnFinished.AddDynamic(this, &ARMainMenuController::OnSequenceEnd);
-	}
+	}*/
 }

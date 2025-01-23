@@ -33,12 +33,10 @@ public:
 	UFUNCTION()
 	void ConfirmCharacterChoice();
 
-	int GetPlayerID();
-
 private:
-	class ACineCameraActor* CineCamera;
+	//class ACineCameraActor* CineCamera;
 
-	class ALevelSequenceActor* MainMenuSequence;
+	//class ALevelSequenceActor* MainMenuSequence;
 
 	void PostPossessionSetup(APawn* NewPawn);
 
@@ -58,6 +56,4 @@ private:
 
 	UPROPERTY()
 	UCharacterSelect* CharacterSelectUI;
-
-	int myPlayerID;
 };

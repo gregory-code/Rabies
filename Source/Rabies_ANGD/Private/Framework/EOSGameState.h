@@ -19,6 +19,7 @@ class AEOSGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+
 	FOnSessionNameReplicated OnSessionNameReplicated;
 	FOnCharacterSelectionReplicated OnCharacterSelectionReplicated;
 

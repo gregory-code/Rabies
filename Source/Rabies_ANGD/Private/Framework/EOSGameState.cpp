@@ -4,7 +4,6 @@
 #include "Framework/EOSGameState.h"
 #include "Net/UnrealNetwork.h"
 #include "Framework/RCharacterDefination.h"
-#include "Framework/EOSPlayerState.h"
 #include "Player/RCharacterSelectController.h"
 
 void AEOSGameState::BeginPlay()

@@ -55,7 +55,7 @@ void ARMainMenuController::BeginPlay()
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 	GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
 
-	for (TActorIterator<ACineCameraActor> It(GetWorld()); It; ++It)
+	/*for (TActorIterator<ACineCameraActor> It(GetWorld()); It; ++It)
 	{
 		CineCamera = *It;
 		break;
@@ -78,7 +78,7 @@ void ARMainMenuController::BeginPlay()
 		SequencePlayer->SetPlaybackPosition(playbackParams);
 	}
 
-	SetViewTarget(CineCamera);
+	SetViewTarget(CineCamera);*/
 
 	GameState = Cast<AEOSGameState>(UGameplayStatics::GetGameState(this));
 	if (!GameState)
@@ -111,23 +111,6 @@ void ARMainMenuController::ChangeMainMenuState(bool state)
 	}
 }
 
-void ARMainMenuController::ConfirmCharacterChoice()
-{
-	if (!IsLocalPlayerController())
-		return;
-
-	AEOSPlayerState* playerState = Cast<AEOSPlayerState>(PlayerState);
-	if (playerState == nullptr)
-	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No Playerstate was found!"));
-		}
-		return;
-	}
-	playerState->Server_CharacterSelected(CurrentlyHoveredCharacter);
-}
-
 void ARMainMenuController::PostPossessionSetup(APawn* NewPawn)
 {
 
@@ -135,12 +118,12 @@ void ARMainMenuController::PostPossessionSetup(APawn* NewPawn)
 
 void ARMainMenuController::JoinedSession()
 {
-	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
+	/*ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
 	if (SequencePlayer)
 	{
 		SequencePlayer->Play();
 		SequencePlayer->OnFinished.AddDynamic(this, &ARMainMenuController::OnSequenceEnd);
-	}
+	}*/
 }
 
 void ARMainMenuController::CreateMenuUI()
@@ -165,7 +148,7 @@ void ARMainMenuController::CreateMenuUI()
 
 void ARMainMenuController::OnSequenceEnd()
 {
-	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
+	/*ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
 	if (SequencePlayer)
 	{
 		FMovieSceneSequencePlaybackParams playbackParams;
@@ -174,5 +157,5 @@ void ARMainMenuController::OnSequenceEnd()
 		SequencePlayer->SetPlaybackPosition(playbackParams);
 
 		//SequencePlayer->OnFinished.AddDynamic(this, &ARMainMenuController::OnSequenceEnd);
-	}
+	}*/
 }

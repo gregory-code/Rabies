@@ -22,9 +22,6 @@ public:
 	UTexture* CharacterIcon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Character Piece")
-	TSubclassOf<class UAnimInstance> CharacterAnimationInstance;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Character Piece")
 	TSubclassOf<class ACharacter> CharacterClass;
 
 	USkeletalMesh* GetMesh() const;

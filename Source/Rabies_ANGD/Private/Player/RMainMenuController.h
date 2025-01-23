@@ -35,14 +35,11 @@ public:
 	UFUNCTION()
 	void ChangeMainMenuState(bool state);
 
-	UFUNCTION()
-	void ConfirmCharacterChoice();
-
 
 private:
-	class ACineCameraActor* CineCamera;
+	//class ACineCameraActor* CineCamera;
 
-	class ALevelSequenceActor* MainMenuSequence;
+	//class ALevelSequenceActor* MainMenuSequence;
 
 	void PostPossessionSetup(APawn* NewPawn);
 
