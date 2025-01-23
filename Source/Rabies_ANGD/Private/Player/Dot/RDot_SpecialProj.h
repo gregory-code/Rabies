@@ -18,6 +18,10 @@ private:
 	void HitCharacter(class ARCharacterBase* usingCharacter, class ARCharacterBase* hitCharacter, bool isEnemy, int hitNumber);
 
 	TArray<TSubclassOf<class UGameplayEffect>> EffectsToApply;
+
+	TArray<class ARCharacterBase*> AlreadyHitCharacters;
+
+	void ApplyEffect(int whichEffect, ARCharacterBase* usingCharacter, ARCharacterBase* hitCharacter);
 	
 public:
 	void Init(TArray<TSubclassOf<class UGameplayEffect>> effectsToApply);

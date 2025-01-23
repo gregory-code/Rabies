@@ -25,24 +25,43 @@
 
 void ARDot_SpecialProj::HitCharacter(ARCharacterBase* usingCharacter, ARCharacterBase* hitCharacter, bool isEnemy, int hitNumber)
 {
+	for (ARCharacterBase* character : AlreadyHitCharacters)
+	{
+		if (hitCharacter == character)
+			return;
+	}
+
+	AlreadyHitCharacters.Add(hitCharacter);
+
 	if (isEnemy == false)
+	{
+		ApplyEffect(2, usingCharacter, hitCharacter);
+
 		return;
+	}
 
 	for (TSubclassOf<UGameplayEffect>& damageEffect : EffectsToApply)
 	{
-		FGameplayEventData Payload = FGameplayEventData();
-
-		FGameplayEffectContextHandle contextHandle = usingCharacter->GetAbilitySystemComponent()->MakeEffectContext();
-		FGameplayEffectSpecHandle effectSpechandle = usingCharacter->GetAbilitySystemComponent()->MakeOutgoingSpec(damageEffect, 1.0f, contextHandle);
-
-		FGameplayEffectSpec* spec = effectSpechandle.Data.Get();
-		if (spec)
-		{
-			hitCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
-
-			UAISense_Damage::ReportDamageEvent(this, hitCharacter, usingCharacter, 1, hitCharacter->GetActorLocation(), hitCharacter->GetActorLocation());
-		}
 	
+	}
+	ApplyEffect(0, usingCharacter, hitCharacter);
+	ApplyEffect(1, usingCharacter, hitCharacter);
+}
+
+void ARDot_SpecialProj::ApplyEffect(int whichEffect, ARCharacterBase* usingCharacter, ARCharacterBase* hitCharacter)
+{
+	FGameplayEventData Payload = FGameplayEventData();
+
+	FGameplayEffectContextHandle contextHandle = usingCharacter->GetAbilitySystemComponent()->MakeEffectContext();
+	FGameplayEffectSpecHandle effectSpechandle = usingCharacter->GetAbilitySystemComponent()->MakeOutgoingSpec(EffectsToApply[whichEffect], 1.0f, contextHandle);
+
+	FGameplayEffectSpec* spec = effectSpechandle.Data.Get();
+	if (spec)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Damaging Target"));
+		hitCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+
+		UAISense_Damage::ReportDamageEvent(this, hitCharacter, usingCharacter, 1, hitCharacter->GetActorLocation(), hitCharacter->GetActorLocation());
 	}
 }
 

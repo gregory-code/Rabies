@@ -21,7 +21,7 @@ public:
 	virtual float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attribute")
-	float BaseMagnitude = 0.25f;
+	float BaseShootingSpeed = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attribute")
 	bool rangedCooldown;

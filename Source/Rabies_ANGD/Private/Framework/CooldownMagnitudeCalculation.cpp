@@ -9,7 +9,7 @@
 
 float UCooldownMagnitudeCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
-    float ShootingSpeed = BaseMagnitude;
+    float baseSpeed = 1.0f;
 
     const UAbilitySystemComponent* SourceASC = Spec.GetContext().GetOriginalInstigatorAbilitySystemComponent();
 
@@ -17,23 +17,25 @@ float UCooldownMagnitudeCalculation::CalculateBaseMagnitude_Implementation(const
     if (SourceASC)
     {
         // Get the instigator’s strength attribute
-        float rangedAttackSpeed = 1.0;
+        float modifiedSpeed = SourceASC->GetNumericAttributeBase(URAttributeSet::GetRangedAttackCooldownReductionAttribute());
 
         if(meleeCooldown)
-            SourceASC->GetNumericAttributeBase(URAttributeSet::GetMeleeAttackCooldownReductionAttribute());
+            modifiedSpeed = SourceASC->GetNumericAttributeBase(URAttributeSet::GetMeleeAttackCooldownReductionAttribute());
 
         if(rangedCooldown)
-            SourceASC->GetNumericAttributeBase(URAttributeSet::GetRangedAttackCooldownReductionAttribute());
+            modifiedSpeed = SourceASC->GetNumericAttributeBase(URAttributeSet::GetRangedAttackCooldownReductionAttribute());
 
         if (specialCooldown)
-            SourceASC->GetNumericAttributeBase(URAttributeSet::GetAbilityCooldownReductionAttribute());
+            modifiedSpeed = SourceASC->GetNumericAttributeBase(URAttributeSet::GetAbilityCooldownReductionAttribute());
 
         if (ultimateCooldown)
-            SourceASC->GetNumericAttributeBase(URAttributeSet::GetUltimateCooldownReductionAttribute());
+            modifiedSpeed = SourceASC->GetNumericAttributeBase(URAttributeSet::GetUltimateCooldownReductionAttribute());
 
-        ShootingSpeed *= rangedAttackSpeed;
-        ShootingSpeed = FMath::Max(ShootingSpeed, 0.1f); // Ensure the result is not 0
+        baseSpeed *= modifiedSpeed;
+        UE_LOG(LogTemp, Warning, TEXT("%f Base Magnitude "), baseSpeed);
+
+        modifiedSpeed = FMath::Max(baseSpeed, 0.1f); // Ensure the result is not 0
     }
 
-    return ShootingSpeed;
+    return baseSpeed;
 }

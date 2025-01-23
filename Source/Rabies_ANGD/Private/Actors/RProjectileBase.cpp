@@ -111,12 +111,18 @@ void ARProjectileBase::Tick(float DeltaTime)
 
 void ARProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Error, TEXT("%s Hit Target"), *OverlappedComponent->GetName());
+	//UE_LOG(LogTemp, Error, TEXT("%s Hit Target"), *OverlappedComponent->GetName());
 	ARCharacterBase* hitCharacter = Cast<ARCharacterBase>(OtherActor);
 	if (!hitCharacter)
 	{
 		return;
 	}
+
+	if (!OwnedPlayer)
+		return;
+
+	if (!OwnedPlayer->HasAuthority())
+		return;
 
 	bool isEnemy = false;
 

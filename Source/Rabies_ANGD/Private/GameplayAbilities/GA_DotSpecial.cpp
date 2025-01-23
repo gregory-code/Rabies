@@ -89,7 +89,7 @@ void UGA_DotSpecial::TargetAquired(const FGameplayAbilityTargetDataHandle& Data)
 		playTargettingMontageTask->OnCancelled.RemoveAll(this);
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("Target aquired!"));
+	//UE_LOG(LogTemp, Error, TEXT("Target aquired!"));
 	if (HasAuthorityOrPredictionKey(CurrentActorInfo, &CurrentActivationInfo))
 	{
 		if (!K2_CommitAbility())
@@ -133,7 +133,7 @@ void UGA_DotSpecial::TargetCancelled(const FGameplayAbilityTargetDataHandle& Dat
 
 void UGA_DotSpecial::SendOffAttack(FGameplayEventData Payload)
 {
-	UE_LOG(LogTemp, Error, TEXT("Sending Attack"));
+	//UE_LOG(LogTemp, Error, TEXT("Sending Attack"));
 	FVector viewLoc;
 	FRotator viewRot;
 
