@@ -37,7 +37,7 @@ public:
 
 
 private:
-	//class ACineCameraActor* CineCamera;
+	class ACineCameraActor* CineCamera;
 
 	//class ALevelSequenceActor* MainMenuSequence;
 
@@ -63,4 +63,21 @@ private:
 	class AEOSGameState* GameState;
 
 	int myPlayerID;
+
+	void EnableLights(UWorld* world, FName Tag);
+
+	void EnableBacklights();
+
+	FTimerHandle BacklightTimerHandle;
+
+	void EnableFrontlights();
+
+	FTimerHandle FrontlightTimerHandle;
+
+	void EnableComputer();
+
+	FTimerHandle FinalTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "ComputerMaterial")
+	UMaterialInterface* ComputerMaterial;
 };

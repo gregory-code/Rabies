@@ -55,13 +55,14 @@ void ARCharacterSelectController::BeginPlay()
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 	GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
 
-	/*for (TActorIterator<ACineCameraActor> It(GetWorld()); It; ++It)
+	for (TActorIterator<ACineCameraActor> It(GetWorld()); It; ++It)
 	{
 		CineCamera = *It;
+		SetViewTarget(CineCamera);
 		break;
 	}
 
-	for (TActorIterator<ALevelSequenceActor> It(GetWorld()); It; ++It)
+	/*for (TActorIterator<ALevelSequenceActor> It(GetWorld()); It; ++It)
 	{
 		MainMenuSequence = *It;
 		break;
@@ -70,7 +71,6 @@ void ARCharacterSelectController::BeginPlay()
 	if (!CineCamera || !MainMenuSequence)
 		return;
 
-	SetViewTarget(CineCamera);
 	ULevelSequencePlayer* SequencePlayer = MainMenuSequence->GetSequencePlayer();
 	if (SequencePlayer)
 	{
