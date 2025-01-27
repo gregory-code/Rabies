@@ -19,6 +19,11 @@ void AEOSPlayerState::OnRep_PickedCharacter()
 	OnPickedCharacterReplicated.Broadcast(PickedCharacter);
 }
 
+URCharacterDefination* AEOSPlayerState::GetCharacterDefination() const
+{
+	return PickedCharacter;
+}
+
 void AEOSPlayerState::Server_IssueCharacterPick_Implementation(URCharacterDefination* newPickedCharacterDefination)
 {
 	if (newPickedCharacterDefination == PickedCharacter)
@@ -36,6 +41,15 @@ void AEOSPlayerState::Server_IssueCharacterPick_Implementation(URCharacterDefina
 bool AEOSPlayerState::Server_IssueCharacterPick_Validate(URCharacterDefination* newPickedCharacterDefination)
 {
 	return true;
+}
+
+void AEOSPlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Copied Updated Character"));
+	AEOSPlayerState* NewPlayerState = Cast<AEOSPlayerState>(PlayerState);
+	NewPlayerState->PickedCharacter = PickedCharacter;
 }
 
 AEOSPlayerState::AEOSPlayerState()

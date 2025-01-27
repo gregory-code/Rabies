@@ -57,6 +57,7 @@ void AClipboard::SetClipboardInfo(URCharacterDefination* Character)
 
 void AClipboard::SetNewCharacter(URCharacterDefination* Character)
 {
+	GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
 	MoveClipboard(ClipboardPosHidden, ClipboardRotHidden);
 	if (Character)
 	{
@@ -75,9 +76,12 @@ void AClipboard::FinishNewCharacter()
 void AClipboard::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 	infoWidget = Cast<UClipboardInfo>(InteractWidgetComp->GetUserWidgetObject());
 	infoWidget->SetVisibility(ESlateVisibility::Visible);
+
+	SetNewCharacter(DefaultCharacter);
 }
 
 // Called every frame

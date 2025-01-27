@@ -7,6 +7,7 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
+#include "Player/RCharacterSelectController.h"
 #include "Algo/Sort.h"
 #include "EOSGameState.h"
 #include "EOSGameInstance.h"
@@ -61,5 +62,6 @@ URCharacterDefination* ARCharacterSelectMode::NextCharacter()
 
     CagedCharacters[0]->TickPosition(ShownCage, Sideline, false);
 
+    Cast<ARCharacterSelectController>(GetWorld()->GetFirstPlayerController())->SetCurrentlyHoveredCharacter(CagedCharacters[0]->Character);
     return CagedCharacters[0]->Character;
 }

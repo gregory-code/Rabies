@@ -33,6 +33,9 @@ public:
 	UFUNCTION()
 	void ConfirmCharacterChoice();
 
+	UFUNCTION()
+	void SetCurrentlyHoveredCharacter(class URCharacterDefination* currentlyHoveredCharacter);
+
 private:
 	class ACineCameraActor* CineCamera;
 
@@ -45,7 +48,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UCharacterSelect> CharacterSelectUIClass;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "Character")
 	class URCharacterDefination* CurrentlyHoveredCharacter;
 
 	UFUNCTION()

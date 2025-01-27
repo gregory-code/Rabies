@@ -14,6 +14,9 @@ class AClipboard : public AActor
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Clipboard Detail")
+	class URCharacterDefination* DefaultCharacter;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Clipboard Detail")
 	FVector ClipboardPosShown;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Clipboard Detail")

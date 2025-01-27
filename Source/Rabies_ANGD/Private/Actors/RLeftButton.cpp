@@ -8,9 +8,9 @@
 
 void ARLeftButton::OnActorClicked(AActor* TouchedActor, FKey ButtonPressed)
 {
-	if (GEngine)
+	if (GEngine && CharacterSelectController)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("LeftButton clicked!"));
+		CharacterSelectController->ConfirmCharacterChoice();
 	}
 }
 

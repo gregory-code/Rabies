@@ -106,6 +106,12 @@ void ARCharacterSelectController::ConfirmCharacterChoice()
 		return;
 	}
 	playerState->Server_IssueCharacterPick_Implementation(CurrentlyHoveredCharacter);
+	GameState->ReadyUp();
+}
+
+void ARCharacterSelectController::SetCurrentlyHoveredCharacter(URCharacterDefination* currentlyHoveredCharacter)
+{
+	CurrentlyHoveredCharacter = currentlyHoveredCharacter;
 }
 
 void ARCharacterSelectController::PostPossessionSetup(APawn* NewPawn)

@@ -18,7 +18,7 @@ class AEOSPlayerState : public APlayerState
 	// Character select
 
 private:
-	UPROPERTY(replicatedUsing = OnRep_PickedCharacter)
+	UPROPERTY(replicatedUsing = OnRep_PickedCharacter, VisibleAnywhere, Category = "Character")
 	class URCharacterDefination* PickedCharacter;
 
 	UFUNCTION()
@@ -27,8 +27,16 @@ private:
 public:
 	FOnPickedCharacterReplicated OnPickedCharacterReplicated;
 
+	UFUNCTION()
+	class URCharacterDefination* GetCharacterDefination() const;
+	 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_IssueCharacterPick(class URCharacterDefination* newPickedCharacterDefination);
+
+
+	/** Copy properties which need to be saved in inactive PlayerState */
+	virtual void CopyProperties(APlayerState* PlayerState) override;
+
 
 public:
 	// Gameplay
