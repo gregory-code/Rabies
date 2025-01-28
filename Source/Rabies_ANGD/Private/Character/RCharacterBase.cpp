@@ -65,6 +65,7 @@ ARCharacterBase::ARCharacterBase()
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetFlyingTag()).AddUObject(this, &ARCharacterBase::FlyingTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetTakeOffDelayTag()).AddUObject(this, &ARCharacterBase::TakeOffDelayTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetHoldingJump()).AddUObject(this, &ARCharacterBase::HoldingJumpTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetMeleeAttackingTag()).AddUObject(this, &ARCharacterBase::MeleeAttackingTagChanged);
 
 	HealthBarWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Status Widget Comp");
 	HealthBarWidgetComp->SetupAttachment(GetRootComponent());
@@ -295,6 +296,12 @@ void ARCharacterBase::HoldingJumpTagChanged(const FGameplayTag TagChanged, int32
 {
 	bHoldingJump = NewStackCount != 0;
 	HoldingJumpTagChanged(bHoldingJump);
+}
+
+void ARCharacterBase::MeleeAttackingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
+{
+	bMeleeAttacking = NewStackCount != 0;
+	MeleeAttackingTagChanged(bMeleeAttacking);
 }
 
 void ARCharacterBase::LevelUpdated(const FOnAttributeChangeData& ChangeData)

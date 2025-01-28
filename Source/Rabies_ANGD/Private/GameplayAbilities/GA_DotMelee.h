@@ -27,6 +27,15 @@ private:
 	UFUNCTION()
 	void DotSuperZoom();
 
+	UFUNCTION()
+	void DotFall();
+
+	UFUNCTION()
+	void DotRise();
+
+	UFUNCTION()
+	void ApplyEffect(float value);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> AttackDamage;
 
@@ -39,5 +48,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> MeleePushClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<class UGameplayEffect> GravityClass;
+
+	FActiveGameplayEffectHandle GravityFallEffectHandle;
+
 	FTimerHandle ZoomTimerHandle;
+	FTimerHandle FallTimerHandle;
+	FTimerHandle RiseTimerHandle;
 };
