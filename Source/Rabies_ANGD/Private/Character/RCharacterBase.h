@@ -165,6 +165,7 @@ private:
 	void MaxHealthUpdated(const FOnAttributeChangeData& ChangeData);
 	void MovementSpeedUpdated(const FOnAttributeChangeData& ChangeData);
 	void GravityUpdated(const FOnAttributeChangeData& ChangeData);
+	void ForwardSpeedUpdated(const FOnAttributeChangeData& ChangeData);
 
 	FHitResult hitResult;
 

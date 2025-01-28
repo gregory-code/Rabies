@@ -59,6 +59,7 @@ ARCharacterBase::ARCharacterBase()
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &ARCharacterBase::MaxHealthUpdated);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetMovementSpeedAttribute()).AddUObject(this, &ARCharacterBase::MovementSpeedUpdated);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetGravityAttribute()).AddUObject(this, &ARCharacterBase::GravityUpdated);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetForwardSpeedAttribute()).AddUObject(this, &ARCharacterBase::ForwardSpeedUpdated);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetScopingTag()).AddUObject(this, &ARCharacterBase::ScopingTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetDeadTag()).AddUObject(this, &ARCharacterBase::DeathTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetFlyingTag()).AddUObject(this, &ARCharacterBase::FlyingTagChanged);
@@ -445,6 +446,32 @@ void ARCharacterBase::GravityUpdated(const FOnAttributeChangeData& ChangeData)
 	}
 
 	GetCharacterMovement()->GravityScale = ChangeData.NewValue;
+}
+
+void ARCharacterBase::ForwardSpeedUpdated(const FOnAttributeChangeData& ChangeData)
+{
+	if (!AttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s NO ATTRIBUTE SET"), *GetName());
+		return;
+	}
+
+	if (ChangeData.NewValue == 0)
+	{
+		FVector currentVelocity = GetCharacterMovement()->Velocity;
+		FVector force = (-currentVelocity) * 0.9f;
+
+		GetCharacterMovement()->AddImpulse(force, true);
+	}
+	else
+	{
+		FRotator viewRot = GetActorRotation();
+
+		FVector forwardDirection = viewRot.Vector();
+		FVector force = forwardDirection * ChangeData.NewValue;
+
+		GetCharacterMovement()->AddImpulse(force, true);
+	}
 }
 
 void ARCharacterBase::LevelUpUpgrade(int level, bool setLevel)
