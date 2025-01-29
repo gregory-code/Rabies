@@ -13,6 +13,7 @@
 #include "LevelSequenceActor.h"
 #include "CineCameraActor.h"
 #include "LevelSequence.h"
+#include "Net/UnrealNetwork.h"
 #include "LevelSequenceCameraSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/GameStateBase.h"
@@ -92,7 +93,10 @@ void ARCharacterSelectController::BeginPlay()
 void ARCharacterSelectController::ConfirmCharacterChoice()
 {
 	if (!IsLocalPlayerController())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Is Not local player"));
 		return;
+	}
 
 	AEOSPlayerState* playerState = Cast<AEOSPlayerState>(PlayerState);
 	if (playerState == nullptr)
@@ -103,13 +107,35 @@ void ARCharacterSelectController::ConfirmCharacterChoice()
 		}
 		return;
 	}
-	playerState->Server_IssueCharacterPick_Implementation(CurrentlyHoveredCharacter);
-	GameState->ReadyUp();
+
+	ServerRequestButtonClick(playerState);
+}
+
+void ARCharacterSelectController::NextCharacter()
+{
+	if (!IsLocalPlayerController())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Is Not local player"));
+		return;
+	}
+
+	ServerRequestNextClick();
 }
 
 void ARCharacterSelectController::SetCurrentlyHoveredCharacter(URCharacterDefination* currentlyHoveredCharacter)
 {
 	CurrentlyHoveredCharacter = currentlyHoveredCharacter;
+}
+
+void ARCharacterSelectController::ServerRequestButtonClick_Implementation(AEOSPlayerState* requrestingPlayerState)
+{
+	requrestingPlayerState->Server_IssueCharacterPick_Implementation(CurrentlyHoveredCharacter);
+	GameState->Server_ReadyUp();
+}
+
+void ARCharacterSelectController::ServerRequestNextClick_Implementation()
+{
+	GameState->Server_NextCharacter();
 }
 
 void ARCharacterSelectController::GetCameraView()

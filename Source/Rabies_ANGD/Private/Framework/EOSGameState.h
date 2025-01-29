@@ -34,10 +34,19 @@ public:
 
 	URCharacterDefination* GetDefinationFromIndex(int index);
 
-	UFUNCTION(NetMulticast, Reliable) // this function calls on both server and client if it's called from the server.
-	void ReadyUp();
+	UFUNCTION(BlueprintCallable, Server, Reliable) // this function calls on both server and client if it's called from the server.
+	void Server_ReadyUp();
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable) // this function calls on both server and client if it's called from the server.
+	void Server_NextCharacter();
+
+	UFUNCTION()
+	URCharacterDefination* NextCharacter();
 	
 private:
+
+	class AClipboard* Clipboard;
+
 	UFUNCTION(NetMulticast, Reliable) // this function calls on both server and client if it's called from the server.
 	void LoadMapAndListen();
 
@@ -69,6 +78,22 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> GameLevel;
+
+private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "CagedCharacter")
+	FVector ShownCage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "CagedCharacter")
+	FVector OffScreen;
+
+	UPROPERTY(EditDefaultsOnly, Category = "CagedCharacter")
+	FVector Sideline;
+
+	UPROPERTY(VisibleAnywhere, Category = "CagedCharacter")
+	TArray<class ACagedCharacter*> CagedCharacters;
+
+	void GetCagedCharacters();
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;

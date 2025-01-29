@@ -34,9 +34,19 @@ public:
 	void ConfirmCharacterChoice();
 
 	UFUNCTION()
+	void NextCharacter();
+
+	UFUNCTION()
 	void SetCurrentlyHoveredCharacter(class URCharacterDefination* currentlyHoveredCharacter);
 
 private:
+
+	UFUNCTION(Server, Reliable)
+	void ServerRequestButtonClick(class AEOSPlayerState* requrestingPlayerState);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRequestNextClick();
+
 	void GetCameraView();
 
 	class ACineCameraActor* CineCamera;

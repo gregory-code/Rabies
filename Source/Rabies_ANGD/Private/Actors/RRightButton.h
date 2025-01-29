@@ -27,7 +27,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Convayer")
 	UMaterialInstanceDynamic* DynamicConveyerMaterialInstance;  // The dynamic material instance
 
-	class ARCharacterSelectMode* GameMode;
+	class AEOSGameState* GameState;
 
 	class AClipboard* Clipboard;
 	
