@@ -53,7 +53,7 @@ void UGA_DotMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	ARPlayerBase* character = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
 	float currentGravity = character->GetCharacterMovement()->GravityScale;
 
-	UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, character->IsFlying() ? FlyingAttackAnim : FlyingAttackAnim);
+	UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, character->IsFlying() ? FlyingAttackAnim : MeleeAttackAnim);
 	playTargettingMontageTask->OnBlendOut.AddDynamic(this, &UGA_DotMelee::K2_EndAbility);
 	playTargettingMontageTask->OnInterrupted.AddDynamic(this, &UGA_DotMelee::K2_EndAbility);
 	playTargettingMontageTask->OnCompleted.AddDynamic(this, &UGA_DotMelee::K2_EndAbility);
@@ -64,15 +64,28 @@ void UGA_DotMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	pushSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), 0.0f);
 	ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, pushSpec);
 
-	UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
-	WaitForDamage->EventReceived.AddDynamic(this, &UGA_DotMelee::HandleDamage);
-	WaitForDamage->ReadyForActivation();
+	if (character->IsFlying())
+	{
+		UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
+		WaitForDamage->EventReceived.AddDynamic(this, &UGA_DotMelee::HandleDamage);
+		WaitForDamage->ReadyForActivation();
 
-	ApplyEffect(-4.0f);
+		ApplyEffect(-4.0f);
 
-	GetWorld()->GetTimerManager().SetTimer(ZoomTimerHandle, this, &UGA_DotMelee::DotSuperZoom, 0.5f, false);
-	GetWorld()->GetTimerManager().SetTimer(FallTimerHandle, this, &UGA_DotMelee::DotFall, 0.3f, false);
-	GetWorld()->GetTimerManager().SetTimer(RiseTimerHandle, this, &UGA_DotMelee::DotRise, 0.9f, false);
+		GetWorld()->GetTimerManager().SetTimer(ZoomTimerHandle, this, &UGA_DotMelee::DotSuperZoom, 0.5f, false);
+		GetWorld()->GetTimerManager().SetTimer(FallTimerHandle, this, &UGA_DotMelee::DotFall, 0.3f, false);
+		GetWorld()->GetTimerManager().SetTimer(RiseTimerHandle, this, &UGA_DotMelee::DotRise, 0.9f, false);
+	}
+	else
+	{
+		UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
+		WaitForDamage->EventReceived.AddDynamic(this, &UGA_DotMelee::HandleEnemyPush);
+		WaitForDamage->ReadyForActivation();
+
+	}
+
+	TriggerAudioCue();
+
 }
 
 void UGA_DotMelee::HandleDamage(FGameplayEventData Payload)
@@ -82,7 +95,21 @@ void UGA_DotMelee::HandleDamage(FGameplayEventData Payload)
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(AttackDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
 		SignalDamageStimuliEvent(Payload.TargetData);
+	}
+}
 
+void UGA_DotMelee::HandleEnemyPush(FGameplayEventData Payload)
+{
+	if (K2_HasAuthority())
+	{
+		FGameplayEffectSpecHandle fallSpec = MakeOutgoingGameplayEffectSpec(GravityClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+		fallSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), -20000.0f);
+		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, fallSpec, Payload.TargetData);
+
+		FGameplayEffectSpecHandle pushSpec = MakeOutgoingGameplayEffectSpec(MeleePushClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+		pushSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), -10000.0f);
+		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, pushSpec, Payload.TargetData);
+		SignalDamageStimuliEvent(Payload.TargetData);
 	}
 }
 

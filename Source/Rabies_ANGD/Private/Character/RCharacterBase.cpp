@@ -342,6 +342,22 @@ void ARCharacterBase::NextLevelExpUpdated(const FOnAttributeChangeData& ChangeDa
 	}
 }
 
+void ARCharacterBase::HitSpecialAttack_Implementation(ARCharacterBase* hitCharacter)
+{
+	if (HasAuthority())
+	{
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("%s Hit special"), *GetName());
+	FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(IVBagEffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+
+	FGameplayEffectSpec* spec = specHandle.Data.Get();
+	if (spec)
+	{
+		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+	}
+}
+
 void ARCharacterBase::LevelUp(int carryOverEXP) // Handles the player level up
 {
 	if (LevelUpEffect && GetAbilitySystemComponent())

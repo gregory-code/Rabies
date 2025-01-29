@@ -25,6 +25,9 @@ private:
 	void HandleDamage(FGameplayEventData Payload);
 
 	UFUNCTION()
+	void HandleEnemyPush(FGameplayEventData Payload);
+
+	UFUNCTION()
 	void DotSuperZoom();
 
 	UFUNCTION()

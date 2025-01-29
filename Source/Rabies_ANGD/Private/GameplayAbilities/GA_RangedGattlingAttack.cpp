@@ -91,6 +91,8 @@ void UGA_RangedGattlingAttack::Fire(FGameplayEventData Payload)
 
 				//ApplyCooldown(cooldownHandle, actorInfo, activationInfo);
 				Player->Hitscan(4000, Player->GetPlayerBaseState());
+
+				StartDurationAudioEffect();
 			}
 		}
 	}

@@ -60,6 +60,7 @@ void ARDot_SpecialProj::ApplyEffect(int whichEffect, ARCharacterBase* usingChara
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Damaging Target"));
 		hitCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+		usingCharacter->HitSpecialAttack(hitCharacter);
 
 		UAISense_Damage::ReportDamageEvent(this, hitCharacter, usingCharacter, 1, hitCharacter->GetActorLocation(), hitCharacter->GetActorLocation());
 	}

@@ -101,6 +101,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Death")
 	UAnimMontage* ReviveMontage;
 
+public:
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void HitSpecialAttack(ARCharacterBase* hitCharacter);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	TSubclassOf<UGameplayEffect> IVBagEffect;
+
 private:
 	bool bHasDied;
 
