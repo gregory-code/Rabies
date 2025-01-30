@@ -377,6 +377,7 @@ void ARCharacterBase::HitMeleeAttack(ARCharacterBase* hitCharacter)
 		return;
 
 	CheckHardhat();
+	CheckNails(hitCharacter);
 	DealtDamage(hitCharacter);
 }
 
@@ -411,6 +412,28 @@ void ARCharacterBase::CheckHardhat()
 		UE_LOG(LogTemp, Error, TEXT("%s Healed from melee attack!"), *GetName());
 		spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), meleeStrength * lifesteal);
 		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+	}
+}
+
+void ARCharacterBase::CheckNails(ARCharacterBase* hitCharacter)
+{
+	bool bFound = false;
+	float nailsChance = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetNailsEffectChanceAttribute(), bFound);
+
+	if (bFound == false || nailsChance <= 0)
+		return;
+
+	float randomApplyChance = FMath::RandRange(0, 100);
+	UE_LOG(LogTemp, Error, TEXT("%f% Trying to inflict got %f"), nailsChance, randomApplyChance);
+	if (nailsChance >= randomApplyChance)
+	{
+		FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(NailsEfffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+
+		FGameplayEffectSpec* spec = specHandle.Data.Get();
+		if (spec)
+		{
+			hitCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+		}
 	}
 }
 

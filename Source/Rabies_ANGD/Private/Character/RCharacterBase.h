@@ -121,6 +121,9 @@ public:
 	UFUNCTION()
 	void CheckHardhat();
 
+	UFUNCTION()
+	void CheckNails(ARCharacterBase* hitCharacter);
+
 	UFUNCTION(Server, Reliable)
 	void CheckFriendShipBracelet();
 
@@ -140,6 +143,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TSubclassOf<UGameplayEffect> LifestealEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	TSubclassOf<UGameplayEffect> NailsEfffect;
 
 private:
 	bool bHasDied;
