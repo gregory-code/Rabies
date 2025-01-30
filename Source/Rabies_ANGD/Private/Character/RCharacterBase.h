@@ -102,11 +102,24 @@ public:
 	UAnimMontage* ReviveMontage;
 
 public:
+
+	UFUNCTION()
+	void DealtDamage(ARCharacterBase* hitCharacter);
+
 	UFUNCTION()
 	void HitSpecialAttack(ARCharacterBase* hitCharacter);
 
 	UFUNCTION()
+	void HitRangedAttack(ARCharacterBase* hitCharacter);
+
+	UFUNCTION()
+	void HitMeleeAttack(ARCharacterBase* hitCharacter);
+
+	UFUNCTION()
 	void CheckIVBag();
+
+	UFUNCTION()
+	void CheckHardhat();
 
 	UFUNCTION(Server, Reliable)
 	void CheckFriendShipBracelet();
@@ -116,11 +129,17 @@ public:
 	UFUNCTION()
 	void HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEffect, bool IVBag);
 
+	UFUNCTION(Server, Reliable)
+	void LaunchBozo(FVector launchVelocity);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TSubclassOf<UGameplayEffect> IVBagEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TSubclassOf<UGameplayEffect> FriendShipEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	TSubclassOf<UGameplayEffect> LifestealEffect;
 
 private:
 	bool bHasDied;

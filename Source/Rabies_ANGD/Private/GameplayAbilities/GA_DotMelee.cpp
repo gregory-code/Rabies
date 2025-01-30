@@ -8,6 +8,8 @@
 #include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
+#include "GameplayAbilities/RAbilitySystemComponent.h"
+#include "GameplayAbilities/RAttributeSet.h"
 
 #include "Player/RPlayerBase.h"
 
@@ -50,10 +52,10 @@ void UGA_DotMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	ARPlayerBase* character = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
-	float currentGravity = character->GetCharacterMovement()->GravityScale;
+	Player = Cast<ARPlayerBase>(GetOwningActorFromActorInfo());
+	//float currentGravity = Player->GetCharacterMovement()->GravityScale;
 
-	UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, character->IsFlying() ? FlyingAttackAnim : MeleeAttackAnim);
+	UAbilityTask_PlayMontageAndWait* playTargettingMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Player->IsFlying() ? FlyingAttackAnim : MeleeAttackAnim);
 	playTargettingMontageTask->OnBlendOut.AddDynamic(this, &UGA_DotMelee::K2_EndAbility);
 	playTargettingMontageTask->OnInterrupted.AddDynamic(this, &UGA_DotMelee::K2_EndAbility);
 	playTargettingMontageTask->OnCompleted.AddDynamic(this, &UGA_DotMelee::K2_EndAbility);
@@ -64,7 +66,7 @@ void UGA_DotMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	pushSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), 0.0f);
 	ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, pushSpec);
 
-	if (character->IsFlying())
+	if (Player->IsFlying())
 	{
 		UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
 		WaitForDamage->EventReceived.AddDynamic(this, &UGA_DotMelee::HandleDamage);
@@ -95,6 +97,26 @@ void UGA_DotMelee::HandleDamage(FGameplayEventData Payload)
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(AttackDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
 		SignalDamageStimuliEvent(Payload.TargetData);
+
+		for (int32 i = 0; i < Payload.TargetData.Num(); ++i)
+		{
+			const FGameplayAbilityTargetData* Data = Payload.TargetData.Get(i);
+			if (Data)
+			{
+				const TArray<TWeakObjectPtr<AActor>> Actors = Data->GetActors();
+				for (const TWeakObjectPtr<AActor>& WeakActorPtr : Actors)
+				{
+					if (WeakActorPtr.IsValid())
+					{
+						ARCharacterBase* hitCharacter = Cast<ARCharacterBase>(WeakActorPtr.Get());
+						if (hitCharacter)
+						{
+							Player->HitMeleeAttack(hitCharacter);
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -102,14 +124,34 @@ void UGA_DotMelee::HandleEnemyPush(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		FGameplayEffectSpecHandle fallSpec = MakeOutgoingGameplayEffectSpec(GravityClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-		fallSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), -20000.0f);
-		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, fallSpec, Payload.TargetData);
+		bool bFound = false;
+		float strength =  Player->GetAbilitySystemComponent()->GetGameplayAttributeValue(URAttributeSet::GetMeleeAttackStrengthAttribute(), bFound);
 
-		FGameplayEffectSpecHandle pushSpec = MakeOutgoingGameplayEffectSpec(MeleePushClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-		pushSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), -10000.0f);
-		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, pushSpec, Payload.TargetData);
-		SignalDamageStimuliEvent(Payload.TargetData);
+		if (bFound == false)
+			return;
+
+		for (int32 i = 0; i < Payload.TargetData.Num(); ++i)
+		{
+			const FGameplayAbilityTargetData* Data = Payload.TargetData.Get(i);
+			if (Data)
+			{
+				const TArray<TWeakObjectPtr<AActor>> Actors = Data->GetActors();
+				for (const TWeakObjectPtr<AActor>& WeakActorPtr : Actors)
+				{
+					if (WeakActorPtr.IsValid())
+					{
+						ARCharacterBase* hitCharacter = Cast<ARCharacterBase>(WeakActorPtr.Get());
+						if (hitCharacter)
+						{
+							FVector LaunchVelocity = Player->GetActorForwardVector() * (strength * 200.f);  // Adjust strength as needed
+							LaunchVelocity.Z += (strength * 20.0);
+							hitCharacter->LaunchBozo(LaunchVelocity);
+							SignalDamageStimuliEvent(Payload.TargetData);
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -117,8 +159,8 @@ void UGA_DotMelee::DotSuperZoom()
 {
 
 	// FOR TESTING SELF DAMAGE
-	FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(AttackDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-	ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
+	//FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(AttackDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+	//ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec);
 
 	FGameplayEffectSpecHandle pushSpec = MakeOutgoingGameplayEffectSpec(MeleePushClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 	pushSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), 1000.0f);

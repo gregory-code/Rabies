@@ -349,12 +349,35 @@ void ARCharacterBase::NextLevelExpUpdated(const FOnAttributeChangeData& ChangeDa
 	}
 }
 
+void ARCharacterBase::DealtDamage(ARCharacterBase* hitCharacter)
+{
+
+}
+
 void ARCharacterBase::HitSpecialAttack(ARCharacterBase* hitCharacter)
 {
 	if (HasAuthority() == false)
 		return;
 
 	CheckIVBag();
+	DealtDamage(hitCharacter);
+}
+
+void ARCharacterBase::HitRangedAttack(ARCharacterBase* hitCharacter)
+{
+	if (HasAuthority() == false)
+		return;
+
+	DealtDamage(hitCharacter);
+}
+
+void ARCharacterBase::HitMeleeAttack(ARCharacterBase* hitCharacter)
+{
+	if (HasAuthority() == false)
+		return;
+
+	CheckHardhat();
+	DealtDamage(hitCharacter);
 }
 
 void ARCharacterBase::CheckFriendShipBracelet_Implementation()
@@ -362,6 +385,32 @@ void ARCharacterBase::CheckFriendShipBracelet_Implementation()
 	if (HasAuthority())
 	{
 		HealingRadiusEffect(FriendShipEffect, false);
+	}
+}
+
+void ARCharacterBase::CheckIVBag()
+{
+	HealingRadiusEffect(IVBagEffect, true);
+}
+
+void ARCharacterBase::CheckHardhat()
+{
+	bool bFoundLifeSteal = false;
+	bool bFoundMeleeStrength = false;
+	float lifesteal = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetBasicAttackLifestealAttribute(), bFoundLifeSteal);
+	float meleeStrength = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetMeleeAttackStrengthAttribute(), bFoundMeleeStrength);
+
+	if (bFoundLifeSteal == false || bFoundMeleeStrength == 0 || lifesteal <= 0)
+		return;
+
+	FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(LifestealEffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+
+	FGameplayEffectSpec* spec = specHandle.Data.Get();
+	if (spec)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s Healed from melee attack!"), *GetName());
+		spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), meleeStrength * lifesteal);
+		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
 	}
 }
 
@@ -420,11 +469,6 @@ void ARCharacterBase::HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEf
 			GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
 		}
 	}
-}
-
-void ARCharacterBase::CheckIVBag()
-{
-	HealingRadiusEffect(IVBagEffect, true);
 }
 
 void ARCharacterBase::LevelUp(int carryOverEXP) // Handles the player level up
@@ -563,6 +607,15 @@ void ARCharacterBase::ForwardSpeedUpdated(const FOnAttributeChangeData& ChangeDa
 		FVector force = forwardDirection * ChangeData.NewValue;
 
 		GetCharacterMovement()->AddImpulse(force, true);
+	}
+}
+
+void ARCharacterBase::LaunchBozo_Implementation(FVector launchVelocity)
+{
+	if (HasAuthority())
+	{
+		LaunchCharacter(launchVelocity, true, true);
+		//GetCharacterMovement()->Launch(launchVelocity);
 	}
 }
 

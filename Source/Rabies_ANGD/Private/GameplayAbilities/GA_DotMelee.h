@@ -39,6 +39,9 @@ private:
 	UFUNCTION()
 	void ApplyEffect(float value);
 
+	UPROPERTY()
+	class ARPlayerBase* Player;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> AttackDamage;
 
