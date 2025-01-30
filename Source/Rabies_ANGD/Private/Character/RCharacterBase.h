@@ -102,11 +102,25 @@ public:
 	UAnimMontage* ReviveMontage;
 
 public:
-	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	UFUNCTION()
 	void HitSpecialAttack(ARCharacterBase* hitCharacter);
+
+	UFUNCTION()
+	void CheckIVBag();
+
+	UFUNCTION(Server, Reliable)
+	void CheckFriendShipBracelet();
+
+	FTimerHandle FriendshipBraceletTimer;
+
+	UFUNCTION()
+	void HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEffect, bool IVBag);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TSubclassOf<UGameplayEffect> IVBagEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	TSubclassOf<UGameplayEffect> FriendShipEffect;
 
 private:
 	bool bHasDied;
@@ -229,5 +243,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
 	float RangedStrengthOnLevelUp = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
+	float SpeicalStrengthOnLevelUp = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
+	float UltimateStrengthOnLevelUp = 1;
 
 };

@@ -9,7 +9,11 @@
 
 #include "Framework/RGameMode.h"
 
+#include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/Character.h"
 #include "Framework/EOSActionGameState.h"
+
+#include "Player/RPlayerBase.h"
 
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAttributeSet.h"
@@ -122,6 +126,9 @@ void ARCharacterBase::PossessedBy(AController* NewController)
 
 	if (HasAuthority() && Controller && Controller->IsPlayerController())
 	{
+		GetWorldTimerManager().SetTimer(FriendshipBraceletTimer,this,&ARCharacterBase::CheckFriendShipBracelet, 0.5f,  true );
+		// THIS IS FOR HEALING BRACLET, AND WILL WORK FOREVER IF YOU ARE FAINTED
+
 		APlayerController* OwningPlayerController = Cast<APlayerController>(Controller);
 		// Find the ID
 
@@ -342,20 +349,82 @@ void ARCharacterBase::NextLevelExpUpdated(const FOnAttributeChangeData& ChangeDa
 	}
 }
 
-void ARCharacterBase::HitSpecialAttack_Implementation(ARCharacterBase* hitCharacter)
+void ARCharacterBase::HitSpecialAttack(ARCharacterBase* hitCharacter)
+{
+	if (HasAuthority() == false)
+		return;
+
+	CheckIVBag();
+}
+
+void ARCharacterBase::CheckFriendShipBracelet_Implementation()
 {
 	if (HasAuthority())
 	{
+		HealingRadiusEffect(FriendShipEffect, false);
 	}
+}
 
-	UE_LOG(LogTemp, Error, TEXT("%s Hit special"), *GetName());
-	FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(IVBagEffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+void ARCharacterBase::HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEffect, bool IVBag)
+{
+	bool bFound = false;
+	float healingRadius = (IVBag) ? AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetAbilityHealingRadiusAttribute(), bFound) : AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetFriendshipHealingRadiusAttribute(), bFound);
 
-	FGameplayEffectSpec* spec = specHandle.Data.Get();
-	if (spec)
+	if (bFound == false || healingRadius == 0)
+		return;
+
+	TArray<FOverlapResult> OverlappingResults;
+
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(healingRadius);
+	FCollisionQueryParams QueryParams;
+	if (IVBag == false)
 	{
-		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+		QueryParams.AddIgnoredActor(this); // Ignore self
 	}
+
+	DrawDebugSphere(GetWorld(), GetActorLocation(), healingRadius, 32, FColor::Green, false, 2.0f);
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(OverlappingResults, GetActorLocation(), FQuat::Identity, ECC_Pawn, Sphere, QueryParams);
+
+	TArray<ARPlayerBase*> alreadyHealedPlayers;
+	bool foundFriend = false;
+
+	for (const FOverlapResult& result : OverlappingResults)
+	{
+		ARPlayerBase* player = Cast<ARPlayerBase>(result.GetActor());
+		if (player)
+		{
+			if (alreadyHealedPlayers.Contains(player) == false)
+			{
+				foundFriend = true;
+
+				FGameplayEffectSpecHandle specHandle = player->GetAbilitySystemComponent()->MakeOutgoingSpec(healingEffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+
+				FGameplayEffectSpec* spec = specHandle.Data.Get();
+				if (spec)
+				{
+					alreadyHealedPlayers.Add(player);
+					player->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+				}
+			}
+		}
+	}
+
+	if (IVBag == false && foundFriend)
+	{
+		FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(healingEffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+
+		FGameplayEffectSpec* spec = specHandle.Data.Get();
+		if (spec)
+		{
+			GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+		}
+	}
+}
+
+void ARCharacterBase::CheckIVBag()
+{
+	HealingRadiusEffect(IVBagEffect, true);
 }
 
 void ARCharacterBase::LevelUp(int carryOverEXP) // Handles the player level up
@@ -513,6 +582,8 @@ void ARCharacterBase::LevelUpUpgrade(int level, bool setLevel)
 			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetHealthTag(), HealthOnLevelUp * levelScale);
 			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMeleeAttackStrengthTag(), MeleeStrengthOnLevelUp * levelScale);
 			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetRangedAttackStrengthTag(), RangedStrengthOnLevelUp * levelScale);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetSpecialStrengthTag(), SpeicalStrengthOnLevelUp * levelScale);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetUltimateStrengthTag(), UltimateStrengthOnLevelUp * levelScale);
 		}
 		else
 		{
@@ -521,6 +592,8 @@ void ARCharacterBase::LevelUpUpgrade(int level, bool setLevel)
 			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetHealthTag(), HealthOnLevelUp);
 			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetMeleeAttackStrengthTag(), MeleeStrengthOnLevelUp);
 			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetRangedAttackStrengthTag(), RangedStrengthOnLevelUp);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetSpecialStrengthTag(), SpeicalStrengthOnLevelUp);
+			spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetUltimateStrengthTag(), UltimateStrengthOnLevelUp);
 		}
 
 		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
