@@ -14,6 +14,7 @@
 #include "Framework/EOSActionGameState.h"
 
 #include "Player/RPlayerBase.h"
+#include "Enemy/REnemyBase.h"
 
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAttributeSet.h"
@@ -368,6 +369,7 @@ void ARCharacterBase::HitRangedAttack(ARCharacterBase* hitCharacter)
 	if (HasAuthority() == false)
 		return;
 
+	CheckRadio(hitCharacter);
 	DealtDamage(hitCharacter);
 }
 
@@ -424,7 +426,7 @@ void ARCharacterBase::CheckNails(ARCharacterBase* hitCharacter)
 		return;
 
 	float randomApplyChance = FMath::RandRange(0, 100);
-	UE_LOG(LogTemp, Error, TEXT("%f% Trying to inflict got %f"), nailsChance, randomApplyChance);
+	//UE_LOG(LogTemp, Error, TEXT("%f% Trying to inflict got %f"), nailsChance, randomApplyChance);
 	if (nailsChance >= randomApplyChance)
 	{
 		FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(NailsEfffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
@@ -433,6 +435,58 @@ void ARCharacterBase::CheckNails(ARCharacterBase* hitCharacter)
 		if (spec)
 		{
 			hitCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+		}
+	}
+}
+
+void ARCharacterBase::CheckRadio(ARCharacterBase* hitCharacter)
+{
+	
+	bool bFoundHealth = false;
+	float health = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetHealthAttribute(), bFoundHealth);
+
+	if (bFoundHealth == false)
+		return;
+
+	if (health > 0)
+		return;
+
+	bool bFoundRadioEffect = false; // this is used for radius instead of effect
+	bool bFoundRadioStrength = false; // this is used for radius instead of effect
+	float radioEffect = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetRadioEffectChanceAttribute(), bFoundRadioEffect);
+	float radioStrength = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetRadioEffectStrengthAttribute(), bFoundRadioStrength);
+
+	if (bFoundRadioEffect == false || bFoundRadioStrength == false)
+		return;
+
+	TArray<FOverlapResult> OverlappingResults;
+
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(bFoundRadioEffect);
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	DrawDebugSphere(GetWorld(), hitCharacter->GetActorLocation(), bFoundRadioEffect, 32, FColor::Red, false, 2.0f);
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(OverlappingResults, hitCharacter->GetActorLocation(), FQuat::Identity, ECC_Pawn, Sphere, QueryParams);
+
+	TArray<AREnemyBase*> alreadyDamaged;
+
+	for (const FOverlapResult& result : OverlappingResults)
+	{
+		AREnemyBase* enemy = Cast<AREnemyBase>(result.GetActor());
+		if (enemy)
+		{
+			if (alreadyDamaged.Contains(enemy) == false)
+			{
+				FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(RadioEfffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+
+				FGameplayEffectSpec* spec = specHandle.Data.Get();
+				if (spec)
+				{
+					alreadyDamaged.Add(enemy);
+					enemy->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+				}
+			}
 		}
 	}
 }

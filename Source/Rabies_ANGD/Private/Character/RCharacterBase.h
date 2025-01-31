@@ -124,6 +124,9 @@ public:
 	UFUNCTION()
 	void CheckNails(ARCharacterBase* hitCharacter);
 
+	UFUNCTION()
+	void CheckRadio(ARCharacterBase* hitCharacter);
+
 	UFUNCTION(Server, Reliable)
 	void CheckFriendShipBracelet();
 
@@ -146,6 +149,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TSubclassOf<UGameplayEffect> NailsEfffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	TSubclassOf<UGameplayEffect> RadioEfffect;
 
 private:
 	bool bHasDied;
