@@ -127,6 +127,9 @@ public:
 	UFUNCTION()
 	void CheckRadio(ARCharacterBase* hitCharacter);
 
+	UFUNCTION()
+	void CheckRadioDelay(AREnemyBase* hitCharacter);
+
 	UFUNCTION(Server, Reliable)
 	void CheckFriendShipBracelet();
 
@@ -152,6 +155,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TSubclassOf<UGameplayEffect> RadioEfffect;
+
+	FTimerHandle RadioDelayTimer;
 
 private:
 	bool bHasDied;

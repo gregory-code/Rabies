@@ -443,7 +443,7 @@ void ARCharacterBase::CheckRadio(ARCharacterBase* hitCharacter)
 {
 	
 	bool bFoundHealth = false;
-	float health = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetHealthAttribute(), bFoundHealth);
+	float health = hitCharacter->GetAbilitySystemComponent()->GetGameplayAttributeValue(URAttributeSet::GetHealthAttribute(), bFoundHealth);
 
 	if (bFoundHealth == false)
 		return;
@@ -452,20 +452,22 @@ void ARCharacterBase::CheckRadio(ARCharacterBase* hitCharacter)
 		return;
 
 	bool bFoundRadioEffect = false; // this is used for radius instead of effect
-	bool bFoundRadioStrength = false; // this is used for radius instead of effect
 	float radioEffect = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetRadioEffectChanceAttribute(), bFoundRadioEffect);
-	float radioStrength = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetRadioEffectStrengthAttribute(), bFoundRadioStrength);
 
-	if (bFoundRadioEffect == false || bFoundRadioStrength == false)
+	if (bFoundRadioEffect == false)
+		return;
+
+
+	if (radioEffect <= 0)
 		return;
 
 	TArray<FOverlapResult> OverlappingResults;
 
-	FCollisionShape Sphere = FCollisionShape::MakeSphere(bFoundRadioEffect);
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(radioEffect);
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
+	QueryParams.AddIgnoredActor(hitCharacter);
 
-	DrawDebugSphere(GetWorld(), hitCharacter->GetActorLocation(), bFoundRadioEffect, 32, FColor::Red, false, 2.0f);
+	DrawDebugSphere(GetWorld(), hitCharacter->GetActorLocation(), radioEffect, 32, FColor::Red, false, 2.0f);
 
 	bool bHit = GetWorld()->OverlapMultiByChannel(OverlappingResults, hitCharacter->GetActorLocation(), FQuat::Identity, ECC_Pawn, Sphere, QueryParams);
 
@@ -476,7 +478,10 @@ void ARCharacterBase::CheckRadio(ARCharacterBase* hitCharacter)
 		AREnemyBase* enemy = Cast<AREnemyBase>(result.GetActor());
 		if (enemy)
 		{
-			if (alreadyDamaged.Contains(enemy) == false)
+			bool bNewFoundHealth = false;
+			float newEnemyhealth = enemy->GetAbilitySystemComponent()->GetGameplayAttributeValue(URAttributeSet::GetHealthAttribute(), bNewFoundHealth);
+
+			if (alreadyDamaged.Contains(enemy) == false && newEnemyhealth > 0)
 			{
 				FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(RadioEfffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
 
@@ -485,10 +490,17 @@ void ARCharacterBase::CheckRadio(ARCharacterBase* hitCharacter)
 				{
 					alreadyDamaged.Add(enemy);
 					enemy->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+					RadioDelayTimer = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ARCharacterBase::CheckRadioDelay, enemy));
+					//GetWorldTimerManager().SetTimer(RadioDelayTimer, this, &ARCharacterBase::CheckRadioDelay, 0.2f, enemy);
 				}
 			}
 		}
 	}
+}
+
+void ARCharacterBase::CheckRadioDelay(AREnemyBase* hitCharacter)
+{
+	CheckRadio(hitCharacter);
 }
 
 void ARCharacterBase::HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEffect, bool IVBag)
