@@ -3,6 +3,7 @@
 
 #include "Framework/AnimNotifyState_Attack.h"
 #include "Framework/RAttackingBoxComponent.h"
+#include "Framework/RPushBoxComponent.h"
 
 
 void UAnimNotifyState_Attack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
@@ -11,11 +12,19 @@ void UAnimNotifyState_Attack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 
 	const AActor* OwnerActor = MeshComp->GetOwner();
 	AttackingBoxComponent = OwnerActor->GetComponentByClass<URAttackingBoxComponent>();
-	if (AttackingBoxComponent)
+	PushBoxComponent = OwnerActor->GetComponentByClass<URPushBoxComponent>();
+	if (AttackingBoxComponent && bIsPush == false)
 	{
 		AttackingBoxComponent->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachSocket);
 		AttackingBoxComponent->StartDetection();
 		AttackingBoxComponent->DoAttackCheck();
 		AttackingBoxComponent->EndDetection();
+	}
+	else if (PushBoxComponent)
+	{
+		PushBoxComponent->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachSocket);
+		PushBoxComponent->StartDetection();
+		PushBoxComponent->DoAttackCheck();
+		PushBoxComponent->EndDetection();
 	}
 }

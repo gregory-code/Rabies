@@ -20,6 +20,8 @@
 #include "GameplayAbilities/RAttributeSet.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
 
+#include "Framework/RPushBoxComponent.h"
+
 #include "Framework/EOSPlayerState.h"
 
 #include "Math/Color.h"
@@ -77,6 +79,9 @@ ARCharacterBase::ARCharacterBase()
 
 	AttackingBoxComponent = CreateDefaultSubobject<URAttackingBoxComponent>("Attacking Box Component");
 	AttackingBoxComponent->SetupAttachment(GetMesh());
+
+	PushingBoxComponent = CreateDefaultSubobject<URPushBoxComponent>("Pushing Box Component");
+	PushingBoxComponent->SetupAttachment(GetMesh());
 
 	PrimaryActorTick.bRunOnAnyThread = false; // prevents crash??
 }
@@ -703,6 +708,11 @@ void ARCharacterBase::LaunchBozo_Implementation(FVector launchVelocity)
 {
 	if (HasAuthority())
 	{
+		GetCharacterMovement()->StopMovementImmediately();
+		
+		FVector NewLocation = GetActorLocation() + FVector(0, 0, 100);
+		SetActorLocation(NewLocation, true);
+
 		LaunchCharacter(launchVelocity, true, true);
 		//GetCharacterMovement()->Launch(launchVelocity);
 	}

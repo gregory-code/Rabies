@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RCharacterSelectController.generated.h"
 
+class URCharacterDefination;
 class AEOSPlayerState;
 /**
  * 
@@ -34,18 +35,38 @@ public:
 	void ConfirmCharacterChoice();
 
 	UFUNCTION()
-	void NextCharacter();
+	void NextCharacter(class ARRightButton* rightButton);
 
 	UFUNCTION()
-	void SetCurrentlyHoveredCharacter(class URCharacterDefination* currentlyHoveredCharacter);
+	void GetNextCharacterCage();
 
 private:
 
-	UFUNCTION(Server, Reliable)
-	void ServerRequestButtonClick(class AEOSPlayerState* requrestingPlayerState);
+	class ARRightButton* RightButton;
+
+	UFUNCTION()
+	void EnableClickButton();
+
+	FTimerHandle DelayTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Convayer")
+	UMaterial* ConveyerMaterial;  // The base material reference in the editor
+
+	UPROPERTY(VisibleAnywhere, Category = "Convayer")
+	UMaterialInstanceDynamic* DynamicConveyerMaterialInstance;  // The dynamic material instance
+
+	UFUNCTION()
+	void HoveredCharacterIndexChange(int newIndex);
+
+	class AEOSPlayerState* MyPlayerState;
+
+	class AClipboard* Clipboard;
 
 	UFUNCTION(Server, Reliable)
-	void ServerRequestNextClick();
+	void ServerRequestButtonClick(AEOSPlayerState* requestingPlayerState);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRequestNextClick(AEOSPlayerState* requestingPlayerState);
 
 	void GetCameraView();
 
@@ -60,9 +81,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UCharacterSelect> CharacterSelectUIClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "Character")
-	class URCharacterDefination* CurrentlyHoveredCharacter;
-
 	UFUNCTION()
 	void OnSequenceEnd();
 
@@ -70,5 +88,21 @@ private:
 	class AEOSGameState* GameState;
 
 	UPROPERTY()
-	UCharacterSelect* CharacterSelectUI;
+	class UCharacterSelect* CharacterSelectUI;
+
+private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "CagedCharacter")
+	FVector ShownCage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "CagedCharacter")
+	FVector OffScreen;
+
+	UPROPERTY(EditDefaultsOnly, Category = "CagedCharacter")
+	FVector Sideline;
+
+	UPROPERTY(VisibleAnywhere, Category = "CagedCharacter")
+	TArray<class ACagedCharacter*> CagedCharacters;
+
+	void GetCagedCharacters();
 };

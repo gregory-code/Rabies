@@ -15,17 +15,8 @@ class ARRightButton : public ARPhysicalButtonBase
 	GENERATED_BODY()
 
 private:
-	FTimerHandle DelayTimerHandle;
 
 	bool bPressDelay;
-
-	void DelayTimer();
-
-	UPROPERTY(EditDefaultsOnly, Category = "Convayer")
-	UMaterial* ConveyerMaterial;  // The base material reference in the editor
-	
-	UPROPERTY(VisibleAnywhere, Category = "Convayer")
-	UMaterialInstanceDynamic* DynamicConveyerMaterialInstance;  // The dynamic material instance
 
 	class AEOSGameState* GameState;
 
@@ -33,6 +24,9 @@ private:
 	
 public:
 	void OnActorClicked(AActor* TouchedActor, FKey ButtonPressed);
+
+	UFUNCTION()
+	void EnableClick();
 
 protected:
 	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;

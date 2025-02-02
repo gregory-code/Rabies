@@ -19,6 +19,12 @@ class UAnimNotifyState_Attack : public UAnimNotify
 	UPROPERTY(EditAnywhere, Category = "Attacking")
 	FName AttachSocket;
 
+	UPROPERTY(EditAnywhere, Category = "Attacking")
+	bool bIsPush;
+
 	UPROPERTY()
 	class URAttackingBoxComponent* AttackingBoxComponent;
+
+	UPROPERTY()
+	class URPushBoxComponent* PushBoxComponent;
 };

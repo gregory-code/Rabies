@@ -11,15 +11,11 @@
 #include "Framework/EOSGameState.h"
 #include "GameFramework/Actor.h"
 
-void ARRightButton::DelayTimer()
+void ARRightButton::EnableClick()
 {
 	SetLight(true);
 	bPressDelay = false;
 
-	if (DynamicConveyerMaterialInstance)
-	{
-		DynamicConveyerMaterialInstance->SetVectorParameterValue(FName("Scroll"), FVector(0.0f, 0.0f, 0.0f));
-	}
 }
 
 void ARRightButton::OnActorClicked(AActor* TouchedActor, FKey ButtonPressed)
@@ -33,14 +29,7 @@ void ARRightButton::OnActorClicked(AActor* TouchedActor, FKey ButtonPressed)
 			SetLight(false);
 			bPressDelay = true;
 
-			if (DynamicConveyerMaterialInstance)
-			{
-				DynamicConveyerMaterialInstance->SetVectorParameterValue(FName("Scroll"), FVector(0.2f, 0.0f, 0.0f));
-			}
-
-			GetWorld()->GetTimerManager().SetTimer(DelayTimerHandle, this, &ARRightButton::DelayTimer, 1.3f, false);
-			Clipboard->SetNewCharacter(GameState->NextCharacter());
-			//CharacterSelectController->NextCharacter();
+			CharacterSelectController->NextCharacter(this);
 		}
 		else
 		{
@@ -61,16 +50,6 @@ void ARRightButton::BeginPlay()
 	CharacterSelectController = Cast<ARCharacterSelectController>(GetWorld()->GetFirstPlayerController());
 
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Conveyer"), FoundActors);
-	for (int i = 0; i < FoundActors.Num(); i++)
-	{
-		UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(FoundActors[i]->GetComponentByClass(UStaticMeshComponent::StaticClass()));
-		DynamicConveyerMaterialInstance = UMaterialInstanceDynamic::Create(ConveyerMaterial, MeshComponent);
-		if (DynamicConveyerMaterialInstance)
-		{
-			MeshComponent->SetMaterial(1, DynamicConveyerMaterialInstance);
-		}
-	}
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AClipboard::StaticClass(), FoundActors);
 

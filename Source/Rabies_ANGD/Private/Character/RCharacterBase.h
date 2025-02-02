@@ -166,6 +166,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attacking")
 	class URAttackingBoxComponent* AttackingBoxComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Attacking")
+	class URPushBoxComponent* PushingBoxComponent;
+
 	void PlayMontage(UAnimMontage* MontageToPlay);
 
 	void StartDeath();

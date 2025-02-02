@@ -62,12 +62,14 @@ void UGA_DotMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	playTargettingMontageTask->OnCancelled.AddDynamic(this, &UGA_DotMelee::K2_EndAbility);
 	playTargettingMontageTask->ReadyForActivation();
 
-	FGameplayEffectSpecHandle pushSpec = MakeOutgoingGameplayEffectSpec(MeleePushClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-	pushSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), 0.0f);
-	ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, pushSpec);
-
 	if (Player->IsFlying())
 	{
+		bDealDamage = true;
+
+		FGameplayEffectSpecHandle pushSpec = MakeOutgoingGameplayEffectSpec(MeleePushClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+		pushSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), 0.0f);
+		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, pushSpec);
+
 		UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
 		WaitForDamage->EventReceived.AddDynamic(this, &UGA_DotMelee::HandleDamage);
 		WaitForDamage->ReadyForActivation();
@@ -80,9 +82,11 @@ void UGA_DotMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	}
 	else
 	{
-		UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
-		WaitForDamage->EventReceived.AddDynamic(this, &UGA_DotMelee::HandleEnemyPush);
-		WaitForDamage->ReadyForActivation();
+		bDealDamage = false;
+
+		UAbilityTask_WaitGameplayEvent* WaitForPush = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetExpTag());
+		WaitForPush->EventReceived.AddDynamic(this, &UGA_DotMelee::HandleEnemyPush);
+		WaitForPush->ReadyForActivation();
 
 	}
 
@@ -92,7 +96,7 @@ void UGA_DotMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 
 void UGA_DotMelee::HandleDamage(FGameplayEventData Payload)
 {
-	if (K2_HasAuthority())
+	if (K2_HasAuthority() && bDealDamage)
 	{
 		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(AttackDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
@@ -143,8 +147,8 @@ void UGA_DotMelee::HandleEnemyPush(FGameplayEventData Payload)
 						ARCharacterBase* hitCharacter = Cast<ARCharacterBase>(WeakActorPtr.Get());
 						if (hitCharacter)
 						{
-							FVector LaunchVelocity = Player->GetActorForwardVector() * (strength * 200.f);  // Adjust strength as needed
-							LaunchVelocity.Z += (strength * 20.0);
+							FVector LaunchVelocity = Player->GetActorForwardVector() * (1500.f + (strength * 60.0));  // Adjust strength as needed
+							LaunchVelocity.Z += (400.0f + (strength * 30));
 							hitCharacter->LaunchBozo(LaunchVelocity);
 							SignalDamageStimuliEvent(Payload.TargetData);
 						}
