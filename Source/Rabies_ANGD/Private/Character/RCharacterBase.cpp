@@ -69,6 +69,7 @@ ARCharacterBase::ARCharacterBase()
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(URAttributeSet::GetForwardSpeedAttribute()).AddUObject(this, &ARCharacterBase::ForwardSpeedUpdated);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetScopingTag()).AddUObject(this, &ARCharacterBase::ScopingTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetDeadTag()).AddUObject(this, &ARCharacterBase::DeathTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetTaserTag()).AddUObject(this, &ARCharacterBase::TaserTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetFlyingTag()).AddUObject(this, &ARCharacterBase::FlyingTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetTakeOffDelayTag()).AddUObject(this, &ARCharacterBase::TakeOffDelayTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetHoldingJump()).AddUObject(this, &ARCharacterBase::HoldingJumpTagChanged);
@@ -287,6 +288,18 @@ void ARCharacterBase::DeathTagChanged(const FGameplayTag TagChanged, int32 NewSt
 	}
 }
 
+void ARCharacterBase::TaserTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
+{
+	if (NewStackCount == 1) // for getting stunned
+	{
+		//UE_LOG(LogTemp, Error, TEXT("%s Got stunned"), *GetName());
+	}
+	else if (NewStackCount == 0)
+	{
+		//UE_LOG(LogTemp, Error, TEXT("%s not stunned"), *GetName());
+	}
+}
+
 void ARCharacterBase::ScopingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
 {
 	bIsScoping = NewStackCount != 0;
@@ -366,6 +379,7 @@ void ARCharacterBase::HitSpecialAttack(ARCharacterBase* hitCharacter)
 		return;
 
 	CheckIVBag();
+	CheckTaser(hitCharacter);
 	DealtDamage(hitCharacter);
 }
 
@@ -399,6 +413,28 @@ void ARCharacterBase::CheckFriendShipBracelet_Implementation()
 void ARCharacterBase::CheckIVBag()
 {
 	HealingRadiusEffect(IVBagEffect, true);
+}
+
+void ARCharacterBase::CheckTaser(ARCharacterBase* hitCharacter)
+{
+	bool bFound = false;
+	float taserChance = AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetTaserStunChanceAttribute(), bFound);
+
+	if (bFound == false || taserChance <= 0)
+		return;
+
+	float randomApplyChance = FMath::RandRange(0, 100);
+	//UE_LOG(LogTemp, Error, TEXT("%f% Trying to inflict got %f"), nailsChance, randomApplyChance);
+	if (taserChance >= randomApplyChance)
+	{
+		FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(TaserEffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+
+		FGameplayEffectSpec* spec = specHandle.Data.Get();
+		if (spec)
+		{
+			hitCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+		}
+	}
 }
 
 void ARCharacterBase::CheckHardhat()
