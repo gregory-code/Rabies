@@ -187,7 +187,7 @@ void UGA_DotUltimate::SendOffAttack(FGameplayEventData Payload)
 
 			Player->Hitscan(40000, Player->GetPlayerBaseState());
 
-			StartDurationAudioEffect();
+			//StartDurationAudioEffect();
 		}
 	}
 }
@@ -202,7 +202,7 @@ void UGA_DotUltimate::SendOffFinalAttack(FGameplayEventData Payload)
 
 			Player->Hitscan(40000, Player->GetPlayerBaseState());
 
-			StartDurationAudioEffect();
+			//StartDurationAudioEffect();
 		}
 	}
 }

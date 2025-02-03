@@ -44,7 +44,7 @@ ARTargetActor_DotUltimate::ARTargetActor_DotUltimate()
 void ARTargetActor_DotUltimate::SetOwningPlayerControler(class ARPlayerBase* myPlayer)
 {
     MyPlayer = myPlayer;
-    GetWorldTimerManager().SetTimer(DamageTimer, this, &ARTargetActor_DotUltimate::CheckDamage, 0.2f, true);
+    GetWorldTimerManager().SetTimer(DamageTimer, this, &ARTargetActor_DotUltimate::CheckDamage, 0.05f, true);
 }
 
 void ARTargetActor_DotUltimate::SetDamageEffects(TSubclassOf<class UGameplayEffect> attackDamage)
@@ -72,8 +72,7 @@ void ARTargetActor_DotUltimate::CheckDamage()
     QueryParams.AddIgnoredActor(MyPlayer);
 
     bool bHit = GetWorld()->OverlapMultiByChannel(OverlapResults, GetActorLocation(), CapsuleRotation, ECC_PhysicsBody, FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight), QueryParams);
-
-    DrawDebugCapsule(GetWorld(), GetActorLocation(), CapsuleHalfHeight, CapsuleRadius, CapsuleRotation, FColor::Blue, false, 0.3f);
+    DrawDebugCapsule(GetWorld(), GetActorLocation(), CapsuleHalfHeight, CapsuleRadius, CapsuleRotation, FColor::Blue, false, 0.1f);
     for (const FOverlapResult& Result : OverlapResults)
     {
         if (Result.GetActor())
@@ -87,6 +86,7 @@ void ARTargetActor_DotUltimate::CheckDamage()
             FGameplayEffectSpec* spec = specHandle.Data.Get();
             if (spec)
             {
+                UE_LOG(LogTemp, Error, TEXT("%s Damaging Enemy"), *GetName());
                 potentialEnemy->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
             }
         }
@@ -96,11 +96,13 @@ void ARTargetActor_DotUltimate::CheckDamage()
 
 void ARTargetActor_DotUltimate::SetBetweenTwoPoints_Implementation(const FVector& start, const FVector& end, bool bigLaser)
 {
-    FVector Midpoint = (start + (end)) * 0.5f;
+    FVector adjustedEnd = end + ((end - start) * .5f);
 
-    FVector Direction = (end - start);
+    FVector Direction = (adjustedEnd - start);
+    FVector Midpoint = (start + (adjustedEnd)) * 0.5f;
+
     float Length = Direction.Size();
-    FRotator Rotation = UKismetMathLibrary::MakeRotFromZ(Direction);
+    FRotator Rotation = UKismetMathLibrary::MakeRotFromZ((end - start));
 
     SetActorLocation(Midpoint);
     SetActorRotation(Rotation);

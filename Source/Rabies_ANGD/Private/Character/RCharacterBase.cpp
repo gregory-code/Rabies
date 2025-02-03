@@ -233,7 +233,7 @@ void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState
 
 void ARCharacterBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end, bool enemy)
 {
-	FString actorName = hitActor->GetName();
+	//FString actorName = hitActor->GetName();
 	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
 	//DrawDebugLine(GetWorld(), start, end, FColor::Green);
 	FColor debugColor = (enemy) ? FColor::Red : FColor::Green ;
