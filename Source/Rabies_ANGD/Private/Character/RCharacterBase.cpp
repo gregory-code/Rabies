@@ -546,6 +546,7 @@ void ARCharacterBase::CheckRadioDelay(AREnemyBase* hitCharacter)
 
 void ARCharacterBase::HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEffect, bool IVBag)
 {
+
 	bool bFound = false;
 	float healingRadius = (IVBag) ? AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetAbilityHealingRadiusAttribute(), bFound) : AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetFriendshipHealingRadiusAttribute(), bFound);
 
@@ -638,15 +639,18 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 		bHasDied = false;
 	}
 
-	if (ChangeData.NewValue > 0 && ChangeData.NewValue < ChangeData.OldValue && FlinchMontage != nullptr && AirFlinchMontage != nullptr)
+	if (ChangeData.NewValue > 0 && ChangeData.NewValue < ChangeData.OldValue && ChangeData.NewValue && !AbilitySystemComponent->HasMatchingGameplayTag(URAbilityGenericTags::GetFullHealthTag()))
 	{
-		if (bIsFlying)
+		if (FlinchMontage != nullptr && AirFlinchMontage != nullptr)
 		{
-			ServerPlayAnimMontage(AirFlinchMontage);
-		}
-		else
-		{
-			ServerPlayAnimMontage(FlinchMontage);
+			if (bIsFlying)
+			{
+				ServerPlayAnimMontage(AirFlinchMontage);
+			}
+			else
+			{
+				ServerPlayAnimMontage(FlinchMontage);
+			}
 		}
 	}
 
