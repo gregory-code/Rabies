@@ -39,33 +39,11 @@ ARTargetActor_DotUltimate::ARTargetActor_DotUltimate()
     CylinderMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     CylinderMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
     CylinderMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+    CylinderMesh->SetIsReplicated(true);
 }
 
-void ARTargetActor_DotUltimate::SetParameters(float radius, float height, FRotator rotation, FVector location)
+void ARTargetActor_DotUltimate::Server_SetCylinderSize_Implementation(FVector scale)
 {
-    CylinderRadius = radius;
-    CylinderHeight = height;
-    CylinderRotation = rotation;
-    CylinderLocation = location;
-}
-
-void ARTargetActor_DotUltimate::SetBetweenTwoPoints_Implementation(const FVector& start, const FVector& end, bool bigLaser)
-{
-    FVector adjustedEnd = end + ((end - start) * 2.0f);
-
-    FVector Direction = (adjustedEnd - start);
-    FVector Midpoint = (start + (adjustedEnd)) * 0.5f;
-
-    float Length = Direction.Size();
-
-    SetActorLocation(Midpoint);
-    SetActorRotation(CylinderRotation);
-
-    CylinderHeight = Length;
-    CylinderRadius = (bigLaser) ? 150.0f : 50.0f;
-
-    // Scale the cylinder to match length (assuming default cylinder height = 200 units)
-    float xyScale = (bigLaser) ? 3.0f : 1.0f ;
-    FVector Scale = FVector(xyScale, xyScale, Length / 100.0f);
-    CylinderMesh->SetWorldScale3D(Scale);
+    CylinderMesh->SetRelativeScale3D(scale);
 }

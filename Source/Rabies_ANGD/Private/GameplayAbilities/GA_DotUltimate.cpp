@@ -11,14 +11,22 @@
 #include "Player/Dot/RDot_SpecialProj.h"
 #include "Framework/EOSActionGameState.h"
 #include "Enemy/REnemyBase.h"
+#include "Framework/EOSActionGameState.h"
+
+#include "Kismet/KismetMathLibrary.h"
+#include "Math/UnrealMathUtility.h"
+
 
 #include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Player/Dot/RTargetActor_DotUltimate.h"
 #include "Targeting/RTargetActor_DotSpecial.h"
 
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAttributeSet.h"
+
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+
 
 #include "Player/RPlayerController.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -146,9 +154,12 @@ void UGA_DotUltimate::TargetAquired(const FGameplayAbilityTargetDataHandle& Data
 	waitTargetDataUltimateTask->BeginSpawningActor(this, targetUltimateActorClass, spawnedTargetActor);
 
 	TargetActorDotUltimate = Cast<ARTargetActor_DotUltimate>(spawnedTargetActor);
+	TargetActorDotUltimate->CylinderMesh->SetVisibility(false, true);
 	waitTargetDataUltimateTask->FinishSpawningActor(this, TargetActorDotUltimate);
 
 	GetWorld()->GetTimerManager().SetTimer(DamageTimer, this, &UGA_DotUltimate::CheckDamage, 0.05f, true);
+
+	GetWorld()->GetTimerManager().SetTimer(StopTimer, this, &UGA_DotUltimate::StopAttacking, 5.5f, false);
 }
 
 void UGA_DotUltimate::TargetCancelled(const FGameplayAbilityTargetDataHandle& Data)
@@ -169,14 +180,14 @@ void UGA_DotUltimate::CheckDamage()
 
 
 	bool bHit = GetWorld()->OverlapMultiByChannel(OverlappingResults, CylinderLocation, FQuat(CylinderRotation), ECC_Pawn, Capsule, QueryParams);
-	DrawDebugCapsule(GetWorld(), CylinderLocation, CylinderHeight / 2, CylinderRadius, FQuat(CylinderRotation), FColor::Blue, false, 0.1f);
+	//DrawDebugCapsule(GetWorld(), CylinderLocation, CylinderHeight / 2, CylinderRadius, FQuat(CylinderRotation), FColor::Blue, false, 0.1f);
 
 	for (const FOverlapResult& result : OverlappingResults)
 	{
 		AREnemyBase* enemy = Cast<AREnemyBase>(result.GetActor());
 		if (enemy)
 		{
-			FGameplayEffectSpecHandle specHandle = Player->GetAbilitySystemComponent()->MakeOutgoingSpec(AttackDamage, 1.0f, Player->GetAbilitySystemComponent()->MakeEffectContext());
+			FGameplayEffectSpecHandle specHandle = Player->GetAbilitySystemComponent()->MakeOutgoingSpec(CurrentDamage, 1.0f, Player->GetAbilitySystemComponent()->MakeEffectContext());
 
 			FGameplayEffectSpec* spec = specHandle.Data.Get();
 			if (spec)
@@ -187,11 +198,23 @@ void UGA_DotUltimate::CheckDamage()
 	}
 }
 
+void UGA_DotUltimate::StopAttacking()
+{
+	GetWorld()->GetTimerManager().ClearTimer(DamageTimer);
+	TargetActorDotUltimate->CylinderMesh->SetVisibility(false, true);
+
+	FGameplayEffectSpecHandle pushSpec = MakeOutgoingGameplayEffectSpec(MeleePushClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+	pushSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), -1000.0f);
+	ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, pushSpec);
+}
+
 void UGA_DotUltimate::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
 {
 	if (hitActor == nullptr) return;
 
-	FVector adjustedEnd = endPos + ((endPos - startPos) * 2.0f);
+	CurrentScale = FMath::Lerp(CurrentScale, CylinderScale, 20 * GetWorld()->GetDeltaSeconds());
+
+	FVector adjustedEnd = endPos + ((endPos - startPos) * 0.5f);
 
 	FVector Direction = (adjustedEnd - startPos);
 	CylinderLocation = (startPos + (adjustedEnd)) * 0.5f;
@@ -200,22 +223,37 @@ void UGA_DotUltimate::RecieveAttackHitscan(AActor* hitActor, FVector startPos, F
 	CylinderRotation = UKismetMathLibrary::MakeRotFromZ((endPos - startPos));
 
 	CylinderHeight = Length;
-	CylinderRadius = (bBigLaser) ? 150.0f : 50.0f;
+
+	AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
+	if (gameState)
+	{
+		gameState->Server_RequestSpawnDotLaserMarks(HitEffectLaserBeam, endPos, Direction, ScorchSize);
+	}
 
 	if (TargetActorDotUltimate)
 	{
-		TargetActorDotUltimate->SetParameters(CylinderRadius, CylinderHeight, CylinderRotation, CylinderLocation);
-		TargetActorDotUltimate->SetBetweenTwoPoints(startPos, endPos, bBigLaser); // replciate this
+		TargetActorDotUltimate->SetActorLocation(CylinderLocation);
+		TargetActorDotUltimate->SetActorRotation(CylinderRotation);
+
+		TargetActorDotUltimate->CylinderMesh->SetVisibility(true, true);
+
+		FVector Scale = FVector(CurrentScale, CurrentScale, Length / 100.0f);
+
+		TargetActorDotUltimate->CylinderMesh->SetRelativeScale3D(Scale);
 	}
 }
 
 void UGA_DotUltimate::SendOffAttack(FGameplayEventData Payload)
 {
+	CylinderRadius = 37.5f;
+	CylinderScale = 0.75f;
+	CurrentDamage = AttackDamage;
+	ScorchSize = 120;
+
 	if (K2_HasAuthority())
 	{
 		if (Player)
 		{
-			bBigLaser = false;
 
 			Player->Hitscan(40000, Player->GetPlayerBaseState());
 
@@ -226,11 +264,15 @@ void UGA_DotUltimate::SendOffAttack(FGameplayEventData Payload)
 
 void UGA_DotUltimate::SendOffFinalAttack(FGameplayEventData Payload)
 {
+	CylinderRadius = 75.0f;
+	CylinderScale = 1.5f;
+	CurrentDamage = BigAttackDamage;
+	ScorchSize = 250;
+
 	if (K2_HasAuthority())
 	{
 		if (Player)
 		{
-			bBigLaser = true;
 
 			Player->Hitscan(40000, Player->GetPlayerBaseState());
 

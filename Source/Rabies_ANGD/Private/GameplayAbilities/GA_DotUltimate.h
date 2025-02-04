@@ -31,7 +31,11 @@ private:
 	UFUNCTION()
 	void CheckDamage();
 
+	UFUNCTION()
+	void StopAttacking();
+
 	FTimerHandle DamageTimer;
+	FTimerHandle StopTimer;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	UAnimMontage* TargettingMontage;
@@ -47,6 +51,18 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> AttackDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<class UGameplayEffect> BigAttackDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<class UGameplayEffect> GravityFallClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<class UGameplayEffect> MeleePushClass;
+
+	UPROPERTY()
+	TSubclassOf<class UGameplayEffect> CurrentDamage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	TSubclassOf<class ARTargetActor_DotSpecial> targetActorClass;
@@ -72,12 +88,17 @@ private:
 	UPROPERTY()
 	class ARPlayerBase* Player;
 
-	FDelegateHandle ClientHitScanHandle;
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class UNiagaraSystem* HitEffectLaserBeam;
 
-	bool bBigLaser;
+	float CurrentScale;
+	float ScorchSize;
+
+	FDelegateHandle ClientHitScanHandle;
 
 	float CylinderRadius;
 	float CylinderHeight;
+	float CylinderScale;
 	FRotator CylinderRotation;
 	FVector CylinderLocation;
 };
