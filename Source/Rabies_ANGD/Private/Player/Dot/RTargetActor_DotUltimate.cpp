@@ -41,77 +41,31 @@ ARTargetActor_DotUltimate::ARTargetActor_DotUltimate()
     CylinderMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
-void ARTargetActor_DotUltimate::SetOwningPlayerControler(class ARPlayerBase* myPlayer)
+void ARTargetActor_DotUltimate::SetParameters(float radius, float height, FRotator rotation, FVector location)
 {
-    MyPlayer = myPlayer;
-    GetWorldTimerManager().SetTimer(DamageTimer, this, &ARTargetActor_DotUltimate::CheckDamage, 0.05f, true);
-}
-
-void ARTargetActor_DotUltimate::SetDamageEffects(TSubclassOf<class UGameplayEffect> attackDamage)
-{
-    AttackDamage = attackDamage;
-}
-
-void ARTargetActor_DotUltimate::CheckDamage()
-{
-    if (MyPlayer == nullptr || AttackDamage == nullptr)
-        return;
-
-    // Get Start and End positions of the cylinder
-    //FVector startLocation = GetActorLocation() - (GetActorUpVector() * (CylinderHeight / 2));
-    //FVector endLocation = GetActorLocation() + (GetActorUpVector() * (CylinderHeight / 2));
-
-    float CapsuleRadius = CylinderRadius;
-    float CapsuleHalfHeight = CylinderHeight / 2;
-    FQuat CapsuleRotation = GetActorQuat();
-
-    TArray<FOverlapResult> OverlapResults;
-
-    FCollisionQueryParams QueryParams;
-    QueryParams.AddIgnoredActor(this);
-    QueryParams.AddIgnoredActor(MyPlayer);
-
-    bool bHit = GetWorld()->OverlapMultiByChannel(OverlapResults, GetActorLocation(), CapsuleRotation, ECC_PhysicsBody, FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight), QueryParams);
-    DrawDebugCapsule(GetWorld(), GetActorLocation(), CapsuleHalfHeight, CapsuleRadius, CapsuleRotation, FColor::Blue, false, 0.1f);
-    for (const FOverlapResult& Result : OverlapResults)
-    {
-        if (Result.GetActor())
-        {
-            AREnemyBase* potentialEnemy = Cast<AREnemyBase>(Result.GetActor());
-            if (potentialEnemy == nullptr)
-                return;
-
-            FGameplayEffectSpecHandle specHandle = MyPlayer->GetAbilitySystemComponent()->MakeOutgoingSpec(AttackDamage, 1.0f, MyPlayer->GetAbilitySystemComponent()->MakeEffectContext());
-
-            FGameplayEffectSpec* spec = specHandle.Data.Get();
-            if (spec)
-            {
-                UE_LOG(LogTemp, Error, TEXT("%s Damaging Enemy"), *GetName());
-                potentialEnemy->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
-            }
-        }
-    }
-
+    CylinderRadius = radius;
+    CylinderHeight = height;
+    CylinderRotation = rotation;
+    CylinderLocation = location;
 }
 
 void ARTargetActor_DotUltimate::SetBetweenTwoPoints_Implementation(const FVector& start, const FVector& end, bool bigLaser)
 {
-    FVector adjustedEnd = end + ((end - start) * .5f);
+    FVector adjustedEnd = end + ((end - start) * 2.0f);
 
     FVector Direction = (adjustedEnd - start);
     FVector Midpoint = (start + (adjustedEnd)) * 0.5f;
 
     float Length = Direction.Size();
-    FRotator Rotation = UKismetMathLibrary::MakeRotFromZ((end - start));
 
     SetActorLocation(Midpoint);
-    SetActorRotation(Rotation);
+    SetActorRotation(CylinderRotation);
 
     CylinderHeight = Length;
-    CylinderRadius = (bigLaser) ? 200.0f : 75.0f;
+    CylinderRadius = (bigLaser) ? 150.0f : 50.0f;
 
     // Scale the cylinder to match length (assuming default cylinder height = 200 units)
-    float xyScale = (bigLaser) ? 4.0f : 1.5f ;
+    float xyScale = (bigLaser) ? 3.0f : 1.0f ;
     FVector Scale = FVector(xyScale, xyScale, Length / 100.0f);
     CylinderMesh->SetWorldScale3D(Scale);
 }

@@ -20,25 +20,16 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void SetBetweenTwoPoints(const FVector& start, const FVector& end, bool bigLaser);
 
-	void SetOwningPlayerControler(class ARPlayerBase* myPlayer);
-
-	void SetDamageEffects(TSubclassOf<class UGameplayEffect> attackDamage);
+	UFUNCTION(NetMulticast, Reliable)
+	void SetParameters(float radius, float height, FRotator rotation, FVector location);
 
 private:
-
-	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	TSubclassOf<class UGameplayEffect> AttackDamage;
-
-	UFUNCTION()
-	void CheckDamage();
-
-	FTimerHandle DamageTimer;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Mesh")
 	UStaticMeshComponent* CylinderMesh;
 
-	class ARPlayerBase* MyPlayer;
-
 	float CylinderRadius;
 	float CylinderHeight;
+	FRotator CylinderRotation;
+	FVector CylinderLocation;
 };

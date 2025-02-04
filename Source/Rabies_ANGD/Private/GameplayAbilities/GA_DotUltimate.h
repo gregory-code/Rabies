@@ -28,6 +28,11 @@ private:
 	UFUNCTION()
 	void TargetCancelled(const FGameplayAbilityTargetDataHandle& Data);
 
+	UFUNCTION()
+	void CheckDamage();
+
+	FTimerHandle DamageTimer;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	UAnimMontage* TargettingMontage;
 
@@ -70,4 +75,9 @@ private:
 	FDelegateHandle ClientHitScanHandle;
 
 	bool bBigLaser;
+
+	float CylinderRadius;
+	float CylinderHeight;
+	FRotator CylinderRotation;
+	FVector CylinderLocation;
 };

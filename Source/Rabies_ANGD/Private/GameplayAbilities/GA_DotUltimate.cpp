@@ -10,7 +10,10 @@
 #include "GameplayAbilities/RAbilityGenericTags.h"
 #include "Player/Dot/RDot_SpecialProj.h"
 #include "Framework/EOSActionGameState.h"
+#include "Enemy/REnemyBase.h"
 
+#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Player/Dot/RTargetActor_DotUltimate.h"
 #include "Targeting/RTargetActor_DotSpecial.h"
 
@@ -143,38 +146,67 @@ void UGA_DotUltimate::TargetAquired(const FGameplayAbilityTargetDataHandle& Data
 	waitTargetDataUltimateTask->BeginSpawningActor(this, targetUltimateActorClass, spawnedTargetActor);
 
 	TargetActorDotUltimate = Cast<ARTargetActor_DotUltimate>(spawnedTargetActor);
-	TargetActorDotUltimate->SetOwningPlayerControler(Player);
-	TargetActorDotUltimate->SetDamageEffects(AttackDamage);
 	waitTargetDataUltimateTask->FinishSpawningActor(this, TargetActorDotUltimate);
+
+	GetWorld()->GetTimerManager().SetTimer(DamageTimer, this, &UGA_DotUltimate::CheckDamage, 0.05f, true);
 }
 
 void UGA_DotUltimate::TargetCancelled(const FGameplayAbilityTargetDataHandle& Data)
 {
 }
 
+void UGA_DotUltimate::CheckDamage()
+{
+	if (Player == nullptr)
+		return;
+
+	TArray<FOverlapResult> OverlappingResults;
+
+	FCollisionShape Capsule = FCollisionShape::MakeCapsule(CylinderRadius, CylinderHeight / 2);
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(Player); // Ignore self
+	QueryParams.AddIgnoredActor(TargetActorDotUltimate);
+
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(OverlappingResults, CylinderLocation, FQuat(CylinderRotation), ECC_Pawn, Capsule, QueryParams);
+	DrawDebugCapsule(GetWorld(), CylinderLocation, CylinderHeight / 2, CylinderRadius, FQuat(CylinderRotation), FColor::Blue, false, 0.1f);
+
+	for (const FOverlapResult& result : OverlappingResults)
+	{
+		AREnemyBase* enemy = Cast<AREnemyBase>(result.GetActor());
+		if (enemy)
+		{
+			FGameplayEffectSpecHandle specHandle = Player->GetAbilitySystemComponent()->MakeOutgoingSpec(AttackDamage, 1.0f, Player->GetAbilitySystemComponent()->MakeEffectContext());
+
+			FGameplayEffectSpec* spec = specHandle.Data.Get();
+			if (spec)
+			{
+				enemy->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+			}
+		}
+	}
+}
+
 void UGA_DotUltimate::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
 {
 	if (hitActor == nullptr) return;
 
+	FVector adjustedEnd = endPos + ((endPos - startPos) * 2.0f);
+
+	FVector Direction = (adjustedEnd - startPos);
+	CylinderLocation = (startPos + (adjustedEnd)) * 0.5f;
+
+	float Length = Direction.Size();
+	CylinderRotation = UKismetMathLibrary::MakeRotFromZ((endPos - startPos));
+
+	CylinderHeight = Length;
+	CylinderRadius = (bBigLaser) ? 150.0f : 50.0f;
+
 	if (TargetActorDotUltimate)
 	{
+		TargetActorDotUltimate->SetParameters(CylinderRadius, CylinderHeight, CylinderRotation, CylinderLocation);
 		TargetActorDotUltimate->SetBetweenTwoPoints(startPos, endPos, bBigLaser); // replciate this
 	}
-	/*if (hitActor != Player)
-	{
-		FGameplayEventData Payload = FGameplayEventData();
-
-		Payload.TargetData = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(hitActor);
-
-		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RangedGattlingDamage, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpec, Payload.TargetData);
-
-		if (ARCharacterBase* hitCharacter = Cast<ARCharacterBase>(hitActor))
-			Player->HitRangedAttack(hitCharacter); // make sure to do it afterwards so you can check health
-
-		SignalDamageStimuliEvent(Payload.TargetData);
-	}*/
-
 }
 
 void UGA_DotUltimate::SendOffAttack(FGameplayEventData Payload)
