@@ -193,6 +193,7 @@ void UGA_DotUltimate::CheckDamage()
 			if (spec)
 			{
 				enemy->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+				Player->DealtDamage(enemy);
 			}
 		}
 	}
