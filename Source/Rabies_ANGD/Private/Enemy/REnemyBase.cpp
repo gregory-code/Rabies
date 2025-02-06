@@ -53,7 +53,7 @@ AREnemyBase::AREnemyBase()
 void AREnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	//FVector gunSocket = GetMesh()->GetSocketLocation(WeakpointSocketName);
 }
 
 void AREnemyBase::Tick(float DeltaTime)

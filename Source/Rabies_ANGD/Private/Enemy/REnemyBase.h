@@ -28,7 +28,21 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void InitLevel(int level);
 
+	FName WeakpointSocketName = TEXT("Weakpoint");
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float WeakpointPrecision;
+
 private:
+
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	class UWidgetComponent* WeakpointWidgetComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TSubclassOf<class UWeakpointUI> WeakpointClass;
+
+	UPROPERTY()
+	class UWeakpointUI* WeakpointUI;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	bool bIsDeadlock;
