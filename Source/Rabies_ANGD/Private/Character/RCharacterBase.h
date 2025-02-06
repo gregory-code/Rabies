@@ -164,7 +164,28 @@ public:
 
 	FTimerHandle RadioDelayTimer;
 
+	FName WeakpointSocketName = TEXT("Weakpoint");
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float WeakpointPrecision;
+
+	UFUNCTION()
+	void SetAndShowWeakpointUI(class ARCharacterBase* ScopingCharacter);
+
+	UFUNCTION()
+	void HideWeakpointUI(class ARCharacterBase* ScopingCharacter);
+
 private:
+
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	class UWidgetComponent* WeakpointWidgetComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TSubclassOf<class UWeakpointUI> WeakpointClass;
+
+	UPROPERTY()
+	class UWeakpointUI* WeakpointUI;
+
 	bool bHasDied;
 
 	void LevelUp(int carryOverEXP);

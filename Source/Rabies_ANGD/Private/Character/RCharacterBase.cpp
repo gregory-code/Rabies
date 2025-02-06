@@ -27,6 +27,7 @@
 #include "Math/Color.h"
 #include "Math/UnrealMathUtility.h"
 
+#include "Widgets/WeakpointUI.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
@@ -78,6 +79,9 @@ ARCharacterBase::ARCharacterBase()
 	HealthBarWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Status Widget Comp");
 	HealthBarWidgetComp->SetupAttachment(GetRootComponent());
 
+	WeakpointWidgetComp = CreateDefaultSubobject<UWidgetComponent>("Weakpoint Widget Comp");
+	WeakpointWidgetComp->SetupAttachment(GetRootComponent());
+
 	AttackingBoxComponent = CreateDefaultSubobject<URAttackingBoxComponent>("Attacking Box Component");
 	AttackingBoxComponent->SetupAttachment(GetMesh());
 
@@ -106,6 +110,40 @@ void ARCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	InitStatusHUD();
+
+	WeakpointWidgetComp->SetWidgetClass(WeakpointClass);
+	WeakpointUI = CreateWidget<UWeakpointUI>(GetWorld(), WeakpointWidgetComp->GetWidgetClass());
+	if (WeakpointUI)
+	{
+		
+		WeakpointWidgetComp->SetWidget(WeakpointUI);
+		WeakpointWidgetComp->SetDrawAtDesiredSize(true);
+		WeakpointUI->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void ARCharacterBase::SetAndShowWeakpointUI(ARCharacterBase* ScopingCharacter)
+{
+	if (WeakpointUI)
+	{
+		WeakpointUI->SetVisibility(ESlateVisibility::Visible);
+
+		float Distance = FVector::Dist(ScopingCharacter->GetActorLocation(), GetActorLocation());
+		//UE_LOG(LogTemp, Warning, TEXT("Value is: %f"), Distance);
+		float BaseSize = 200.f; // Default UI size
+		float SizeFactor = BaseSize / Distance;
+		WeakpointUI->SetRenderScale(FVector2D(SizeFactor, SizeFactor));
+
+	}
+
+}
+
+void ARCharacterBase::HideWeakpointUI(ARCharacterBase* ScopingCharacter)
+{
+	if (WeakpointUI)
+	{
+		WeakpointUI->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 
@@ -114,6 +152,7 @@ void ARCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	WeakpointWidgetComp->SetWorldLocation(GetMesh()->GetSocketLocation(WeakpointSocketName));
 }
 
 void ARCharacterBase::PossessedBy(AController* NewController)

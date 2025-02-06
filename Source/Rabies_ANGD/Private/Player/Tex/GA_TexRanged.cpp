@@ -6,7 +6,6 @@
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAttributeSet.h"
 
-#include "Enemy/REnemyBase.h"
 
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -20,6 +19,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 
+#include "Enemy/REnemyBase.h"
 #include "Character/RCharacterBase.h"
 #include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -85,7 +85,7 @@ void UGA_TexRanged::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVe
 			bool hitCrit = false;
 
 			FVector hitPointVector = hitEnemy->GetMesh()->GetSocketLocation(hitEnemy->WeakpointSocketName);
-			//UE_LOG(LogTemp, Warning, TEXT("Value is: %f"), FVector::Dist(endPos, hitPointVector));
+			UE_LOG(LogTemp, Warning, TEXT("Value is: %f"), FVector::Dist(endPos, hitPointVector));
 
 			if (FVector::Dist(hitPointVector, endPos) <= hitEnemy->WeakpointPrecision)
 			{
