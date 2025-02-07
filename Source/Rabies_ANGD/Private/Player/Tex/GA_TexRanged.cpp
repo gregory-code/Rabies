@@ -78,7 +78,7 @@ void UGA_TexRanged::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVe
 		if (hitActor == nullptr) return;
 		if (hitActor != Player)
 		{
-			AREnemyBase* hitEnemy = Cast<AREnemyBase>(hitActor);
+			ARCharacterBase* hitEnemy = Cast<ARCharacterBase>(hitActor);
 			if (hitEnemy == nullptr)
 				return;
 
@@ -87,10 +87,10 @@ void UGA_TexRanged::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVe
 			FVector hitPointVector = hitEnemy->GetMesh()->GetSocketLocation(hitEnemy->WeakpointSocketName);
 			UE_LOG(LogTemp, Warning, TEXT("Value is: %f"), FVector::Dist(endPos, hitPointVector));
 
-			if (FVector::Dist(hitPointVector, endPos) <= hitEnemy->WeakpointPrecision)
+			/*if (FVector::Dist(hitPointVector, endPos) <= hitEnemy->WeakpointPrecision)
 			{
 				hitCrit = true;
-			}
+			}*/
 
 			FGameplayEventData Payload = FGameplayEventData();
 

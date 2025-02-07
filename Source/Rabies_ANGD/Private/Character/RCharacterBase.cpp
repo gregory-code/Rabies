@@ -88,6 +88,14 @@ ARCharacterBase::ARCharacterBase()
 	PushingBoxComponent = CreateDefaultSubobject<URPushBoxComponent>("Pushing Box Component");
 	PushingBoxComponent->SetupAttachment(GetMesh());
 
+	WeakpointCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitCapsule"));
+	WeakpointCollider->SetupAttachment(RootComponent); // Default to root, attach later
+
+	WeakpointCollider->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	WeakpointCollider->SetCollisionObjectType(ECC_GameTraceChannel2);
+	WeakpointCollider->SetCollisionResponseToAllChannels(ECR_Ignore);
+	WeakpointCollider->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Block);
+
 	PrimaryActorTick.bRunOnAnyThread = false; // prevents crash??
 }
 
@@ -111,6 +119,12 @@ void ARCharacterBase::BeginPlay()
 	Super::BeginPlay();
 	InitStatusHUD();
 
+	if (WeakpointCollider)
+	{
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		WeakpointCollider->AttachToComponent(GetMesh(), AttachmentRules, WeakpointSocketName);
+	}
+
 	WeakpointWidgetComp->SetWidgetClass(WeakpointClass);
 	WeakpointUI = CreateWidget<UWeakpointUI>(GetWorld(), WeakpointWidgetComp->GetWidgetClass());
 	if (WeakpointUI)
@@ -130,7 +144,7 @@ void ARCharacterBase::SetAndShowWeakpointUI(ARCharacterBase* ScopingCharacter)
 
 		float Distance = FVector::Dist(ScopingCharacter->GetActorLocation(), GetActorLocation());
 		//UE_LOG(LogTemp, Warning, TEXT("Value is: %f"), Distance);
-		float BaseSize = 200.f; // Default UI size
+		float BaseSize = 250.f; // Default UI size
 		float SizeFactor = BaseSize / Distance;
 		WeakpointUI->SetRenderScale(FVector2D(SizeFactor, SizeFactor));
 

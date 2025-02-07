@@ -166,8 +166,6 @@ public:
 
 	FName WeakpointSocketName = TEXT("Weakpoint");
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	float WeakpointPrecision;
 
 	UFUNCTION()
 	void SetAndShowWeakpointUI(class ARCharacterBase* ScopingCharacter);
@@ -176,6 +174,9 @@ public:
 	void HideWeakpointUI(class ARCharacterBase* ScopingCharacter);
 
 private:
+
+	UPROPERTY(VisibleAnywhere, Category = "CharacterDetail")
+	class UCapsuleComponent* WeakpointCollider;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	class UWidgetComponent* WeakpointWidgetComp;
