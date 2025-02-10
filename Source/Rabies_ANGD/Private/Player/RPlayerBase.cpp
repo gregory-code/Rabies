@@ -110,6 +110,9 @@ void ARPlayerBase::BeginPlay()
 	ItemPickupCollider->OnComponentEndOverlap.AddDynamic(this, &ARPlayerBase::OnOverlapEnd);
 
 	OnDeadStatusChanged.AddUObject(this, &ARPlayerBase::DeadStatusUpdated);
+	OnInvisStatusChanged.AddUObject(this, &ARPlayerBase::InvisStatusUpdated);
+
+	DynamicTexMaterialInstance = UMaterialInstanceDynamic::Create(TexStealthMat, GetMesh());
 
 	ReviveUIWidgetComp->SetWidgetClass(ReviveUIClass);
 	ReviveUI = CreateWidget<UReviveUI>(GetWorld(), ReviveUIWidgetComp->GetWidgetClass());
@@ -579,6 +582,21 @@ void ARPlayerBase::DeadStatusUpdated(bool bIsDead)
 	else
 	{
 		
+	}
+}
+
+void ARPlayerBase::InvisStatusUpdated(bool bIsDead)
+{
+	if (bIsDead)
+	{
+		if (DynamicTexMaterialInstance)
+		{
+			GetMesh()->SetMaterial(0, DynamicTexMaterialInstance);
+		}
+	}
+	else
+	{
+		GetMesh()->SetMaterial(0, TexDefaultMat);
 	}
 }
 

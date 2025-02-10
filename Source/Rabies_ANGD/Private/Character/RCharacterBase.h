@@ -19,6 +19,7 @@ class UGameplayEffect;
 
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeadStatusChanged, bool /*bIsDead*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInvisStatusChanged, bool /*bIsDead*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelUp, int /*new level*/);
 DECLARE_MULTICAST_DELEGATE_FourParams(FOnClientHitScan, AActor* /*Hit Target*/, FVector /* Start Pos */, FVector /* End Pos */, bool /*crit*/);
 
@@ -29,6 +30,8 @@ class ARCharacterBase : public ACharacter, public IAbilitySystemInterface, /*pub
 
 public:
 	FOnDeadStatusChanged OnDeadStatusChanged;
+
+	FOnInvisStatusChanged OnInvisStatusChanged;
 
 	FOnClientHitScan ClientHitScan;
 	FOnLevelUp onLevelUp;
@@ -224,6 +227,11 @@ private:
 	void FlyingTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 	virtual void FlyingTagChanged(bool bNewIsAiming) {/*empty in base*/ };
 	bool bIsFlying;
+
+	void InvisTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
+	virtual void InvisTagChanged(bool bNewIsAiming) {/*empty in base*/ };
+	bool bIsInvis;
+
 
 	void TakeOffDelayTagChanged(const FGameplayTag TagChanged, int32 NewStackCount);
 	virtual void TakeOffDelayTagChanged(bool bNewIsAiming) {/*empty in base*/ };

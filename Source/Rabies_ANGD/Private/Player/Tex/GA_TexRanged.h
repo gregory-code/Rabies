@@ -38,6 +38,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	UAnimMontage* ShootingMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	UAnimMontage* UltimateMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> RangedDamage;
@@ -46,6 +48,7 @@ private:
 	TSubclassOf<class UGameplayEffect> CritRangedDamage;
 
 	FDelegateHandle ClientHitScanHandle;
+	FTimerHandle UltimateTimerHandle;
 
 	UPROPERTY()
 	class ARPlayerBase* Player;

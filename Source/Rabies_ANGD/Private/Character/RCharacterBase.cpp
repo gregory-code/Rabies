@@ -72,6 +72,7 @@ ARCharacterBase::ARCharacterBase()
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetDeadTag()).AddUObject(this, &ARCharacterBase::DeathTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetTaserTag()).AddUObject(this, &ARCharacterBase::TaserTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetFlyingTag()).AddUObject(this, &ARCharacterBase::FlyingTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetInvisTag()).AddUObject(this, &ARCharacterBase::InvisTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetTakeOffDelayTag()).AddUObject(this, &ARCharacterBase::TakeOffDelayTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetHoldingJump()).AddUObject(this, &ARCharacterBase::HoldingJumpTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(URAbilityGenericTags::GetMeleeAttackingTag()).AddUObject(this, &ARCharacterBase::MeleeAttackingTagChanged);
@@ -368,6 +369,21 @@ void ARCharacterBase::FlyingTagChanged(const FGameplayTag TagChanged, int32 NewS
 {
 	bIsFlying = NewStackCount != 0;
 	FlyingTagChanged(bIsFlying);
+}
+
+void ARCharacterBase::InvisTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
+{
+	bIsInvis = NewStackCount != 0;
+	if (NewStackCount == 0)
+	{
+		OnInvisStatusChanged.Broadcast(false);
+	}
+	else
+	{
+		OnInvisStatusChanged.Broadcast(true);
+
+	}
+	InvisTagChanged(bIsInvis);
 }
 
 void ARCharacterBase::TakeOffDelayTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
