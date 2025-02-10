@@ -88,13 +88,13 @@ ARCharacterBase::ARCharacterBase()
 	PushingBoxComponent = CreateDefaultSubobject<URPushBoxComponent>("Pushing Box Component");
 	PushingBoxComponent->SetupAttachment(GetMesh());
 
-	WeakpointCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitCapsule"));
+	WeakpointCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Weakpoint Collider"));
 	WeakpointCollider->SetupAttachment(RootComponent); // Default to root, attach later
 
-	WeakpointCollider->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	WeakpointCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	WeakpointCollider->SetCollisionObjectType(ECC_GameTraceChannel2);
 	WeakpointCollider->SetCollisionResponseToAllChannels(ECR_Ignore);
-	WeakpointCollider->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Block);
+	WeakpointCollider->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Block);
 
 	PrimaryActorTick.bRunOnAnyThread = false; // prevents crash??
 }
@@ -144,7 +144,7 @@ void ARCharacterBase::SetAndShowWeakpointUI(ARCharacterBase* ScopingCharacter)
 
 		float Distance = FVector::Dist(ScopingCharacter->GetActorLocation(), GetActorLocation());
 		//UE_LOG(LogTemp, Warning, TEXT("Value is: %f"), Distance);
-		float BaseSize = 250.f; // Default UI size
+		float BaseSize = 250.f * WeakpointSize; // Default UI size
 		float SizeFactor = BaseSize / Distance;
 		WeakpointUI->SetRenderScale(FVector2D(SizeFactor, SizeFactor));
 
@@ -258,6 +258,7 @@ void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState
 	FVector endPos = FVector(0, 0, 0);
 
 	bool isEnemy = (requestedPlayerState == nullptr);
+	bool IsCrit = false;
 
 	if (isEnemy) // it's an enemy request
 	{
@@ -277,25 +278,29 @@ void ARCharacterBase::Hitscan(float range, AEOSPlayerState* requestedPlayerState
 	bool hit = GetWorld()->SweepSingleByChannel(hitResult, startPos, endPos, FQuat::Identity, collisionChannel, collisionShape);
 	if (hit)
 	{
+		if (hitResult.GetComponent()->GetName() == "Weakpoint Collider")
+		{
+			IsCrit = true;
+		}
 		FVector weaponStart = (isEnemy) ? startPos : requestedPlayerState->GetRangedLocation();
 		FVector hitEnd = hitResult.ImpactPoint;
 		CharacterShootParticle(weaponStart, hitEnd, (hitEnd - weaponStart).GetSafeNormal().Rotation() + FRotator(0, -90, 0)); // this gets the point towards the hit
-		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd, isEnemy);
+		ClientHitScanResult(hitResult.GetActor(), weaponStart, hitEnd, isEnemy, IsCrit);
 	}
 }
 
-void ARCharacterBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end, bool enemy)
+void ARCharacterBase::ClientHitScanResult_Implementation(AActor* hitActor, FVector start, FVector end, bool enemy, bool bIsCrit)
 {
 	//FString actorName = hitActor->GetName();
 	//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *actorName));
 	//DrawDebugLine(GetWorld(), start, end, FColor::Green);
 	FColor debugColor = (enemy) ? FColor::Red : FColor::Green ;
 	DrawDebugCylinder(GetWorld(), start, end, 1.0f, 32, debugColor, false, 0.2f, 0U, 1.0f);
-	ClientHitScan.Broadcast(hitActor, start, end);
+	ClientHitScan.Broadcast(hitActor, start, end, bIsCrit);
 }
 
 
-bool ARCharacterBase::ClientHitScanResult_Validate(AActor* hitActor, FVector start, FVector end, bool enemy)
+bool ARCharacterBase::ClientHitScanResult_Validate(AActor* hitActor, FVector start, FVector end, bool enemy, bool bIsCrit)
 {
 	return true;
 }

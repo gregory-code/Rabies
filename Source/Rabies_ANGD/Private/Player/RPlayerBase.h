@@ -65,6 +65,9 @@ public:
 	class AEscapeToWin* escapeToWin;
 private:
 
+	UFUNCTION()
+	void FrameDelayItemPickup(class AItemPickup* newItem);
+
 	UPROPERTY(VisibleAnywhere, Category = "PlayerDetail")
 	class USphereComponent* ItemPickupCollider;
 
@@ -257,6 +260,8 @@ public:
 	/////////////////////////////////
 	/*          Passives           */
 	////////////////////////////////
+
+	FTimerHandle PickupItemHandle;
 
 private:
 

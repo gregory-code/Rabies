@@ -100,9 +100,9 @@ void UGA_DotUltimate::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 
 	if (Player)
 	{
-		ClientHitScanHandle = Player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos)
+		ClientHitScanHandle = Player->ClientHitScan.AddLambda([this](AActor* hitActor, FVector startPos, FVector endPos, bool bIsCrit)
 			{
-				RecieveAttackHitscan(hitActor, startPos, endPos);
+				RecieveAttackHitscan(hitActor, startPos, endPos, bIsCrit);
 			});
 	}
 }
@@ -208,7 +208,7 @@ void UGA_DotUltimate::StopAttacking()
 	ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, pushSpec);
 }
 
-void UGA_DotUltimate::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos)
+void UGA_DotUltimate::RecieveAttackHitscan(AActor* hitActor, FVector startPos, FVector endPos, bool bIsCrit)
 {
 	if (hitActor == nullptr) return;
 

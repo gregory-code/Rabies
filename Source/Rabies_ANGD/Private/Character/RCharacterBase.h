@@ -20,7 +20,7 @@ class UGameplayEffect;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeadStatusChanged, bool /*bIsDead*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelUp, int /*new level*/);
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnClientHitScan, AActor* /*Hit Target*/, FVector /* Start Pos */, FVector /* End Pos */);
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnClientHitScan, AActor* /*Hit Target*/, FVector /* Start Pos */, FVector /* End Pos */, bool /*crit*/);
 
 UCLASS()
 class ARCharacterBase : public ACharacter, public IAbilitySystemInterface, /*public IRGameplayCueInterface,*/ public IGenericTeamAgentInterface
@@ -175,10 +175,13 @@ public:
 
 private:
 
-	UPROPERTY(VisibleAnywhere, Category = "CharacterDetail")
-	class UCapsuleComponent* WeakpointCollider;
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float WeakpointSize;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
+	class UCapsuleComponent* WeakpointCollider;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	class UWidgetComponent* WeakpointWidgetComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
@@ -282,7 +285,7 @@ public:
 	void UpdateAITarget(AActor* newTargetActor);
 
 	UFUNCTION(NetMulticast, Unreliable, WithValidation)
-	void ClientHitScanResult(AActor* hitActor, FVector start, FVector end, bool enemy);
+	void ClientHitScanResult(AActor* hitActor, FVector start, FVector end, bool enemy, bool bIsCrit);
 
 private:
 
