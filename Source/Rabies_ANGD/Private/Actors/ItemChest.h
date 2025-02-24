@@ -50,9 +50,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TSubclassOf<class UGameplayEffect> ScrapPriceEffect;
 
-	UPROPERTY(Replicated, Transient, EditDefaultsOnly, Category = "Abilities")
-	float ScrapPrice;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -60,6 +57,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(Replicated, Transient, EditDefaultsOnly, Category = "Abilities")
+	float ScrapPrice;
 
 	UFUNCTION(BlueprintCallable, Category = "Chest Detail")
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -86,6 +86,6 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable, Server, Unreliable)
-	void Server_OpenChest();
+	void Server_OpenChest(bool bFeelinLucky);
 
 };

@@ -25,7 +25,7 @@ public:
 	void SelectEnemy(AREnemyBase* selectedEnemy, bool isDeadlock, bool bIsDeadlockComponent);
 
 	UFUNCTION()
-	void SelectChest(AItemChest* openedChest);
+	void SelectChest(AItemChest* openedChest, int spawnCount);
 
 	UFUNCTION()
 	void SelectItem(AItemPickup* selectedItem, class ARPlayerBase* targetingPlayer);
@@ -42,13 +42,37 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_RequestSpawnDotLaserMarks(UNiagaraSystem* SystemToSpawn, FVector SpawnLocation, FVector Direction, float ScorchSize);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_RequestSpawnVFXOnCharacter(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, float otherValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_RequestSpawnVFX(UNiagaraSystem* SystemToSpawn, FVector SpawnLocation, FVector Direction, float otherValue);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RequestSpawnVFX(UNiagaraSystem* SystemToSpawn, FVector SpawnLocation, FVector Direction, float otherValue);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RequestSpawnVFXOnCharacter(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, float otherValue);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AdjustFireOnCharacter(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, float otherValue);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_AdjustIceOnCharacter(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, float otherValue);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AdjustIceOnCharacter(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, float otherValue);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ShootTexUltimate(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, FVector endPos);
+
 
 private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SpawnDotLaserMarks(UNiagaraSystem* SystemToSpawn, FVector SpawnLocation, FVector Direction, float ScorchSize);
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category = "Deadlock")
 	FVector deadlockPos;
 
 	FTimerHandle WaveHandle;
@@ -87,13 +111,13 @@ private:
 	int enemyMax;
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void SpawnChest(FVector SpawnLocation);
+	void SpawnChest(FVector SpawnLocation, bool bRareChest);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void SpawnEnemy(int EnemyIDToSpawn, FVector SpawnLocation);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void OpenedChest(int chestID);
+	void OpenedChest(int chestID, int spawnCount);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void RemoveEnemy(int enemyID);

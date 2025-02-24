@@ -16,8 +16,14 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"
 
+#include "Engine/PostProcessVolume.h"
+
+#include "Engine/World.h"
+#include "EngineUtils.h"
 
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "Player/Dot/RTargetActor_DotUltimate.h"
 #include "Targeting/RTargetActor_DotSpecial.h"
 
@@ -105,6 +111,17 @@ void UGA_DotUltimate::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 				RecieveAttackHitscan(hitActor, startPos, endPos, bIsCrit);
 			});
 	}
+
+
+	for (TActorIterator<APostProcessVolume> It(GetWorld()); It; ++It)
+	{
+		PostProcessVolume = *It;
+	}
+	if (PostProcessVolume)
+	{
+		//PostProcessVolume->BlendWeight = 1.0f;
+	}
+
 }
 
 void UGA_DotUltimate::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -115,6 +132,11 @@ void UGA_DotUltimate::EndAbility(const FGameplayAbilitySpecHandle Handle, const 
 	{
 		StopDurationAudioEffect();
 		Player->ClientHitScan.Remove(ClientHitScanHandle);
+	}
+
+	if (PostProcessVolume)
+	{
+		//PostProcessVolume->BlendWeight = 0.0f;
 	}
 }
 
@@ -192,6 +214,7 @@ void UGA_DotUltimate::CheckDamage()
 			if (spec)
 			{
 				enemy->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+				//Player->ApplyItemEffectAtRandom(enemy, URAttributeSet::GetMaxHealthAttribute(), FireUltimateEffect);
 				Player->DealtDamage(enemy);
 			}
 		}
@@ -245,19 +268,17 @@ void UGA_DotUltimate::RecieveAttackHitscan(AActor* hitActor, FVector startPos, F
 
 void UGA_DotUltimate::SendOffAttack(FGameplayEventData Payload)
 {
+	//called peoridically
 	CylinderRadius = 37.5f;
 	CylinderScale = 0.75f;
 	CurrentDamage = AttackDamage;
 	ScorchSize = 120;
-
+	StartDurationAudioEffect();
 	if (K2_HasAuthority())
 	{
 		if (Player)
 		{
-
 			Player->Hitscan(40000, Player->GetPlayerBaseState());
-
-			StartDurationAudioEffect();
 		}
 	}
 }

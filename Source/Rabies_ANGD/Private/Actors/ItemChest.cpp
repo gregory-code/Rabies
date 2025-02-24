@@ -104,6 +104,7 @@ void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 	bWithinInteraction = false;
 	InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
 
+	player->SetInteractionChest(nullptr);
 	player->PlayerInteraction.Clear();
 }
 
@@ -122,7 +123,7 @@ void AItemChest::Interact()
 	player->SetInteractionChest(this);
 }
 
-void AItemChest::Server_OpenChest_Implementation()
+void AItemChest::Server_OpenChest_Implementation(bool bFeelinLucky)
 {
 	if (HasAuthority())
 	{
@@ -166,7 +167,8 @@ void AItemChest::Server_OpenChest_Implementation()
 			AEOSActionGameState* gameState = Cast<AEOSActionGameState>(GetWorld()->GetGameState());
 			if (gameState == GetOwner())
 			{
-				gameState->SelectChest(this);
+				int amount = bFeelinLucky ? 2 : 1 ;
+				gameState->SelectChest(this, amount);
 			}
 		}
 	}

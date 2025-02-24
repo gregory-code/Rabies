@@ -5,10 +5,11 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-
+#include "Widgets/ChesterLuckUI.h"
 #include "Widgets/ItemPopupUI.h"
 #include "Widgets/PlayerItemInventory.h"
 #include "Widgets/BossHealthBar.h"
+#include "Player/RPlayerBase.h"
 
 #include "Framework/RItemDataAsset.h"
 
@@ -144,6 +145,12 @@ void UGameplayUI::NativeConstruct()
 		ownerCharacter->OnDeadStatusChanged.AddUObject(this, &UGameplayUI::DeadStatusUpdated);
 	}
 
+	ARPlayerBase* ownerPlayer = Cast<ARPlayerBase>(GetOwningPlayerPawn());
+	if (ownerPlayer)
+	{
+		ChesterLuckUI->Init(ownerPlayer->bFeelinLucky);
+	}
+
 	//GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 	//GetWorld()->GetFirstPlayerController()->bEnableClickEvents = true;
 }
@@ -194,6 +201,19 @@ void UGameplayUI::RemoveBossHealthFromUI(UBossHealthBar* barToRemove)
 {
 	BossVerticalBox->RemoveChild(barToRemove);
 	barToRemove = nullptr;
+}
+
+bool UGameplayUI::CashMyLuck()
+{
+	if (ChesterLuckUI->IsFeelinLucky())
+	{
+		ChesterLuckUI->Charge(-3);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -263,6 +283,11 @@ void UGameplayUI::DeadTimer(float timeRemaining)
 
 void UGameplayUI::LevelUpdated(const FOnAttributeChangeData& ChangeData)
 {
+	if (ChesterLuckUI)
+	{
+		ChesterLuckUI->Charge(ChangeData.NewValue - ChangeData.OldValue);
+	}
+
 	if (LEvelText)
 	{
 		FText Text = FText::Format(FText::FromString("Lv {0}"), FText::AsNumber((int)ChangeData.NewValue));
@@ -273,11 +298,13 @@ void UGameplayUI::LevelUpdated(const FOnAttributeChangeData& ChangeData)
 void UGameplayUI::ExpUpdated(const FOnAttributeChangeData& ChangeData)
 {
 	float Percent = ChangeData.NewValue / GetAttributeValue(URAttributeSet::GetNextLevelExpAttribute());
+
 	levelBar->SetPercent(Percent);
 }
 
 void UGameplayUI::NextLevelExpUpdated(const FOnAttributeChangeData& ChangeData)
 {
+
 }
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)

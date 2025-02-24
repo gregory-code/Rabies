@@ -5,22 +5,21 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayAbilities/RAbilitySystemComponent.h"
-#include "GameplayAbilities/GA_AbilityBase.h"
 
 #include "Player/RPlayerBase.h"
 
 #include "Net/UnrealNetwork.h"
 
 #include "Character/RCharacterBase.h"
-#include "GameplayAbilities/GA_AbilityBase.h"
 
 #include "Enemy/REnemyBase.h"
-
+#include "GameplayAbilities/GA_AbilityBase.h"
+#include "GameplayAbilities/RAbilityGenericTags.h"
+#include "AbilitySystemComponent.h"
 #include "Enemy/GA_EnemyMeleeAttack.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BrainComponent.h"
-#include "GameplayAbilities/RAbilityGenericTags.h"
 
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Damage.h"
@@ -96,6 +95,7 @@ void AREnemyAIController::OnPossess(APawn* InPawn)
 		if (Enemy)
 		{
 			Enemy->OnDeadStatusChanged.AddUObject(this, &AREnemyAIController::PawnDeathStatusChanged);
+			Enemy->OnTaserStatusChanged.AddUObject(this, &AREnemyAIController::PawnTaserStatusChanged);
 		}
 	}
 }
@@ -105,7 +105,14 @@ void AREnemyAIController::TargetPerceptionUpdated(AActor* Target, FAIStimulus St
 	if (!GetBlackboardComponent()) return;
 
 	ARPlayerBase* player = Cast<ARPlayerBase>(Target);
-	if (!player)
+	AREnemyBase* enemy = Cast<AREnemyBase>(Target);
+
+	if (player == nullptr)
+	{
+		return;
+	}
+
+	if (enemy != nullptr)
 	{
 		return;
 	}
@@ -157,17 +164,23 @@ void AREnemyAIController::ProcessForgottonTarget(AActor* Target)
 {
 	TArray<AActor*> OtherTargets;
 	PerceptionComponent->GetPerceivedHostileActors(OtherTargets);
-	if (OtherTargets.Num() != 0)
+	for(AActor* actor : OtherTargets)
 	{
-		Enemy->UpdateAITarget(OtherTargets[0]);
-		GetBlackboardComponent()->SetValueAsObject(TargetBlackboardKeyName, OtherTargets[0]);
+		if (actor != nullptr)
+		{
+			AREnemyBase* enemy = Cast<AREnemyBase>(actor);
+			if (enemy == nullptr)
+			{
+				Enemy->UpdateAITarget(actor);
+				GetBlackboardComponent()->SetValueAsObject(TargetBlackboardKeyName, actor);
+				return;
+			}
+		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Forgot player completely"));
-		Enemy->UpdateAITarget(nullptr);
-		GetBlackboardComponent()->ClearValue(TargetBlackboardKeyName);
-	}
+
+	UE_LOG(LogTemp, Error, TEXT("Forgot player completely"));
+	Enemy->UpdateAITarget(nullptr);
+	GetBlackboardComponent()->ClearValue(TargetBlackboardKeyName);
 }
 
 void AREnemyAIController::PlayerDeadStatusUpdated(bool bIsDead)
@@ -189,6 +202,18 @@ void AREnemyAIController::PlayerDeadStatusUpdated(bool bIsDead)
 void AREnemyAIController::PawnDeathStatusChanged(bool bIsDead)
 {
 	if (bIsDead)
+	{
+		GetBrainComponent()->StopLogic("Dead");
+	}
+	else
+	{
+		GetBrainComponent()->StartLogic();
+	}
+}
+
+void AREnemyAIController::PawnTaserStatusChanged(bool bIsTased)
+{
+	if (bIsTased)
 	{
 		GetBrainComponent()->StopLogic("Dead");
 	}

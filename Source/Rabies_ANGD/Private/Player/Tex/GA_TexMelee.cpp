@@ -65,6 +65,7 @@ void UGA_TexMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	UAbilityTask_WaitGameplayEvent* WaitForDamage = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetGenericTargetAquiredTag());
 	WaitForDamage->EventReceived.AddDynamic(this, &UGA_TexMelee::HandleDamage);
 	WaitForDamage->ReadyForActivation();
+	TriggerAudioCue();
 }
 
 void UGA_TexMelee::HandleDamage(FGameplayEventData Payload)

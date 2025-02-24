@@ -67,4 +67,5 @@ private:
 	void ProcessForgottonTarget(AActor* Target);
 
 	void PawnDeathStatusChanged(bool bIsDead);
+	void PawnTaserStatusChanged(bool bIsTased);
 };

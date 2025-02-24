@@ -275,6 +275,16 @@ public:
 
 	FTimerHandle PickupItemHandle;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Passive")
+	bool bFeelinLucky;
+
+	UFUNCTION()
+	bool CashMyLuck();
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Passive")
+	UAnimMontage* RevivingBuddy;
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Passive")
@@ -291,7 +301,7 @@ private:
 	class AEOSPlayerState* EOSPlayerState;
 
 	UFUNCTION(Server, Reliable)
-	void ServerRequestInteraction(class AItemChest* Chest, class AEscapeToWin* winPoint);
+	void ServerRequestInteraction(class AItemChest* Chest, class AEscapeToWin* winPoint, bool bLucky);
 
 	UFUNCTION(Server, Reliable)
 	void ServerRequestPickupItem(class AItemPickup* itemPickup, class URItemDataAsset* itemAsset);

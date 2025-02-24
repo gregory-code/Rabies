@@ -10,6 +10,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "DisplayDebugHelpers.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
+#include "Player/RPlayerBase.h"
+#include "Enemy/REnemyBase.h"
 
 void URAttackingBoxComponent::StartDetection()
 {
@@ -32,10 +34,21 @@ void URAttackingBoxComponent::DoAttackCheck()
 	{
 		for (const FOverlapResult& result : outResult)
 		{
-			AActor* overlappedActor = result.GetActor();
-			if (result.GetComponent() == overlappedActor->GetRootComponent())
+			if (bEnemy)
 			{
-				TargetFound(overlappedActor);
+				ARPlayerBase* overlappedPlayer = Cast<ARPlayerBase>(result.GetActor());
+				if (overlappedPlayer)
+				{
+					TargetFound(overlappedPlayer);
+				}
+			}
+			else
+			{
+				AREnemyBase* overlappedEnemy = Cast<AREnemyBase>(result.GetActor());
+				if (overlappedEnemy)
+				{
+					TargetFound(overlappedEnemy);
+				}
 			}
 		}
 	}

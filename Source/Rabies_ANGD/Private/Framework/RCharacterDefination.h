@@ -46,6 +46,9 @@ public:
 	FText UltimateText;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Info")
+	UTexture* PassiveIcon;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Info")
 	FText PassiveText;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Character Piece")

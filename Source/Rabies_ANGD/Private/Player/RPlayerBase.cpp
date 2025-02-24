@@ -243,6 +243,12 @@ void ARPlayerBase::StartJump()
 
 	if (bInstantJump)
 	{
+		if (!GetCharacterMovement()->IsFalling())
+		{
+			AudioComp->SetSound(JumpAudio);
+			AudioComp->Play();
+		}
+
 		Jump();
 		return;
 	}
@@ -375,7 +381,14 @@ void ARPlayerBase::FinishUltimateAttack()
 void ARPlayerBase::Interact()
 {
 	PlayerInteraction.Broadcast();
-	ServerRequestInteraction(interactionChest, escapeToWin); // if there's lag this might not work... Reconsider your options carefully
+
+	bool bLucky = false;
+	if (interactionChest != nullptr)
+	{
+		 bLucky = CashMyLuck();
+	}
+
+	ServerRequestInteraction(interactionChest, escapeToWin, bLucky); // if there's lag this might not work... Reconsider your options carefully
 }
 
 void ARPlayerBase::Pause()
@@ -467,6 +480,14 @@ void ARPlayerBase::SetPausetoFalse()
 	isPaused = false;
 }
 
+bool ARPlayerBase::CashMyLuck()
+{
+	if (playerController == nullptr)
+		return false;
+
+	return playerController->CashMyLuck();
+}
+
 void ARPlayerBase::PlayPickupAudio()
 {
 	if (AudioComp && PickupAudio)
@@ -519,11 +540,11 @@ void ARPlayerBase::ServerRequestPickupItem_Implementation(AItemPickup* itemPicku
 	}
 }
 
-void ARPlayerBase::ServerRequestInteraction_Implementation(AItemChest* Chest, AEscapeToWin* winPoint)
+void ARPlayerBase::ServerRequestInteraction_Implementation(AItemChest* Chest, AEscapeToWin* winPoint, bool bLucky)
 {
 	if (Chest)
 	{
-		Chest->Server_OpenChest();
+		Chest->Server_OpenChest(bLucky);
 	}
 
 	if (winPoint)
