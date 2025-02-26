@@ -63,14 +63,14 @@ bool AEOSPlayerState::Server_ChangeHoveredCharacterPick_Validate()
 	return true;
 }
 
-void AEOSPlayerState::CopyProperties(APlayerState* PlayerState)
+/*void AEOSPlayerState::CopyProperties(APlayerState* PlayerState)
 {
-	Super::CopyProperties(PlayerState);
+	//Super::CopyProperties(PlayerState);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Copied Updated Character"));
-	AEOSPlayerState* NewPlayerState = Cast<AEOSPlayerState>(PlayerState);
-	NewPlayerState->PickedCharacter = PickedCharacter;
-}
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Copied Updated Character"));
+	//AEOSPlayerState* NewPlayerState = Cast<AEOSPlayerState>(PlayerState);
+	//NewPlayerState->PickedCharacter = PickedCharacter;
+}*/
 
 AEOSPlayerState::AEOSPlayerState()
 {

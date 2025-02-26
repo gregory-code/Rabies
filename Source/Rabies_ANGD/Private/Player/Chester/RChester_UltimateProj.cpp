@@ -10,6 +10,7 @@
 #include "GameplayAbilities/RAbilityGenericTags.h"
 #include "AbilitySystemComponent.h"
 #include "Framework/EOSActionGameState.h"
+#include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 
@@ -32,9 +33,6 @@
 
 ARChester_UltimateProj::ARChester_UltimateProj()
 {
-	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
-	AudioComp->SetupAttachment(GetRootComponent());
-	AudioComp->bAutoActivate = false;
 }
 
 void ARChester_UltimateProj::HitCharacter(ARCharacterBase* usingCharacter, ARCharacterBase* hitCharacter, bool isEnemy, int hitNumber)
@@ -77,14 +75,18 @@ void ARChester_UltimateProj::Explosion(ARCharacterBase* usingCharacter)
 {
 	GetWorld()->GetTimerManager().SetTimer(NewDestroyHandle, this, &ARProjectileBase::DestroySelf, 0.3f, false);
 
-	AudioComp->SetSound(ExplosionAudio);
-	AudioComp->Play();
+	//AudioComp->SetSound(ExplosionAudio);
+	//AudioComp->Play();
+
+	//void PlaySoundAtLocation(const UObject * WorldContextObject, USoundBase * Sound, FVector Location, FRotator Rotation, float VolumeMultiplier = 1.f, float PitchMultiplier = 1.f, float StartTime = 0.f, class USoundAttenuation* AttenuationSettings = nullptr, USoundConcurrency * ConcurrencySettings = nullptr, const AActor * OwningActor = nullptr, const UInitialActiveSoundParams * InitialParams = nullptr);
+
 
 	AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
 	if (gameState && HitExplosion)
 	{
 		FVector spawnPos = GetActorLocation();
 		gameState->Multicast_RequestSpawnVFX(HitExplosion, spawnPos, FVector::UpVector, 0);
+		gameState->Multicast_RequestPlayAudio(ExplosionAudio, GetActorLocation(), GetActorRotation(), 1, 1, 0, ExplosionSoundAttenuationSettings);
 	}
 
 	TArray<FOverlapResult> OverlappingResults;

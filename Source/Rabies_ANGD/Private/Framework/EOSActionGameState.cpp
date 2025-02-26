@@ -200,7 +200,7 @@ void AEOSActionGameState::SpawnEnemyWave(int amountOfEnemies)
             continue;
 
         float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
-        SpawnEnemy(4, spawnLocations[randomSpawn]->GetActorLocation());
+        SpawnEnemy(5, spawnLocations[randomSpawn]->GetActorLocation());
         spawnLocations.RemoveAt(randomSpawn);
     }
 }
@@ -328,6 +328,11 @@ void AEOSActionGameState::Multicast_ShootTexUltimate_Implementation(UNiagaraSyst
     {
         SpawnSystemAttached->SetVectorParameter(FName("BeamEnd"), endPos);
     }
+}
+
+void AEOSActionGameState::Multicast_RequestPlayAudio_Implementation(USoundBase* Sound, FVector Location, FRotator Rotation, float VolumeMultiplier, float PitchMultiplier, float StartTime, USoundAttenuation* AttenuationSettings)
+{
+    UGameplayStatics::PlaySoundAtLocation(this, Sound, Location, Rotation, VolumeMultiplier, PitchMultiplier, StartTime, AttenuationSettings);
 }
 
 void AEOSActionGameState::LoadMapAndListen(TSoftObjectPtr<UWorld> levelToLoad)

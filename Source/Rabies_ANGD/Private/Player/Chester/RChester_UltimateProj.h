@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/RProjectileBase.h"
+#include "Sound/SoundAttenuation.h"
 #include "RChester_UltimateProj.generated.h"
 
 /**
@@ -26,6 +27,9 @@ private:
 
 	void SelfDestroyExplosion();
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	class USoundAttenuation* ExplosionSoundAttenuationSettings;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	class UNiagaraSystem* HitExplosion;
 
@@ -39,9 +43,6 @@ private:
 	FTimerHandle EnableTimerHandle;
 
 	void EnableHitDetection();
-
-	UPROPERTY(VisibleAnywhere, Category = "Audio")
-	class UAudioComponent* AudioComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	class USoundCue* ExplosionAudio;

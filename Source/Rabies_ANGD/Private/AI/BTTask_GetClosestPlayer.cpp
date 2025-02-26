@@ -54,13 +54,22 @@ EBTNodeResult::Type UBTTask_GetClosestPlayer::ExecuteTask(UBehaviorTreeComponent
 	if (!PerceptionComponent)
 		return EBTNodeResult::Failed;
 
+
+	AREnemyBase* enemy = Cast<AREnemyBase>(AIC->GetPawn());
+	if (enemy == nullptr)
+		return EBTNodeResult::Failed;
+		
+	AIC->GetBlackboardComponent()->SetValueAsObject(TargetBlackboardKeyName, chosenPlayer);
+	enemy->UpdateAITarget(chosenPlayer);
+	
 	FAIStimulus Stimulus;
 	Stimulus.Tag = FName("Sight"); // Set the tag for the type of stimulus
 	Stimulus.Strength = 1.0f; // Strength of the stimulus (e.g., full strength)
 	Stimulus.StimulusLocation = chosenPlayer->GetActorLocation(); // Where the stimulus is coming from
 	Stimulus.WasSuccessfullySensed(); // Whether it was successfully sensed
 	Cast<AREnemyAIController>(AIC)->bAutoSense = true;
-	Cast<AREnemyAIController>(AIC)->TargetPerceptionUpdated(chosenPlayer, Stimulus);
+	//Cast<AREnemyAIController>(AIC)->TargetPerceptionUpdated(chosenPlayer, Stimulus);
+
 
 	return EBTNodeResult::Succeeded;
 }

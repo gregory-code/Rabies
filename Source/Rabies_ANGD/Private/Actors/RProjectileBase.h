@@ -76,6 +76,15 @@ public:
 
 	class ARCharacterBase* OwnedPlayer;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	class USoundCue* HitAudio;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	class USoundAttenuation* HitSoundAttenuationSettings;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	float AudioPlayMinSpeed = 200;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

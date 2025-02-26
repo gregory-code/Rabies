@@ -224,6 +224,18 @@ public:
 
 private:
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	class UStaticMeshComponent* Weapon_LeftHand;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	class UStaticMeshComponent* Weapon_RightHand;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	FName WeaponLeftSocketName = TEXT("Replace With Joint");
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	FName WeaponRightSocketName = TEXT("Replace With Joint");
+
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	class UCapsuleComponent* WeakpointCollider;
 

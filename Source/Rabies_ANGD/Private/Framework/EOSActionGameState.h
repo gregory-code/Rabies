@@ -66,7 +66,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ShootTexUltimate(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, FVector endPos);
 
-
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RequestPlayAudio(USoundBase* Sound, FVector Location, FRotator Rotation, float VolumeMultiplier = 1.f, float PitchMultiplier = 1.f, float StartTime = 0.f, class USoundAttenuation* AttenuationSettings = nullptr);
 private:
 
 	UFUNCTION(NetMulticast, Reliable)

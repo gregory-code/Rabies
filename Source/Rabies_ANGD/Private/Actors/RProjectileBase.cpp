@@ -26,6 +26,9 @@
 
 #include "Net/UnrealNetwork.h"
 
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
+
 // Sets default values
 ARProjectileBase::ARProjectileBase()
 {
@@ -86,7 +89,15 @@ void ARProjectileBase::BeginPlay()
 
 void ARProjectileBase::OnBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity)
 {
-	OnBounceCharacter.Broadcast(ImpactResult, ImpactVelocity);
+	OnBounceCharacter.Broadcast(ImpactResult, ImpactVelocity); 
+	if (ImpactVelocity.Length() > AudioPlayMinSpeed)
+	{
+		AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
+		if (gameState && HitAudio)
+		{
+			gameState->Multicast_RequestPlayAudio(HitAudio, GetActorLocation(), GetActorRotation(), 1, 1, 0, HitSoundAttenuationSettings);
+		}
+	}
 }
 
 void ARProjectileBase::DestroySelf()

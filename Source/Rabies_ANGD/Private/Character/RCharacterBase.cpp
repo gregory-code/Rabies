@@ -99,6 +99,16 @@ ARCharacterBase::ARCharacterBase()
 	WeakpointCollider->SetCollisionResponseToAllChannels(ECR_Ignore);
 	WeakpointCollider->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Block);
 
+	Weapon_LeftHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftWeapon"));
+	Weapon_LeftHand->SetupAttachment(RootComponent); // Default to root, attach later
+	Weapon_LeftHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Weapon_LeftHand->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	Weapon_RightHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightWeapon"));
+	Weapon_RightHand->SetupAttachment(RootComponent); // Default to root, attach later
+	Weapon_RightHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Weapon_RightHand->SetCollisionResponseToAllChannels(ECR_Ignore);
+
 	PrimaryActorTick.bRunOnAnyThread = false; // prevents crash??
 }
 
@@ -129,6 +139,18 @@ void ARCharacterBase::BeginPlay()
 	if (DynamicMaterialInstance)
 	{
 		GetMesh()->SetMaterial(0, DynamicMaterialInstance);
+	}
+
+	if (Weapon_LeftHand && WeaponLeftSocketName != TEXT("Replace With Joint"))
+	{
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		Weapon_LeftHand->AttachToComponent(GetMesh(), AttachmentRules, WeaponLeftSocketName);
+	}
+
+	if (Weapon_RightHand && WeaponRightSocketName != TEXT("Replace With Joint"))
+	{
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		Weapon_RightHand->AttachToComponent(GetMesh(), AttachmentRules, WeaponRightSocketName);
 	}
 
 	if (WeakpointCollider)

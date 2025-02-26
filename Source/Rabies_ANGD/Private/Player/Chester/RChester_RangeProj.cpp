@@ -27,6 +27,10 @@
 #include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Framework/EOSActionGameState.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
+
 void ARChester_RangeProj::HitCharacter(ARCharacterBase* usingCharacter, ARCharacterBase* hitCharacter, bool isEnemy, int hitNumber)
 {
 	for (ARCharacterBase* character : AlreadyHitCharacters)
