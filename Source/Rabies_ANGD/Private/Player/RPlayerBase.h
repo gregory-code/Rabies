@@ -63,7 +63,14 @@ public:
 	TArray<AActor*> nearbyFaintedActors;
 
 	class AEscapeToWin* escapeToWin;
+
 private:
+
+	UFUNCTION(Server, Reliable)
+	void Server_HandlePing(FVector hitPoint, AActor* hitActor);
+
+	UFUNCTION()
+	void SetAllyHealthBars();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tex Invis")
 	UMaterial* TexDefaultMat;  // The base material reference in the editor
@@ -178,6 +185,9 @@ private:
 	UInputAction* PausingInputAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* PingInputAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* LoadDebugInputAction;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -205,6 +215,9 @@ private:
 
 	UFUNCTION()
 	void DoBasicAttack();
+
+	UFUNCTION()
+	void Ping();
 
 	UFUNCTION()
 	void StopBasicAttack();

@@ -38,7 +38,7 @@ void AEOSPlayerState::Server_IssueCharacterPick_Implementation(URCharacterDefina
 	if (!gameState)
 		return;
 
-	gameState->UpdateCharacterSelection(newPickedCharacterDefination, PickedCharacter);
+	gameState->UpdateCharacterSelection(newPickedCharacterDefination, PickedCharacter, GetPlayerName());
 	PickedCharacter = newPickedCharacterDefination;
 	OnPickedCharacterReplicated.Broadcast(PickedCharacter);
 }
@@ -63,14 +63,14 @@ bool AEOSPlayerState::Server_ChangeHoveredCharacterPick_Validate()
 	return true;
 }
 
-/*void AEOSPlayerState::CopyProperties(APlayerState* PlayerState)
+void AEOSPlayerState::CopyProperties(APlayerState* PlayerState)
 {
-	//Super::CopyProperties(PlayerState);
+	Super::CopyProperties(PlayerState);
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Copied Updated Character"));
-	//AEOSPlayerState* NewPlayerState = Cast<AEOSPlayerState>(PlayerState);
-	//NewPlayerState->PickedCharacter = PickedCharacter;
-}*/
+	AEOSPlayerState* NewPlayerState = Cast<AEOSPlayerState>(PlayerState);
+	NewPlayerState->PickedCharacter = PickedCharacter;
+}
 
 AEOSPlayerState::AEOSPlayerState()
 {
@@ -151,7 +151,8 @@ void AEOSPlayerState::OnRep_HitScanLocation()
 
 void AEOSPlayerState::OnRep_PlayerVelocity()
 {
-	Player->PlayerVelocity = playerVelocity;
+	if(Player != nullptr)
+		Player->PlayerVelocity = playerVelocity;
 }
 
 

@@ -44,13 +44,13 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Unreliable)
 	void Server_PickupItem();
 
-	UFUNCTION(NetMulticast, Unreliable)
+	UFUNCTION(Server, Unreliable)
 	void PlayerPickupRequest(class ARPlayerBase* player);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void UpdateItemPickedup();
 
-	UPROPERTY(VisibleAnywhere, Category = "ItemEffect")
+	UPROPERTY(VisibleDefaultsOnly, Category = "ItemEffect")
 	URItemDataAsset* ItemAsset;
 
 	UFUNCTION(NetMulticast, Unreliable)

@@ -41,8 +41,6 @@
 
 #include "Engine/PostProcessVolume.h"
 
-#include "Components/HorizontalBox.h"
-#include "Components/HorizontalBoxSlot.h"
 #include "Components/VerticalBox.h"
 
 #include "GameplayAbilitySpec.h"
@@ -105,7 +103,7 @@ void UGameplayUI::NativeConstruct()
 		{
 			UPlayerAbilityGauge* newAbilityGague = CreateWidget<UPlayerAbilityGauge>(this, AbilityGaugeClass);
 			UHorizontalBoxSlot* AbilitySlot = AbilityHorizontalBox->AddChildToHorizontalBox(newAbilityGague);
-			newAbilityGague->SetupOwningAbilityCDO(GrantedAbility, OwnerASC);
+			newAbilityGague->SetupOwningAbilityCDO(GrantedAbility, OwnerASC, ButtonInputs[whichAttribute]);
 			switch (whichAttribute)
 			{
 				default:
@@ -260,6 +258,8 @@ void UGameplayUI::DeadTimer(float timeRemaining)
 
 		if (PostProcessVolume)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Post processing"), *GetName());
+
 			float inverseValue = FMath::Abs(1.0f - (CurrentDeathDuration / 1.0f));
 			FVector4 newSaturation = FVector4(CurrentDeathDuration, CurrentDeathDuration, CurrentDeathDuration, 1.0f);
 			PostProcessVolume->Settings.ColorSaturation = newSaturation;

@@ -67,16 +67,38 @@ public:
 	void Multicast_ShootTexUltimate(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, FVector endPos);
 
 	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SpawnHealingPulse(UNiagaraSystem* SystemToSpawn, class ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, float healingRadius);
+
+
+	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_RequestPlayAudio(USoundBase* Sound, FVector Location, FRotator Rotation, float VolumeMultiplier = 1.f, float PitchMultiplier = 1.f, float StartTime = 0.f, class USoundAttenuation* AttenuationSettings = nullptr);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_Ping(FVector hitPoint, AActor* hitActor);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Ping(FVector hitPoint, AActor* hitActor);
+
+
 private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ping")
+	TSubclassOf<class APingActor> PingActorClass;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SpawnDotLaserMarks(UNiagaraSystem* SystemToSpawn, FVector SpawnLocation, FVector Direction, float ScorchSize);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class UNiagaraSystem* HealingPulse;
+
+	UFUNCTION()
+	TArray<URItemDataAsset*> GetItemPoolOfRarity(TArray<URItemDataAsset*> itemPool, EItemRarity itemRarity);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Deadlock")
 	FVector deadlockPos;
 
 	FTimerHandle WaveHandle;
+	FTimerHandle SpawnHandle;
 
 	void LoadMapAndListen(TSoftObjectPtr<UWorld> levelToLoad);
 
@@ -94,13 +116,16 @@ private:
 	float WaveTime;
 
 	UPROPERTY()
+	bool bFirstSpawn;
+
+	UPROPERTY()
 	int WaveLevel;
 
 	UFUNCTION()
 	void WaveSpawn(float timeToNextWave);
 
 	UFUNCTION()
-	void SpawnEnemyWave(int amountOfEnemies);
+	void SpawnEnemyWave(int powerLevel);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chest")
 	int AmountOfChests;
@@ -111,11 +136,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
 	int enemyMax;
 
-	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void SpawnChest(FVector SpawnLocation, bool bRareChest);
+	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
+	int WaveSpawnCap;
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
-	void SpawnEnemy(int EnemyIDToSpawn, FVector SpawnLocation);
+	void SpawnChest(FVector SpawnLocation, bool bRareChest, float randomItemCost);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void SpawnEnemy(int EnemyIDToSpawn, FVector SpawnLocation, bool fromEnemySelection);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void OpenedChest(int chestID, int spawnCount);
@@ -134,6 +162,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
 	TArray<TSubclassOf<class AREnemyBase>> EnemyLibrary;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
+	TArray<TSubclassOf<class AREnemyBase>> EnemySelection;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Enemies")
+	TArray<int> EnemyIndexPowerLevels;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Items")
 	TArray<URItemDataAsset*> ItemLibrary;

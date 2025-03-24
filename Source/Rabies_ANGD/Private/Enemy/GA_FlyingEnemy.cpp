@@ -53,6 +53,8 @@ void UGA_FlyingEnemy::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 	if (Enemy == nullptr)
 		return;
 
+	FlyingHeight = FMath::RandRange(3000, 8000);
+
 	if (Enemy)
 	{
 		StunHandle = Enemy->OnTaserStatusChanged.AddLambda([this](bool bTased)
@@ -61,7 +63,22 @@ void UGA_FlyingEnemy::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 			});
 	}
 
+	UAbilityTask_WaitGameplayEvent* WaitForActivation = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetDeadTag());
+	WaitForActivation->EventReceived.AddDynamic(this, &UGA_FlyingEnemy::EndFlying);
+	WaitForActivation->ReadyForActivation();
+
 	FlyingHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_FlyingEnemy::Fly));
+}
+
+void UGA_FlyingEnemy::EndFlying(FGameplayEventData Payload)
+{
+	AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
+	if (gameState)
+	{
+		gameState->Multicast_RequestSpawnVFXOnCharacter(DeathSmoke, Enemy, Enemy->GetActorLocation(), Enemy->GetActorLocation(), 0);
+	}
+
+	K2_EndAbility();
 }
 
 void UGA_FlyingEnemy::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -87,7 +104,7 @@ void UGA_FlyingEnemy::Fly()
 		return;
 
 	FVector Start = Enemy->GetActorLocation();
-	FVector End = Start - FVector(0, 0, 5000); // Trace downward
+	FVector End = Start - FVector(0, 0, FlyingHeight); // Trace downward
 
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;

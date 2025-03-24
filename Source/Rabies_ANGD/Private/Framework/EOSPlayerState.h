@@ -46,7 +46,7 @@ public:
 
 
 	/** Copy properties which need to be saved in inactive PlayerState */
-	//virtual void CopyProperties(APlayerState* PlayerState) override;
+	virtual void CopyProperties(APlayerState* PlayerState) override;
 
 
 public:

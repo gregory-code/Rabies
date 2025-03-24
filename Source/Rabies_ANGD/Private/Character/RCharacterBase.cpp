@@ -201,6 +201,7 @@ void ARCharacterBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	WeakpointWidgetComp->SetWorldLocation(GetMesh()->GetSocketLocation(WeakpointSocketName));
+
 }
 
 void ARCharacterBase::PossessedBy(AController* NewController)
@@ -246,6 +247,8 @@ void ARCharacterBase::InitStatusHUD()
 
 	HealthBar->SetRenderScale(FVector2D{ 0.5f });
 
+
+
 	if (AttributeSet)
 	{
 		//UE_LOG(LogTemp, Error, TEXT("health is: %d / %d"), AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
@@ -264,9 +267,35 @@ void ARCharacterBase::InitStatusHUD()
 	if (IsLocallyControlled())
 	{
 		if (GetController() && GetController()->IsPlayerController())
+		{
 			HealthBar->SetVisibility(ESlateVisibility::Hidden);
+
+		}
+	}
+	else
+	{
+		HealthBar->SetAllyView(CharacterIcon);
+		HealthBarWidgetComp->SetDrawAtDesiredSize(true);
+		HealthBar->SetRenderScale(FVector2D{ 0.3f });
 	}
 }
+
+void ARCharacterBase::SetHealthBarFromAllyPerspective(FVector viewingLocation)
+{
+	if (HealthBar && HealthBarWidgetComp)
+	{
+
+		HealthBarWidgetComp->SetDrawAtDesiredSize(true);
+		float Distance = FVector::Dist(viewingLocation, GetActorLocation());
+		//UE_LOG(LogTemp, Warning, TEXT("Value is: %f"), Distance);
+		float BaseSize = 200.f; // Default UI size
+		float SizeFactor = BaseSize / Distance;
+		SizeFactor = FMathf::Clamp(SizeFactor, SizeFactor, 0.6f);
+		HealthBar->SetRenderScale(FVector2D(SizeFactor, SizeFactor));
+
+	}
+}
+
 
 int ARCharacterBase::GetCurrentScrap()
 {
@@ -794,7 +823,9 @@ void ARCharacterBase::HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEf
 		QueryParams.AddIgnoredActor(this); // Ignore self
 	}
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), healingRadius, 32, FColor::Green, false, 0.1f);
+	AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
+
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), healingRadius, 32, FColor::Green, false, 0.1f);
 
 	bool bHit = GetWorld()->OverlapMultiByChannel(OverlappingResults, GetActorLocation(), FQuat::Identity, ECC_Pawn, Sphere, QueryParams);
 
@@ -815,10 +846,23 @@ void ARCharacterBase::HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEf
 				FGameplayEffectSpec* spec = specHandle.Data.Get();
 				if (spec)
 				{
+					if (gameState && HealingSelf)
+					{
+						gameState->Multicast_RequestSpawnVFXOnCharacter(HealingSelf, player, player->GetActorLocation(), player->GetActorLocation(), 0);
+					}
+
 					alreadyHealedPlayers.Add(player);
 					player->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
 				}
 			}
+		}
+	}
+
+	if (foundFriend)
+	{
+		if (gameState)
+		{
+			gameState->Multicast_SpawnHealingPulse(nullptr, this, this->GetActorLocation(), this->GetActorLocation(), healingRadius);
 		}
 	}
 
@@ -829,6 +873,10 @@ void ARCharacterBase::HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEf
 		FGameplayEffectSpec* spec = specHandle.Data.Get();
 		if (spec)
 		{
+			if (gameState && HealingSelf)
+			{
+				gameState->Multicast_RequestSpawnVFXOnCharacter(HealingSelf, this, this->GetActorLocation(), this->GetActorLocation(), 0);
+			}
 			GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
 		}
 	}

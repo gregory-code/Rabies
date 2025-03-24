@@ -67,6 +67,13 @@ void UGA_Revive::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGame
 
 void UGA_Revive::Hold(float timeRemaining)
 {
+	if (Player)
+	{
+		if (Player->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
+		{
+			K2_EndAbility();
+		}
+	}
 
 	if (CurrentHoldDuration <= 5)
 	{
@@ -101,6 +108,7 @@ void UGA_Revive::Hold(float timeRemaining)
                 {
 					if (EOSPlayeState->GetPlayer() == playerBase)
 					{
+						playerBase->ServerSetPlayerReviveState(false);
 						Player->playerController->Server_RequestRevive(EOSPlayeState);
 						Player->ServerPlayAnimMontage(Player->RevivingBuddy);
 						UE_LOG(LogTemp, Error, TEXT("%s Reviving"), *player->GetName());

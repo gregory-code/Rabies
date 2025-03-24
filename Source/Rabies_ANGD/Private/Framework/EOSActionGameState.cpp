@@ -22,6 +22,8 @@
 #include "Actors/EnemySpawnLocation.h"
 #include "GameplayAbilities/GA_AbilityBase.h"
 #include "GameplayAbilities/RAbilitySystemComponent.h"
+#include "Framework/RItemDataAsset.h"
+#include "Actors/PingActor.h"
 #include "GameplayAbilities/RAttributeSet.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
@@ -33,6 +35,8 @@ void AEOSActionGameState::BeginPlay()
 
     if (HasAuthority() == false)
         return;
+
+    bFirstSpawn = true;
 
     TArray<AActor*> EscapeToWinObj;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEscapeToWin::StaticClass(), EscapeToWinObj);
@@ -55,38 +59,47 @@ void AEOSActionGameState::BeginPlay()
 
         if (thisSpawn != nullptr)
         {
-            SpawnChest(thisSpawn->GetActorLocation(), thisSpawn->bRareChest);
+            float randomItemCost = FMath::RandRange(3, 10);
+            SpawnChest(thisSpawn->GetActorLocation(), thisSpawn->bRareChest, randomItemCost);
             spawnLocations.RemoveAt(randomSpawn);
         }
     }
 
+    TArray<AActor*> enemySpawnLocations;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemySpawnLocation::StaticClass(), enemySpawnLocations);
+
+    WaveSpawnCap = FMathf::Clamp(WaveSpawnCap, 1, enemySpawnLocations.Num());
 
     WaveLevel = 0;
-    WaveTime = enemyInitalSpawnRate;
+    WaveTime = enemyInitalSpawnRate + 5.0f;
     WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
 }
 
-void AEOSActionGameState::SpawnChest_Implementation(FVector SpawnLocation, bool bRareChest)
+void AEOSActionGameState::SpawnChest_Implementation(FVector SpawnLocation, bool bRareChest, float randomItemCost)
 {
-    if (HasAuthority() && ItemChestClass != nullptr) // Ensure we're on the server
+    if (HasAuthority() && ItemChestClass != nullptr && GetWorld() != nullptr) // Ensure we're on the server
     {
         FActorSpawnParameters SpawnParams;
         AItemChest* newChest = GetWorld()->SpawnActor<AItemChest>(ItemChestClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
         newChest->SetOwner(this);
         if (bRareChest)
         {
-            newChest->ScrapPrice = 70.0f;
+            newChest->ScrapPrice = 80.0f;
+        }
+        else
+        {
+            newChest->ScrapPrice = randomItemCost * 5.0f;
         }
         AllChests.Add(newChest); // make sure that the chest has bReplicates to true
     }
 }
 
-void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector SpawnLocation)
+void AEOSActionGameState::SpawnEnemy_Implementation(int EnemyIDToSpawn, FVector SpawnLocation, bool fromEnemySelection)
 {
     if (HasAuthority()) // Ensure we're on the server
     {
         FActorSpawnParameters SpawnParams;
-        AREnemyBase* newEnemy = GetWorld()->SpawnActor<AREnemyBase>(EnemyLibrary[EnemyIDToSpawn], SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+        AREnemyBase* newEnemy = GetWorld()->SpawnActor<AREnemyBase>((fromEnemySelection) ? EnemySelection[EnemyIDToSpawn] : EnemyLibrary[EnemyIDToSpawn], SpawnLocation, FRotator::ZeroRotator, SpawnParams);
         if (newEnemy == nullptr || this == nullptr)
         {
             
@@ -177,9 +190,9 @@ void AEOSActionGameState::WaveSpawn(float timeToNextWave)
     if (timeToNextWave >= WaveTime)
     {
         WaveLevel += PlayerArray.Num();
-        int enemiesToSpawn = WaveLevel * 3;
-        enemiesToSpawn = FMath::Clamp(enemiesToSpawn, 3, 6);
-        SpawnEnemyWave(enemiesToSpawn);
+        //int enemiesToSpawn = WaveLevel * 3;
+        //enemiesToSpawn = FMath::Clamp(enemiesToSpawn, 3, 6);
+        SpawnEnemyWave(WaveLevel);
         WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
     }
     else
@@ -189,18 +202,75 @@ void AEOSActionGameState::WaveSpawn(float timeToNextWave)
     }
 }
 
-void AEOSActionGameState::SpawnEnemyWave(int amountOfEnemies)
+void AEOSActionGameState::SpawnEnemyWave(int powerLevel)
 {
+    if (GetWorld() == nullptr)
+        return;
+
+    if (bFirstSpawn)
+    {
+        bFirstSpawn = false;
+        WaveTime = enemyInitalSpawnRate;
+    }
+
     TArray<AActor*> spawnLocations;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemySpawnLocation::StaticClass(), spawnLocations);
 
-    for (int i = 0; i < amountOfEnemies; i++)
+    int spawnsThisWave = 0;
+    float power = powerLevel;
+
+    while (power > 0 && spawnsThisWave < WaveSpawnCap)
     {
         if (AllEnemies.Num() >= enemyMax)
-            continue;
+            return;
 
-        float randomSpawn = FMath::RandRange(0, spawnLocations.Num() - 1);
-        SpawnEnemy(5, spawnLocations[randomSpawn]->GetActorLocation());
+        UE_LOG(LogTemp, Warning, TEXT("Power is: %f"), power);
+
+        int enemyID = -1; // Null default, proceed with caution
+        int tries = 0;
+        while (enemyID < 0)
+        {
+            tries++;
+            int randomEnemyID = FMath::RandRange(0, EnemySelection.Num() - 1);
+            if (power >= EnemyIndexPowerLevels[randomEnemyID])
+            {
+                enemyID = randomEnemyID;
+                power -= EnemyIndexPowerLevels[randomEnemyID];
+            }
+            else if(tries >= 20)
+            {
+                return;
+            }
+        }
+
+        float randomPlayer = FMath::RandRange(0, PlayerArray.Num() - 1);
+        if (PlayerArray[randomPlayer] == nullptr)
+            return;
+
+        if (PlayerArray[randomPlayer]->GetPawn() == nullptr)
+            return;
+
+        float randomSpawn = 0;
+        float closestDistance = TNumericLimits<float>::Max();
+        for (int i = 0; i < spawnLocations.Num(); i++)
+        {
+            if (spawnLocations[i] == nullptr)
+            {
+                continue;
+            }
+
+            float distance = FVector::Dist(spawnLocations[i]->GetActorLocation(), PlayerArray[randomPlayer]->GetPawn()->GetActorLocation());
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                randomSpawn = i;
+            }
+        }
+
+        FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &AEOSActionGameState::SpawnEnemy, enemyID, spawnLocations[randomSpawn]->GetActorLocation(), true);
+        FTimerHandle newSpawnHandle;
+        GetWorldTimerManager().SetTimer(newSpawnHandle, TimerDelegate, 0.1f, false);
+        spawnsThisWave++;
         spawnLocations.RemoveAt(randomSpawn);
     }
 }
@@ -210,7 +280,7 @@ void AEOSActionGameState::StartBossFight_Implementation(int enemyID)
     if (enemyID == 1)
         deadlockPos.X += 300;
 
-    SpawnEnemy(enemyID, deadlockPos);
+    SpawnEnemy(enemyID, deadlockPos, false);
     
     for (APlayerState* playerState : PlayerArray)
     {
@@ -264,19 +334,33 @@ void AEOSActionGameState::OpenedChest_Implementation(int chestID, int spawnCount
         for (int i = 0; i < spawnCount; i++)
         {
             URItemDataAsset* newData = ItemLibrary[0];
+            TArray<URItemDataAsset*> ChosenLibrary = (ItemSelection.IsEmpty() == false) ? ItemSelection : ItemLibrary;
 
-            if (ItemSelection.IsEmpty() == false)
+            bool bRareItem = false;
+
+            float randomItemRariety = FMath::RandRange(0, 75);
+            if (AllChests[chestID]->ScrapPrice > randomItemRariety)
             {
-                int32 randomIndex = FMath::RandRange(0, ItemSelection.Num() - 1);
-                newData = ItemSelection[randomIndex];
+                float reRollRandomItemRariety = FMath::RandRange(0, 100);
+                if (AllChests[chestID]->ScrapPrice > reRollRandomItemRariety || AllChests[chestID]->ScrapPrice >= 80)
+                {
+                    bRareItem = true;
+                    ChosenLibrary = GetItemPoolOfRarity(ChosenLibrary, EItemRarity::Rare);
+                }
+                else
+                {
+                    ChosenLibrary = GetItemPoolOfRarity(ChosenLibrary, EItemRarity::Uncommon);
+                }
             }
             else
             {
-                int32 randomIndex = FMath::RandRange(0, ItemLibrary.Num() - 1);
-                newData = ItemLibrary[randomIndex];
+                ChosenLibrary = GetItemPoolOfRarity(ChosenLibrary, EItemRarity::Common);
             }
 
-            if (GetKeyCard())
+            int32 randomIndex = FMath::RandRange(0, ChosenLibrary.Num() - 1);
+            newData = ChosenLibrary[randomIndex];
+
+            if (GetKeyCard() && bRareItem == false)
                 newData = KeyCard;
 
             FActorSpawnParameters SpawnParams;
@@ -294,6 +378,56 @@ void AEOSActionGameState::OpenedChest_Implementation(int chestID, int spawnCount
         AllChests.RemoveAt(chestID);
     }
 }
+
+void AEOSActionGameState::Server_Ping_Implementation(FVector hitPoint, AActor* hitActor)
+{
+    Multicast_Ping(hitPoint, hitActor);
+}
+
+bool AEOSActionGameState::Server_Ping_Validate(FVector hitPoint, AActor* hitActor)
+{
+    return true;
+}
+
+void AEOSActionGameState::Multicast_Ping_Implementation(FVector hitPoint, AActor* hitActor)
+{
+    if (hitActor == nullptr)
+        return;
+
+    FActorSpawnParameters SpawnParams;
+    APingActor* newPing = GetWorld()->SpawnActor<APingActor>(PingActorClass, hitPoint, FRotator::ZeroRotator, SpawnParams);
+    newPing->SetOwner(this);
+    AItemChest* hitChest = Cast<AItemChest>(hitActor);
+    if (hitChest)
+    {
+        //if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit Chest: %s"), *hitActor->GetName()));
+        newPing->SetChestCostText(hitChest->ScrapPrice);
+    }
+    AItemPickup* hitItem = Cast<AItemPickup>(hitActor);
+    if (hitItem)
+    {
+        //if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit Item: %s"), *hitActor->GetName()));
+        newPing->SetItemIcon(hitItem->ItemAsset);
+    }
+}
+
+TArray<URItemDataAsset*> AEOSActionGameState::GetItemPoolOfRarity(TArray<URItemDataAsset*> itemPool, EItemRarity itemRarity)
+{
+    TArray<URItemDataAsset*> newItemPool;
+    for(URItemDataAsset* item : itemPool)
+    {
+        if (item->ItemRarity == itemRarity)
+        {
+            newItemPool.Add(item);
+        }
+    }
+
+    if (newItemPool.Num() <= 0)
+        return itemPool;
+
+    return newItemPool;
+}
+
 
 bool AEOSActionGameState::GetKeyCard()
 {
@@ -472,6 +606,20 @@ void AEOSActionGameState::Multicast_RequestSpawnVFX_Implementation(UNiagaraSyste
 
 }
 
+void AEOSActionGameState::Multicast_SpawnHealingPulse_Implementation(UNiagaraSystem* SystemToSpawn, ARCharacterBase* characterAttached, FVector SpawnLocation, FVector Direction, float healingRadius)
+{
+    if (!HealingPulse) return;
+    if (!characterAttached) return;
+
+    UNiagaraComponent* SpawnSystemAttached = UNiagaraFunctionLibrary::SpawnSystemAttached(HealingPulse, characterAttached->GetMesh(), NAME_None, SpawnLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true, true, ENCPoolMethod::None, true);
+
+    if (SpawnSystemAttached)
+    {
+        SpawnSystemAttached->SetFloatParameter(FName("circleSize"), healingRadius * 2.25f);
+        SpawnSystemAttached->SetFloatParameter(FName("heartSize"), healingRadius * 1.0f);
+        SpawnSystemAttached->SetFloatParameter(FName("confettiSize"), healingRadius * 0.75f);
+    }
+}
 
 void AEOSActionGameState::Server_RequestSpawnDotLaserMarks_Implementation(UNiagaraSystem* SystemToSpawn, FVector SpawnLocation, FVector Direction, float ScorchSize)
 {

@@ -13,13 +13,10 @@
 
 #include "Player/RPlayerBase.h"
 
-#include "GameplayAbilities/RAbilitySystemComponent.h"
-
 #include "Framework/EOSActionGameState.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
 
-#include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 UGA_ChesterMelee::UGA_ChesterMelee()

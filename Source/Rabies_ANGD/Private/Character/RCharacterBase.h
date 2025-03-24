@@ -154,6 +154,12 @@ public:
 	UPROPERTY()
 	class UNiagaraComponent* CurrentFire;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class UNiagaraSystem* HealingSelf;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class UNiagaraSystem* RedHealingSelf;
+
 	FTimerHandle FriendshipBraceletTimer;
 	FTimerHandle RadiationTimer;
 
@@ -368,6 +374,9 @@ public:
 
 private:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Icon")
+	UTexture* CharacterIcon;
+
 	UPROPERTY(Replicated)
 	FGenericTeamId TeamId;
 
@@ -377,6 +386,9 @@ private:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // need this when doing Replicated things
 
 public:
+	UFUNCTION()
+	void SetHealthBarFromAllyPerspective(FVector viewingLocation);
+
 	UPROPERTY(Replicated)
 	int AILevel;
 

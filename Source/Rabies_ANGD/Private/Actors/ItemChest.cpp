@@ -87,7 +87,11 @@ void AItemChest::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 	}
 
 	bWithinInteraction = true;
-	InteractWidget->SetVisibility(ESlateVisibility::Visible);
+
+	if (InteractWidget != nullptr)
+	{
+		InteractWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 
 	player->PlayerInteraction.AddUObject(this, &AItemChest::Interact);
 
@@ -102,7 +106,11 @@ void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 	}
 
 	bWithinInteraction = false;
-	InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
+
+	if (InteractWidget != nullptr)
+	{
+		InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
 
 	player->SetInteractionChest(nullptr);
 	player->PlayerInteraction.Clear();
@@ -110,7 +118,14 @@ void AItemChest::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 void AItemChest::SetUpUI(bool SetInteraction)
 {
+	if (InteractWidgetComp == nullptr)
+		return;
+
 	InteractWidget = Cast<UChestInteractUI>(InteractWidgetComp->GetUserWidgetObject());
+
+	if (InteractWidget == nullptr)
+		return;
+
 	InteractWidget->SetCostText(ScrapPrice);
 	InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
@@ -177,8 +192,15 @@ void AItemChest::Server_OpenChest_Implementation(bool bFeelinLucky)
 
 void AItemChest::UpdateChestOpened_Implementation()
 {
-	InteractWidget->SetVisibility(ESlateVisibility::Hidden);
-	ChestTopMesh->SetVisibility(false);
+	if (InteractWidget != nullptr)
+	{
+		InteractWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (ChestTopMesh != nullptr)
+	{
+		ChestTopMesh->SetVisibility(false);
+	}
 
 	if (AudioComp && ChestOpenAudio)
 	{
@@ -186,6 +208,7 @@ void AItemChest::UpdateChestOpened_Implementation()
 		AudioComp->Play();
 	}
 
+	SphereCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	bWasOpened = true;
 }
 

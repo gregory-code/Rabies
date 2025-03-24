@@ -72,7 +72,6 @@ void UGA_DotUltimate::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 	if (Player == nullptr)
 		return;
 
-
 	UAbilityTask_WaitGameplayEvent* sendOffAttack = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, URAbilityGenericTags::GetUltimateAttackActivationTag());
 	sendOffAttack->EventReceived.AddDynamic(this, &UGA_DotUltimate::SendOffAttack);
 	sendOffAttack->ReadyForActivation();
@@ -113,14 +112,14 @@ void UGA_DotUltimate::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 	}
 
 
-	for (TActorIterator<APostProcessVolume> It(GetWorld()); It; ++It)
+	/*for (TActorIterator<APostProcessVolume> It(GetWorld()); It; ++It)
 	{
 		PostProcessVolume = *It;
 	}
 	if (PostProcessVolume)
 	{
 		//PostProcessVolume->BlendWeight = 1.0f;
-	}
+	}*/
 
 }
 
@@ -134,10 +133,10 @@ void UGA_DotUltimate::EndAbility(const FGameplayAbilitySpecHandle Handle, const 
 		Player->ClientHitScan.Remove(ClientHitScanHandle);
 	}
 
-	if (PostProcessVolume)
+	/*if (PostProcessVolume)
 	{
 		//PostProcessVolume->BlendWeight = 0.0f;
-	}
+	}*/
 }
 
 void UGA_DotUltimate::TargetAquired(const FGameplayAbilityTargetDataHandle& Data)
@@ -152,7 +151,7 @@ void UGA_DotUltimate::TargetAquired(const FGameplayAbilityTargetDataHandle& Data
 
 	if (HasAuthorityOrPredictionKey(CurrentActorInfo, &CurrentActivationInfo))
 	{
-		if (!K2_CommitAbility())
+		if (!K2_CommitAbility()) // this prevents the ranged attack apparently
 		{
 			K2_EndAbility();
 			return;

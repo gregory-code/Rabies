@@ -13,6 +13,9 @@ UCLASS()
 class URCharacterDefination : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
+
+protected:
+	//virtual void BeginPlay() override;
 	
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Info")

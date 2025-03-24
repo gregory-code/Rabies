@@ -22,6 +22,15 @@ private:
 	FActiveGameplayEffectHandle GravityFallEffectHandle;
 
 	UPROPERTY()
+	float FlyingHeight;
+
+	UFUNCTION()
+	void EndFlying(FGameplayEventData Payload);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	class UNiagaraSystem* DeathSmoke;
+
+	UPROPERTY()
 	class AREnemyBase* Enemy;
 
 	FTimerHandle FlyingHandle;

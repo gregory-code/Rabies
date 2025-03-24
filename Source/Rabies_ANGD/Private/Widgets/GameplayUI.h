@@ -138,6 +138,9 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UChesterLuckUI* ChesterLuckUI;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	TArray<UTexture*> ButtonInputs;
+
 	bool crosshairState;
 
 	void LevelUpdated(const FOnAttributeChangeData& ChangeData);

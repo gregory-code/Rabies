@@ -42,6 +42,9 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "AI")
 	class UAIPerceptionStimuliSourceComponent* AIPerceptionSourceComp;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TSubclassOf<class UGameplayEffect> GravityFallClass;
+
 	FTimerHandle LevelHandle;
 	FTimerHandle DeathHandle;
 

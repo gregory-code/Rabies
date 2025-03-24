@@ -13,6 +13,7 @@
 #include "GameplayAbilities/RAttributeSet.h"
 #include "GameplayAbilities/RAbilitySystemComponent.h"
 #include "GameplayAbilities/RAbilityGenericTags.h"
+#include "Framework/EOSActionGameState.h"
 
 #include "Framework/RItemDataAsset.h"
 
@@ -44,6 +45,8 @@
 
 #include "Components/AudioComponent.h"
 #include "Sound/SoundCue.h"
+
+#define ECC_PingInput ECC_GameTraceChannel4
 
 ARPlayerBase::ARPlayerBase()
 {
@@ -90,6 +93,7 @@ void ARPlayerBase::Tick(float DeltaTime)
 	if (EOSPlayerState && IsLocallyControlled())
 	{
 		//UE_LOG(LogTemp, Error, TEXT(""), *GetName());
+		SetAllyHealthBars();
 		viewPivot->SetRelativeLocation(GetActorLocation()); // centers the pivot on the player without getting the players rotation
 		EOSPlayerState->Server_UpdatePlayerVelocity(GetCharacterMovement()->Velocity);
 		EOSPlayerState->Server_UpdateSocketLocations(GetMesh()->GetSocketLocation(RootAimingSocketName), GetMesh()->GetSocketLocation(RangedAttackSocketName));
@@ -100,6 +104,28 @@ void ARPlayerBase::Tick(float DeltaTime)
 		}
 	}
 
+}
+
+void ARPlayerBase::SetAllyHealthBars()
+{
+	FVector viewLoc;
+	FRotator viewRot;
+
+	playerController->GetPlayerViewPoint(viewLoc, viewRot);
+
+	// Find all actors in the world
+	TArray<AActor*> AllActors;
+	UGameplayStatics::GetAllActorsOfClass(playerController->GetWorld(), ARPlayerBase::StaticClass(), AllActors);
+
+	for (AActor* Actor : AllActors)
+	{
+		ARPlayerBase* allyPlayer = Cast<ARPlayerBase>(Actor);
+
+		if (!allyPlayer || allyPlayer == this)
+			continue;
+
+		allyPlayer->SetHealthBarFromAllyPerspective(GetActorLocation());
+	}
 }
 
 void ARPlayerBase::BeginPlay()
@@ -166,6 +192,7 @@ void ARPlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		enhancedInputComp->BindAction(ultimateAttackAction, ETriggerEvent::Completed, this, &ARPlayerBase::FinishUltimateAttack);
 		enhancedInputComp->BindAction(InteractInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Interact);
 		enhancedInputComp->BindAction(PausingInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Pause);
+		enhancedInputComp->BindAction(PingInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::Ping);
 		enhancedInputComp->BindAction(LoadDebugInputAction, ETriggerEvent::Triggered, this, &ARPlayerBase::LoadDebug);
 	}
 }
@@ -232,7 +259,7 @@ void ARPlayerBase::StartJump()
 	{
 		return;
 	}
-
+	
 	if (bInRangeToRevive)
 	{
 		GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::Revive);
@@ -316,6 +343,51 @@ void ARPlayerBase::DoBasicAttack()
 	else
 	{
 		GetAbilitySystemComponent()->PressInputID((int)EAbilityInputID::MeleeAttack);
+	}
+}
+
+void ARPlayerBase::Ping()
+{
+	if (!EOSPlayerState || !IsLocallyControlled())
+	{
+		return;
+	}
+
+	FVector viewLoc;
+	FRotator viewRot;
+
+	playerController->GetPlayerViewPoint(viewLoc, viewRot);
+	if (bIsScoping == false)
+	{
+		viewLoc = GetActorLocation();
+	}
+
+	FVector startPos = viewLoc + viewRot.Vector();
+	FVector endPos = startPos + viewRot.Vector() * 4000.0f;
+
+	FCollisionShape collisionShape = FCollisionShape::MakeSphere(1);
+	ECollisionChannel collisionChannel = ECC_PingInput;
+	FHitResult newHitResult;
+	bool hit = GetWorld()->SweepSingleByChannel(newHitResult, startPos, endPos, FQuat::Identity, collisionChannel, collisionShape);
+	if (hit)
+	{
+		FVector hitPoint = newHitResult.ImpactPoint;
+		AActor* hitActor = newHitResult.GetActor();
+		Server_HandlePing(hitPoint, hitActor);
+		//FColor debugColor = FColor::Blue;
+		//DrawDebugCylinder(GetWorld(), startPos, endPos, 1.0f, 32, debugColor, false, 0.2f, 0U, 1.0f);
+		//if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit: %s"), *newHitResult.GetActor()->GetName()));
+
+
+	}
+}
+
+void ARPlayerBase::Server_HandlePing_Implementation(FVector hitPoint, AActor* hitActor)
+{
+	AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
+	if (gameState)
+	{
+		gameState->Server_Ping(hitPoint, hitActor);
 	}
 }
 
@@ -482,7 +554,7 @@ void ARPlayerBase::SetPausetoFalse()
 
 bool ARPlayerBase::CashMyLuck()
 {
-	if (playerController == nullptr)
+	if (playerController == nullptr || bFeelinLucky == false)
 		return false;
 
 	return playerController->CashMyLuck();

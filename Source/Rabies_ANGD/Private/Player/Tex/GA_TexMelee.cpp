@@ -13,15 +13,11 @@
 
 #include "Player/RPlayerBase.h"
 
-#include "GameplayAbilities/RAbilitySystemComponent.h"
-
 #include "Framework/EOSActionGameState.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
 
-#include "Player/RPlayerBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GA_TexMelee.h"
 
 UGA_TexMelee::UGA_TexMelee()
 {
