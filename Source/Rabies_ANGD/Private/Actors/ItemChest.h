@@ -73,7 +73,15 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void UpdateChestOpened();
 
+	UFUNCTION()
+	void SetPairedPing(class APingActor* myPing);
+
+	UFUNCTION()
+	bool HasPing();
+
 private:
+	UPROPERTY(Replicated)
+	class APingActor* MyPing;
 
 
 	UPROPERTY(Replicated)

@@ -82,6 +82,9 @@ public:
 
 private:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Info")
+	UTexture* ChestIcon;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ping")
 	TSubclassOf<class APingActor> PingActorClass;
 

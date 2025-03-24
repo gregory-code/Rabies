@@ -39,23 +39,31 @@ APingActor::APingActor()
 	//PingUIWidgetComp->SetupAttachment(GetRootComponent());
 }
 
-void APingActor::SetChestCostText(int costAmount)
+void APingActor::SetIcons(UTexture* imageIcon, FText text)
 {
-	if (PingUI)
-	{	
-		GetWorld()->GetTimerManager().ClearTimer(DestroyTimer);
-		GetWorldTimerManager().SetTimer(DestroyTimer, this, &APingActor::TimedDestroy, 8.0f, true);
-		PingUI->SetChestCostText(costAmount);
-	}
+	if (imageIcon == nullptr)
+		return;
+
+	IconTexture = imageIcon;
+	IconText = text;
+	UpdatePingUI(imageIcon, text);
 }
 
-void APingActor::SetItemIcon(URItemDataAsset* data)
+void APingActor::UpdatePingUI(UTexture* imageIcon, FText text)
 {
+	//PingUI = Cast<UPingUI>(PingUIWidgetComp->GetUserWidgetObject());
+	PingUIWidgetComp->SetWidgetClass(PingUIClass);
+	PingUI = CreateWidget<UPingUI>(GetWorld(), PingUIWidgetComp->GetWidgetClass());
+	if (PingUI)
+	{
+		PingUIWidgetComp->SetWidget(PingUI);
+	}
+
 	if (PingUI)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(DestroyTimer);
-		GetWorldTimerManager().SetTimer(DestroyTimer, this, &APingActor::TimedDestroy, 8.0f, true);
-		PingUI->SetItemIcon(data);
+		GetWorldTimerManager().SetTimer(DestroyTimer, this, &APingActor::TimedDestroy, 20.0f, true);
+		PingUI->SetIcons(imageIcon, text);
 	}
 }
 
@@ -64,12 +72,14 @@ void APingActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	PingUIWidgetComp->SetWidgetClass(PingUIClass);
+	/*PingUIWidgetComp->SetWidgetClass(PingUIClass);
 	PingUI = CreateWidget<UPingUI>(GetWorld(), PingUIWidgetComp->GetWidgetClass());
 	if (PingUI)
 	{
 		PingUIWidgetComp->SetWidget(PingUI);
-	}
+	}*/
+
+	//PingUI = Cast<UPingUI>(PingUIWidgetComp->GetUserWidgetObject());
 
 	//PingUIWidgetComp->SetWidgetClass(PingUIClass);
 	//PingUI = CreateWidget<UPingUI>(GetWorld(), PingUIWidgetComp->GetWidgetClass());
@@ -90,6 +100,24 @@ void APingActor::TimedDestroy()
 void APingActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+void APingActor::OnRep_Icon()
+{
+	UpdatePingUI(IconTexture, IconText);
+}
+
+void APingActor::OnRep_Text()
+{
+	UpdatePingUI(IconTexture, IconText);
+}
+
+void APingActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION_NOTIFY(APingActor, IconTexture, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(APingActor, IconText, COND_None, REPNOTIFY_Always);
 
 }
 

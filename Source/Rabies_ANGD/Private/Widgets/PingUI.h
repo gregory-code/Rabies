@@ -16,7 +16,7 @@ class UPingUI : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetChestCostText(int costAmount);
+	void SetIcons(UTexture* imageIcon, FText text);
 
 	void SetItemIcon(URItemDataAsset* data);
 	

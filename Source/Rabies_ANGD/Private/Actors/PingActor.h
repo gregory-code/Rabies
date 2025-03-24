@@ -24,18 +24,18 @@ private:
 	class UPingUI* PingUI;
 
 	FTimerHandle DestroyTimer;
-
-	UFUNCTION()
-	void TimedDestroy();
 	
 public:	
 	// Sets default values for this actor's properties
 	APingActor();
 
 public:
-	void SetChestCostText(int costAmount);
+	void SetIcons(UTexture* imageIcon, FText text);
 
-	void SetItemIcon(URItemDataAsset* data);
+	void UpdatePingUI(UTexture* imageIcon, FText text);
+
+	UFUNCTION()
+	void TimedDestroy();
 
 protected:
 	// Called when the game starts or when spawned
@@ -44,5 +44,21 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+private: 
+
+	UPROPERTY(ReplicatedUsing = OnRep_Icon)
+	UTexture* IconTexture;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Text)
+	FText IconText;
+
+	UFUNCTION()
+	void OnRep_Icon();
+
+	UFUNCTION()
+	void OnRep_Text();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // need this when doing Replicated things
 
 };

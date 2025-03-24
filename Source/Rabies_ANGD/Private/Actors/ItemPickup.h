@@ -64,4 +64,18 @@ public:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void SetupItem(URItemDataAsset* newItemAsset, FVector randomDirection);
+
+	UFUNCTION()
+	void SetPairedPing(class APingActor* myPing);
+
+	UFUNCTION()
+	bool HasPing();
+
+private:
+	UPROPERTY(Replicated)
+	class APingActor* MyPing;
+
+private:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // need this when doing Replicated things
+
 };

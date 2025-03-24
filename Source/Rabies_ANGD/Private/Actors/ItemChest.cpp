@@ -7,7 +7,8 @@
 #include "Components/SphereComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Widgets/PingUI.h"
+#include "Actors/PingActor.h"
 #include "Framework/EOSActionGameState.h"
 
 #include "GameplayAbilities/GA_AbilityBase.h"
@@ -130,6 +131,19 @@ void AItemChest::SetUpUI(bool SetInteraction)
 	InteractWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
+void AItemChest::SetPairedPing(APingActor* myPing)
+{
+	if (MyPing == nullptr)
+	{
+		MyPing = myPing;
+	}
+}
+
+bool AItemChest::HasPing()
+{
+	return (MyPing != nullptr);
+}
+
 void AItemChest::Interact()
 {
 	if (bWasOpened)
@@ -168,6 +182,9 @@ void AItemChest::Server_OpenChest_Implementation(bool bFeelinLucky)
 		UAbilitySystemComponent* ASC = player->GetAbilitySystemComponent();
 		if (ASC && ScrapPriceEffect)
 		{
+			if (MyPing != nullptr)
+				MyPing->TimedDestroy();
+
 			FGameplayEffectContextHandle effectContext = ASC->MakeEffectContext();
 			FGameplayEffectSpecHandle effectSpecHandle = ASC->MakeOutgoingSpec(ScrapPriceEffect, 1.0f, effectContext);
 			FGameplayEffectSpec* spec = effectSpecHandle.Data.Get();
@@ -216,5 +233,6 @@ void AItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(AItemChest, bWasOpened, COND_None);
+	DOREPLIFETIME_CONDITION(AItemChest, MyPing, COND_None);
 	DOREPLIFETIME_CONDITION(AItemChest, ScrapPrice, COND_None);
 }

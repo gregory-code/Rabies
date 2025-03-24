@@ -381,7 +381,65 @@ void AEOSActionGameState::OpenedChest_Implementation(int chestID, int spawnCount
 
 void AEOSActionGameState::Server_Ping_Implementation(FVector hitPoint, AActor* hitActor)
 {
-    Multicast_Ping(hitPoint, hitActor);
+    if (hitActor == nullptr)
+        return;
+
+    //if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit Chest: %s"), *hitActor->GetName()));
+
+    FText iconText = FText::FromString("");
+    float spawnPosAdjustment = 0.0f;
+    FVector spawnPos = hitPoint;
+    UTexture* iconImage = nullptr;
+
+    FActorSpawnParameters SpawnParams;
+    AItemChest* hitChest = Cast<AItemChest>(hitActor);
+    if (hitChest)
+    {
+        if (hitChest->HasPing())
+            return;
+
+        spawnPos = hitChest->GetActorLocation();
+        spawnPosAdjustment = 50.0f;
+        iconImage = ChestIcon;
+        iconText = FText::Format(FText::FromString("Cost: {0}"), FText::AsNumber(hitChest->ScrapPrice));
+    }
+
+    AItemPickup* hitItem = Cast<AItemPickup>(hitActor);
+    if (hitItem)
+    {
+        if (hitItem->HasPing())
+            return;
+
+        spawnPos = hitItem->GetActorLocation();
+        spawnPosAdjustment = 60.0f;
+        iconImage = hitItem->ItemAsset->ItemIcon;
+        iconText = FText::FromName(hitItem->ItemAsset->ItemName);
+    }
+
+    AREnemyBase* hitEnemy = Cast<AREnemyBase>(hitActor);
+    if (hitEnemy)
+    {
+        spawnPos = hitEnemy->GetActorLocation();
+        spawnPosAdjustment = 60.0f;
+        //iconImage = hitItem->ItemAsset->ItemIcon;
+        //iconText = FText::FromName(hitItem->ItemAsset->ItemName);
+    }
+
+    spawnPos.Z += spawnPosAdjustment;
+    APingActor* newPing = GetWorld()->SpawnActor<APingActor>(PingActorClass, spawnPos, FRotator::ZeroRotator, SpawnParams);
+
+    if(hitItem)
+        hitItem->SetPairedPing(newPing);
+
+    if (hitChest)
+        hitChest->SetPairedPing(newPing);
+
+    if (hitEnemy)
+        newPing->AttachToComponent(hitEnemy->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+
+    newPing->SetOwner(this);
+    newPing->SetIcons(iconImage, iconText);
+    return;
 }
 
 bool AEOSActionGameState::Server_Ping_Validate(FVector hitPoint, AActor* hitActor)
@@ -391,24 +449,6 @@ bool AEOSActionGameState::Server_Ping_Validate(FVector hitPoint, AActor* hitActo
 
 void AEOSActionGameState::Multicast_Ping_Implementation(FVector hitPoint, AActor* hitActor)
 {
-    if (hitActor == nullptr)
-        return;
-
-    FActorSpawnParameters SpawnParams;
-    APingActor* newPing = GetWorld()->SpawnActor<APingActor>(PingActorClass, hitPoint, FRotator::ZeroRotator, SpawnParams);
-    newPing->SetOwner(this);
-    AItemChest* hitChest = Cast<AItemChest>(hitActor);
-    if (hitChest)
-    {
-        //if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit Chest: %s"), *hitActor->GetName()));
-        newPing->SetChestCostText(hitChest->ScrapPrice);
-    }
-    AItemPickup* hitItem = Cast<AItemPickup>(hitActor);
-    if (hitItem)
-    {
-        //if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Hit Item: %s"), *hitActor->GetName()));
-        newPing->SetItemIcon(hitItem->ItemAsset);
-    }
 }
 
 TArray<URItemDataAsset*> AEOSActionGameState::GetItemPoolOfRarity(TArray<URItemDataAsset*> itemPool, EItemRarity itemRarity)
