@@ -28,6 +28,9 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 	void InitLevel(int level);
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UTexture* EnemyIcon;
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")

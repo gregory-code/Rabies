@@ -363,7 +363,7 @@ void ARPlayerBase::Ping()
 	}
 
 	FVector startPos = viewLoc + viewRot.Vector();
-	FVector endPos = startPos + viewRot.Vector() * 4000.0f;
+	FVector endPos = startPos + viewRot.Vector() * 8000.0f;
 
 	FCollisionShape collisionShape = FCollisionShape::MakeSphere(1);
 	ECollisionChannel collisionChannel = ECC_PingInput;

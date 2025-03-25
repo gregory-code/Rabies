@@ -17,7 +17,7 @@ void UAnimNotifyState_Attacking::NotifyBegin(USkeletalMeshComponent* MeshComp, U
 		AttackingBoxComponent->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachSocket);
 		AttackingBoxComponent->StartDetection();
 	}
-	else if (bIsPush)
+	else if (bIsPush && PushBoxComponent)
 	{
 		PushBoxComponent->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachSocket);
 		PushBoxComponent->StartDetection();
@@ -32,7 +32,7 @@ void UAnimNotifyState_Attacking::NotifyTick(USkeletalMeshComponent* MeshComp, UA
 	{
 		AttackingBoxComponent->DoAttackCheck();
 	}
-	else if (bIsPush)
+	else if (bIsPush && PushBoxComponent)
 	{
 		AttackingBoxComponent->DoAttackCheck();
 	}
@@ -46,7 +46,7 @@ void UAnimNotifyState_Attacking::NotifyEnd(USkeletalMeshComponent* MeshComp, UAn
 	{
 		AttackingBoxComponent->EndDetection();
 	}
-	else if (bIsPush)
+	else if (bIsPush && PushBoxComponent)
 	{
 		AttackingBoxComponent->EndDetection();
 	}

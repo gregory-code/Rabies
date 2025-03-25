@@ -64,10 +64,21 @@ void AREnemyAIController::BeginPlay()
 	if (BehaviorTree)
 	{
 		RunBehaviorTree(BehaviorTree);
+		GetBrainComponent()->StopLogic("Dead");
 	}
+
+	GetWorldTimerManager().SetTimer(StartTimerHandle, this, &AREnemyAIController::DelayStart, 1.5f, false);
 
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AREnemyAIController::TargetPerceptionUpdated);
 	AIPerceptionComponent->OnTargetPerceptionForgotten.AddDynamic(this, &AREnemyAIController::TargetForgotton);
+}
+
+void AREnemyAIController::DelayStart()
+{
+	if (BehaviorTree)
+	{
+		GetBrainComponent()->StartLogic();
+	}
 }
 
 void AREnemyAIController::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const

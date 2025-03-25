@@ -421,6 +421,7 @@ void AEOSActionGameState::Server_Ping_Implementation(FVector hitPoint, AActor* h
     {
         spawnPos = hitEnemy->GetActorLocation();
         spawnPosAdjustment = 60.0f;
+        iconImage = hitEnemy->EnemyIcon;
         //iconImage = hitItem->ItemAsset->ItemIcon;
         //iconText = FText::FromName(hitItem->ItemAsset->ItemName);
     }
@@ -435,7 +436,7 @@ void AEOSActionGameState::Server_Ping_Implementation(FVector hitPoint, AActor* h
         hitChest->SetPairedPing(newPing);
 
     if (hitEnemy)
-        newPing->AttachToComponent(hitEnemy->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+        newPing->AttachToComponent(hitEnemy->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 
     newPing->SetOwner(this);
     newPing->SetIcons(iconImage, iconText);

@@ -33,6 +33,10 @@ protected:
 
 private:
 
+	void DelayStart();
+
+	FTimerHandle StartTimerHandle;
+
 	UFUNCTION()
 	void PlayerDeadStatusUpdated(bool bIsDead);
 

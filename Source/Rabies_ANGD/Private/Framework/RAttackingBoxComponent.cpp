@@ -53,7 +53,7 @@ void URAttackingBoxComponent::DoAttackCheck()
 		}
 	}
 
-	DrawDebugBox(GetWorld(), GetComponentLocation(), GetScaledBoxExtent(), FColor::Red, false, 1.f);
+	//DrawDebugBox(GetWorld(), GetComponentLocation(), GetScaledBoxExtent(), FColor::Red, false, 1.f);
 }
 
 void URAttackingBoxComponent::EndDetection()
