@@ -36,8 +36,6 @@ void AEOSActionGameState::BeginPlay()
     if (HasAuthority() == false)
         return;
 
-    bFirstSpawn = true;
-
     TArray<AActor*> EscapeToWinObj;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEscapeToWin::StaticClass(), EscapeToWinObj);
     EscapeToWin = Cast<AEscapeToWin>(EscapeToWinObj[0]);
@@ -71,7 +69,7 @@ void AEOSActionGameState::BeginPlay()
     WaveSpawnCap = FMathf::Clamp(WaveSpawnCap, 1, enemySpawnLocations.Num());
 
     WaveLevel = 0;
-    WaveTime = enemyInitalSpawnRate + 5.0f;
+    WaveTime = enemyInitalSpawnRate;
     WaveHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &AEOSActionGameState::WaveSpawn, 0.0f));
 }
 
@@ -207,11 +205,7 @@ void AEOSActionGameState::SpawnEnemyWave(int powerLevel)
     if (GetWorld() == nullptr)
         return;
 
-    if (bFirstSpawn)
-    {
-        bFirstSpawn = false;
-        WaveTime = enemyInitalSpawnRate;
-    }
+    WaveTime += 2.0f;
 
     TArray<AActor*> spawnLocations;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemySpawnLocation::StaticClass(), spawnLocations);
@@ -312,8 +306,14 @@ void AEOSActionGameState::PickedUpItem_Implementation(int itemID, ARPlayerBase* 
                 {
                     ARPlayerBase* player = Cast<ARPlayerBase>(playerState->GetPawn());
                     if (player)
+                    {
                         player->AddNewItem(AllItems[itemID]->ItemAsset);
+                    }
                 }
+            }
+            if (EscapeToWin != nullptr)
+            {
+                Server_Ping(FVector(0,0,0), EscapeToWin);
             }
         }
         else
@@ -422,6 +422,16 @@ void AEOSActionGameState::Server_Ping_Implementation(FVector hitPoint, AActor* h
         spawnPos = hitEnemy->GetActorLocation();
         spawnPosAdjustment = 60.0f;
         iconImage = hitEnemy->EnemyIcon;
+        //iconImage = hitItem->ItemAsset->ItemIcon;
+        //iconText = FText::FromName(hitItem->ItemAsset->ItemName);
+    }
+
+    AEscapeToWin* escapeToWin = Cast<AEscapeToWin>(hitActor);
+    if (escapeToWin)
+    {
+        spawnPos = escapeToWin->GetActorLocation();
+        spawnPosAdjustment = 70.0f;
+        iconImage = GateIcon;
         //iconImage = hitItem->ItemAsset->ItemIcon;
         //iconText = FText::FromName(hitItem->ItemAsset->ItemName);
     }

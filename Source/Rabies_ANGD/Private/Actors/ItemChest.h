@@ -20,6 +20,8 @@ private:
 
 	bool bWithinInteraction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Info")
+	class UMaterialInstance* NegativeOutline;
 
 	UPROPERTY(VisibleAnywhere, Category = "Chest Detail")
 	class UStaticMeshComponent* ChestBottomMesh;

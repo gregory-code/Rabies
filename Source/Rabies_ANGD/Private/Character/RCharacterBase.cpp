@@ -412,6 +412,9 @@ void ARCharacterBase::DeathTagChanged(const FGameplayTag TagChanged, int32 NewSt
 
 void ARCharacterBase::TaserTagChanged(const FGameplayTag TagChanged, int32 NewStackCount)
 {
+	if (GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
+		return;
+
 	bIsTased = NewStackCount != 0;
 	TaserTagChanged(bIsTased);
 	OnTaserStatusChanged.Broadcast(bIsTased);
@@ -913,6 +916,9 @@ void ARCharacterBase::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 		UE_LOG(LogTemp, Error, TEXT("%s NO ATTRIBUTE SET"), *GetName());
 		return;
 	}
+
+	if(AbilitySystemComponent->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
+		return;
 
 	if (ChangeData.OldValue >= 1)
 	{

@@ -77,8 +77,8 @@ ARPlayerBase::ARPlayerBase()
 	ItemPickupCollider->SetupAttachment(GetRootComponent());
 	ItemPickupCollider->SetCollisionProfileName(TEXT("OverlapAll"));
 
-	cameraClampMax = 10;
-	cameraClampMin = -60;
+	cameraClampMax = 50;
+	cameraClampMin = -80;
 	bIsScoping = false;
 
 	GroundCheckComp = CreateDefaultSubobject<USphereComponent>("Ground Check Comp");
@@ -515,14 +515,14 @@ void ARPlayerBase::ScopingTagChanged(bool bNewIsAiming)
 	if (bNewIsAiming)
 	{
 		cameraClampMax = 50;
-		cameraClampMin = -50;
+		cameraClampMin = -80;
 		LerpCameraToLocalOffset(AimCameraLocalOffset);
 	}
 	else
 	{
 		DisableScoping();
-		cameraClampMax = 10;
-		cameraClampMin = -60;
+		cameraClampMax = 50;
+		cameraClampMin = -80;
 		LerpCameraToLocalOffset(DefaultCameraLocal);
 	}
 }
@@ -583,7 +583,7 @@ void ARPlayerBase::GroundCheckCompOverlapped(UPrimitiveComponent* OverlappedComp
 	}
 }
 
-void ARPlayerBase::ServerSetPlayerReviveState_Implementation(bool state)
+void ARPlayerBase::SetPlayerReviveState_Implementation(bool state)
 {
 	if (ReviveUI == nullptr)
 	{
@@ -717,7 +717,7 @@ void ARPlayerBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 		if (player->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 		{
 			bInRangeToRevive = true;
-			player->ServerSetPlayerReviveState(true);
+			player->SetPlayerReviveState(true);
 		}
 	}
 }
@@ -733,7 +733,7 @@ void ARPlayerBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 		if (player->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 		{
 			bInRangeToRevive = false;
-			player->ServerSetPlayerReviveState(false);
+			player->SetPlayerReviveState(false);
 		}
 	}
 }

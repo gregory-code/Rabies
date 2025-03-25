@@ -309,6 +309,15 @@ void UGameplayUI::NextLevelExpUpdated(const FOnAttributeChangeData& ChangeData)
 
 void UGameplayUI::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 {
+	if (PostProcessVolume)
+	{
+		FVector4 freshValue = FVector4(1.0f, 1.0f, 1.0f, 1.0f);
+		PostProcessVolume->Settings.ColorSaturation = freshValue;
+		PostProcessVolume->Settings.ColorContrast = freshValue;
+		PostProcessVolume->Settings.VignetteIntensity = 0;
+		PostProcessVolume->Settings.SceneFringeIntensity = 0;
+	}
+
 	PlayerHealth->SetHealth(ChangeData.NewValue, GetAttributeValue(URAttributeSet::GetMaxHealthAttribute()));
 }
 

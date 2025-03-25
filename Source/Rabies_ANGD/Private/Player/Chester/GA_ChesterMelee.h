@@ -33,5 +33,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Anim")
 	UAnimMontage* MeleeAttackAnim;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Items")
+	TSubclassOf<UGameplayEffect> StunEffect;
+
 	/*		Extra Audio		*/
 };

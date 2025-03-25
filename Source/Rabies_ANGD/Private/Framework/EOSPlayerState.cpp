@@ -12,7 +12,6 @@
 #include "GameplayAbilities/RAbilityGenericTags.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 void AEOSPlayerState::OnRep_PickedCharacter()
 {
@@ -81,10 +80,13 @@ AEOSPlayerState::AEOSPlayerState()
 
 void AEOSPlayerState::Server_RevivePlayer_Implementation()
 {
+	//if (Player == nullptr)
+		//return;
+
 	FGameplayEventData eventData;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Player, URAbilityGenericTags::GetReviveTag(), eventData);
 
-	Player->ServerSetPlayerReviveState(false);
+	Player->SetPlayerReviveState(false);
 	UE_LOG(LogTemp, Warning, TEXT("Getting revived"));
 }
 

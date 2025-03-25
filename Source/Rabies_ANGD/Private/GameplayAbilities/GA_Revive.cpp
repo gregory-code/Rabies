@@ -71,6 +71,7 @@ void UGA_Revive::Hold(float timeRemaining)
 	{
 		if (Player->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 		{
+			Player->playerController->ChangeRevivalState(false, 0);
 			K2_EndAbility();
 		}
 	}
@@ -108,7 +109,7 @@ void UGA_Revive::Hold(float timeRemaining)
                 {
 					if (EOSPlayeState->GetPlayer() == playerBase)
 					{
-						playerBase->ServerSetPlayerReviveState(false);
+						playerBase->SetPlayerReviveState(false);
 						Player->playerController->Server_RequestRevive(EOSPlayeState);
 						Player->ServerPlayAnimMontage(Player->RevivingBuddy);
 						UE_LOG(LogTemp, Error, TEXT("%s Reviving"), *player->GetName());

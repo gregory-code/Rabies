@@ -102,6 +102,19 @@ void UGA_ChesterMelee::HandleDamage(FGameplayEventData Payload)
 						if (hitCharacter)
 						{
 							Player->HitMeleeAttack(hitCharacter);
+
+							float chance = 50.0f;
+							float randomApplyChance = FMath::RandRange(0, 100);
+							if (chance >= randomApplyChance)
+							{
+								FGameplayEffectSpecHandle specHandle = Player->GetAbilitySystemComponent()->MakeOutgoingSpec(StunEffect, 1.0f, Player->GetAbilitySystemComponent()->MakeEffectContext());
+
+								FGameplayEffectSpec* spec = specHandle.Data.Get();
+								if (spec)
+								{
+									hitCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+								}
+							}
 						}
 					}
 				}

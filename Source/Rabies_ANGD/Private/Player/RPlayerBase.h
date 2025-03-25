@@ -322,7 +322,7 @@ private:
 public:
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void ServerSetPlayerReviveState(bool state);
+	void SetPlayerReviveState(bool state);
 
 	UFUNCTION(Client, Reliable)
 	void AddNewItem(class URItemDataAsset* newItemAsset);

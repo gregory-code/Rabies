@@ -225,6 +225,9 @@ void AItemChest::UpdateChestOpened_Implementation()
 		AudioComp->Play();
 	}
 
+	ChestBottomMesh->SetOverlayMaterial(nullptr);
+	ChestTopMesh->SetOverlayMaterial(nullptr);
+
 	SphereCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	bWasOpened = true;
 }

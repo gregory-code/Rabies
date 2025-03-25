@@ -85,6 +85,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Info")
 	UTexture* ChestIcon;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Info")
+	UTexture* GateIcon;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Ping")
 	TSubclassOf<class APingActor> PingActorClass;
 
@@ -117,9 +120,6 @@ private:
 
 	UPROPERTY()
 	float WaveTime;
-
-	UPROPERTY()
-	bool bFirstSpawn;
 
 	UPROPERTY()
 	int WaveLevel;

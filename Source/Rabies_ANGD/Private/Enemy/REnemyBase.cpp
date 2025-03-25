@@ -104,6 +104,11 @@ void AREnemyBase::DeadStatusUpdated(bool bIsDead)
 {
 	UE_LOG(LogTemp, Error, TEXT("Dead"));
 
+	if (GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
+		return;
+
+	GetAbilitySystemComponent()->AddLooseGameplayTag(URAbilityGenericTags::GetDeadTag());
+
 	FGameplayEventData eventData;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, URAbilityGenericTags::GetDeadTag(), eventData);
 
