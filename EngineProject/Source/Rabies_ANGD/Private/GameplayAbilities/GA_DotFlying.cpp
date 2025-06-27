@@ -75,6 +75,41 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	
 }
 
+void UGA_DotFlying::TryPickUpTeammates()
+{
+	FVector FootLocation = Player->GetMesh()->GetSocketLocation("grabPoint");
+	float SphereRadius = 70.0f;
+
+	TArray<FOverlapResult> Overlaps;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(Player);
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+	bool bHit = GetWorld()->OverlapMultiByObjectType(Overlaps,FootLocation,FQuat::Identity,ObjectQueryParams,FCollisionShape::MakeSphere(SphereRadius),QueryParams);
+
+	if (bHit)
+	{
+		for (const FOverlapResult& Result : Overlaps)
+		{
+			AActor* OverlappedActor = Result.GetActor();
+			if (OverlappedActor && OverlappedActor != Player)
+			{
+				ARPlayerBase* player = Cast<ARPlayerBase>(OverlappedActor);
+				if (player)
+				{
+					player->SetActorLocation(FootLocation);
+				}
+			}
+		}
+	}
+
+	// Optional: draw debug sphere
+	DrawDebugSphere(GetWorld(), FootLocation, SphereRadius, 16, FColor::Green, false, 0.01f);
+}
+
+
 void UGA_DotFlying::StopFlying()
 {
 	K2_EndAbility();
@@ -95,31 +130,36 @@ void UGA_DotFlying::ProcessFlying()
 			StopFlying();
 		}
 
-		if (Player->IsHoldingJump() && CurrentGravityDuration >= 1)
+		if (Player->IsHoldingJump())
 		{
-			FVector currentVelocity = Player->PlayerVelocity;
-			if (currentVelocity.Z <= 0 && Player->IsMeleeAttacking() == false)
+			TryPickUpTeammates();
+
+			if (CurrentGravityDuration >= 1)
 			{
-				float currentGravity = Player->GetCharacterMovement()->GravityScale;
-				float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.02f : (currentVelocity.Z * 0.001f) + 0.3f; // these are fall gravity values, bigger means slower fall
-				float newGravity = fallValue; //FMath::Lerp(currentGravity, fallValue, 20 * GetWorld()->GetDeltaSeconds());
+				FVector currentVelocity = Player->PlayerVelocity;
+				if (currentVelocity.Z <= 0 && Player->IsMeleeAttacking() == false)
+				{
+					float currentGravity = Player->GetCharacterMovement()->GravityScale;
+					float fallValue = (CurrentHoldDuration > 0) ? currentVelocity.Z * 0.02f : (currentVelocity.Z * 0.001f) + 0.3f; // these are fall gravity values, bigger means slower fall
+					float newGravity = fallValue; //FMath::Lerp(currentGravity, fallValue, 20 * GetWorld()->GetDeltaSeconds());
 
-				FGameplayEffectSpecHandle fallSpec = MakeOutgoingGameplayEffectSpec(GravityFallClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-				fallSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), newGravity);
+					FGameplayEffectSpecHandle fallSpec = MakeOutgoingGameplayEffectSpec(GravityFallClass, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
+					fallSpec.Data.Get()->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), newGravity);
 
-				GravityFallEffectHandle = ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, fallSpec);
-			}
+					GravityFallEffectHandle = ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, fallSpec);
+				}
 
-			currentVelocity.Z = 0;
+				currentVelocity.Z = 0;
 
-			float multiplier = (currentVelocity.Length() >= 300) ? 0.15f : 0.05f;
+				float multiplier = (currentVelocity.Length() >= 300) ? 0.15f : 0.05f;
 
-			CurrentHoldDuration -= GetWorld()->GetDeltaSeconds() * multiplier;
-			Player->playerController->ChangeTakeOffState(true, CurrentHoldDuration);
+				CurrentHoldDuration -= GetWorld()->GetDeltaSeconds() * multiplier;
+				Player->playerController->ChangeTakeOffState(true, CurrentHoldDuration);
 
-			if (Player->GetPlayerBaseState())
-			{
-				Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(CurrentHoldDuration);
+				if (Player->GetPlayerBaseState())
+				{
+					Player->GetPlayerBaseState()->Server_ProcessDotFlyingStamina(CurrentHoldDuration);
+				}
 			}
 		}
 
