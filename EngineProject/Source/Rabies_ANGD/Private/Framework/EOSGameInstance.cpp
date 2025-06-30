@@ -580,10 +580,10 @@ FString UEOSGameInstance::GetCoordinatorURLStr() const
 	FParse::Value(FCommandLine::Get(), *FString::Printf(TEXT("%s="), *GetCoordinatorURLStrKey().ToString()), CoordiantorURL);
 	UE_LOG(LogTemp, Warning, TEXT("Found Coordinator URL: %s"), *(CoordiantorURL));
 	if (CoordiantorURL == "")
-		return "13.59.167.31";
+		return "3.16.76.63";
 
 	return CoordiantorURL;
-	//return "13.59.167.31";
+	//return "3.16.76.63";
 }
 
 void UEOSGameInstance::SesssionCreationRequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bProcessdSuccessfully, FGuid SessionUniqueId)

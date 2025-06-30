@@ -23,6 +23,8 @@ private:
 
 	void TryPickUpTeammates();
 
+	bool bHasTeammatePickedup;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<class UGameplayEffect> FlyingSpeedClass;
 
@@ -70,6 +72,9 @@ private:
 
 	UPROPERTY()
 	class ARPlayerBase* Player;
+
+	UPROPERTY()
+	class ARPlayerBase* YoinkedPlayer;
 
 	FActiveGameplayEffectHandle FlyingSpeedEffectHandle;
 	FActiveGameplayEffectHandle GravityFallEffectHandle;

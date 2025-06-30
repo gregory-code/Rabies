@@ -12,6 +12,11 @@
 #include "Player/RPlayerController.h"
 #include "GameplayAbilities/RAttributeSet.h"
 
+
+#include "Framework/EOSActionGameState.h"
+
+#include "Components/CapsuleComponent.h"
+
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -77,8 +82,18 @@ void UGA_DotFlying::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 void UGA_DotFlying::TryPickUpTeammates()
 {
+	AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
+	if (bHasTeammatePickedup && YoinkedPlayer)
+	{
+		if (gameState)
+		{
+			gameState->Multicast_CenterOnDot(YoinkedPlayer, Player);
+		}
+		return;
+	}
+
 	FVector FootLocation = Player->GetMesh()->GetSocketLocation("grabPoint");
-	float SphereRadius = 70.0f;
+	float SphereRadius = 85.0f;
 
 	TArray<FOverlapResult> Overlaps;
 	FCollisionQueryParams QueryParams;
@@ -99,14 +114,23 @@ void UGA_DotFlying::TryPickUpTeammates()
 				ARPlayerBase* player = Cast<ARPlayerBase>(OverlappedActor);
 				if (player)
 				{
-					player->SetActorLocation(FootLocation);
+					if (bHasTeammatePickedup == false)
+					{
+						if (gameState)
+						{
+							gameState->Multicast_StickPlayerOnDot(player, Player, true);
+						}
+
+						YoinkedPlayer = player;
+						bHasTeammatePickedup = true;
+					}
 				}
 			}
 		}
 	}
 
 	// Optional: draw debug sphere
-	DrawDebugSphere(GetWorld(), FootLocation, SphereRadius, 16, FColor::Green, false, 0.01f);
+	//DrawDebugSphere(GetWorld(), FootLocation, SphereRadius, 16, FColor::Green, false, 0.01f);
 }
 
 
@@ -162,6 +186,20 @@ void UGA_DotFlying::ProcessFlying()
 				}
 			}
 		}
+		else
+		{
+			if (bHasTeammatePickedup && YoinkedPlayer)
+			{
+				AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
+				if (gameState)
+				{
+					gameState->Multicast_StickPlayerOnDot(YoinkedPlayer, Player, false);
+				}
+
+				YoinkedPlayer = nullptr;
+				bHasTeammatePickedup = false;
+			}
+		}
 
 	}
 
@@ -182,6 +220,8 @@ void UGA_DotFlying::Hold(float timeRemaining)
 {
 	if (CurrentHoldDuration <= 1)
 	{
+		Player->bWindingUp = true;
+
 		bool bFound = false;
 		float movementSPeed = 1.0f;
 		movementSPeed = Player->GetAbilitySystemComponent()->GetGameplayAttributeValue(URAttributeSet::GetMovementSpeedAttribute(), bFound);
@@ -225,6 +265,9 @@ void UGA_DotFlying::Hold(float timeRemaining)
 
 void UGA_DotFlying::GravityJump(float timeRemaining)
 {
+	if (CurrentGravityDuration >= 0.6f)
+		Player->bWindingUp = false;
+
 	if (CurrentGravityDuration <= 1.0f)
 	{
 		CurrentGravityDuration += GetWorld()->GetDeltaSeconds();
@@ -258,6 +301,18 @@ void UGA_DotFlying::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 		ASC->RemoveActiveGameplayEffect(FlyingSpeedEffectHandle);
 		ASC->RemoveActiveGameplayEffect(GravityJumpEffectHandle);
 		ASC->RemoveActiveGameplayEffect(GravityFallEffectHandle);
+	}
+
+	if (bHasTeammatePickedup && YoinkedPlayer)
+	{
+		AEOSActionGameState* gameState = GetWorld()->GetGameState<AEOSActionGameState>();
+		if (gameState)
+		{
+			gameState->Multicast_StickPlayerOnDot(YoinkedPlayer, Player, false);
+		}
+
+		YoinkedPlayer = nullptr;
+		bHasTeammatePickedup = false;
 	}
 
 	Player->playerController->ChangeTakeOffState(false, 0);
