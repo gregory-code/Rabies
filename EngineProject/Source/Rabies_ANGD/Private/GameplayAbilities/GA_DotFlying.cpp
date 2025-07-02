@@ -92,6 +92,9 @@ void UGA_DotFlying::TryPickUpTeammates()
 		return;
 	}
 
+	if (Player->bWindingUp)
+		return;
+
 	FVector FootLocation = Player->GetMesh()->GetSocketLocation("grabPoint");
 	float SphereRadius = 85.0f;
 

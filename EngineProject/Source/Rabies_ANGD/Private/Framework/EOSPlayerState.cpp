@@ -247,6 +247,7 @@ bool AEOSPlayerState::Server_UpdateHitscanRotator_Validate(FRotator newRot, FVec
 void AEOSPlayerState::Server_UpdateDotCenterLocation_Implementation(FVector newLocation)
 {
 	DotCenterLocation = newLocation;
+	OnRep_DotCenterLocation();
 }
 
 bool AEOSPlayerState::Server_UpdateDotCenterLocation_Validate(FVector newLocation)
@@ -332,15 +333,27 @@ void AEOSPlayerState::SetStickDot(bool state, ARPlayerBase* dot)
 		return;
 
 	ECollisionResponse response = (state) ? ECR_Ignore : ECR_Block;
-	Player->SetReplicateMovement(!state);
+	//Player->SetReplicateMovement(!state);
 	Player->GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, response);
-	Player->GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, response);
-	Player->GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, response);
 }
 
 ARPlayerBase* AEOSPlayerState::GetPlayer()
 {
 	return Player;
+}
+
+void AEOSPlayerState::SetPlayerDisplayName_Implementation(const FString& NewName)
+{
+	if (HasAuthority())
+	{
+		PlayerDisplayName = NewName;
+		OnRep_PlayerDisplayName();
+	}
+}
+
+bool AEOSPlayerState::SetPlayerDisplayName_Validate(const FString& NewName)
+{
+	return true;
 }
 
 void AEOSPlayerState::OnRep_HitScanLocation()
@@ -462,7 +475,25 @@ void AEOSPlayerState::OnRep_DotCenterLocation()
 	if (Player == nullptr)
 		return;
 
-	Player->SetActorLocation(DotCenterLocation);
+	FHitResult HitResult;
+	bool bSuccess = Player->SetActorLocation(DotCenterLocation, true, &HitResult);
+
+	if (bSuccess && Player->bWindingUp == false)
+	{
+		Player->GetCharacterMovement()->StopMovementImmediately();
+		Player->SetActorLocation(DotCenterLocation);
+	}
+}
+
+void AEOSPlayerState::OnRep_PlayerDisplayName()
+{
+	if (Player == nullptr)
+		return;
+
+	if (Player->HealthBar == nullptr)
+		return;
+
+	Player->HealthBar->SetAllyDisplayName(PlayerDisplayName);
 }
 
 void AEOSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -482,6 +513,7 @@ void AEOSPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, hitscanLocation, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, bFullyDead, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, DotCenterLocation, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(AEOSPlayerState, PlayerDisplayName, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION(AEOSPlayerState, Ranged_SocketLocation, COND_None);
 	DOREPLIFETIME_CONDITION(AEOSPlayerState, AltRanged_SocketLocation, COND_None);

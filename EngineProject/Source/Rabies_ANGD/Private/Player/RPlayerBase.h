@@ -360,6 +360,8 @@ private:
 	UFUNCTION()
 	void FinishUltimateAttack();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void SetDisplayName();
 
 	UFUNCTION()
 	void Interact();

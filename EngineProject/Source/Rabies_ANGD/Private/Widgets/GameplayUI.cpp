@@ -333,7 +333,7 @@ void UGameplayUI::DeadTimer(float timeRemaining)
 {
 	if (CurrentDeathDuration > 0)
 	{
-		float rateOfChange = (0.0005f * GetAttributeValue(URAttributeSet::GetDownSurvivalTimeAttribute()));
+		float rateOfChange = (0.00045f * GetAttributeValue(URAttributeSet::GetDownSurvivalTimeAttribute()));
 		float remainingTime = (CurrentDeathDuration / rateOfChange);
 		CurrentDeathDuration -= rateOfChange;
 		DownTimeSlider->SetValue(CurrentDeathDuration / 1.0f);

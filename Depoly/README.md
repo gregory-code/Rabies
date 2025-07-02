@@ -2,7 +2,7 @@
 
 * Build the Linux Server and put the content under ./server/server
 
-* Current IP: 13.59.167.31
+* Current IP: 3.16.76.63
   
 * Zip this ```Deploy``` folder to a zip file
 
