@@ -389,8 +389,8 @@ void ARPlayerBase::Look(const FInputActionValue& InputValue)
 	//input.X *= Sensitvitiy + 0.5f;
 	//input.Y *= Sensitvitiy + 0.5f ;
 
-	AddControllerYawInput(input.X * (Sensitvitiy + 0.5f));
-	AddControllerPitchInput(-input.Y * (Sensitvitiy + 0.5f));
+	AddControllerYawInput(input.X * (Sensitvitiy + 0.2f));
+	AddControllerPitchInput(-input.Y * (Sensitvitiy + 0.2f));
 
 	/*FRotator newRot = viewPivot->GetComponentRotation();
 	newRot.Pitch += input.Y;

@@ -103,8 +103,10 @@ public:
 	UPROPERTY()
 	float Sensitvitiy;
 
+	int airKills;
 
 private:
+
 
 	UFUNCTION()
 	void FocusGame();

@@ -156,7 +156,19 @@ void AEOSPlayerState::Server_WonTheGame_Implementation(const FString& characterN
 				LoadedGame->bWonAsChester = true;
 
 			if (characterName.Contains("Toni"))
+			{
+				if (Player)
+				{
+					if (Player->playerController)
+					{
+						if (Player->playerController->GetElaspedTime() <= 120.0f)
+						{
+							LoadedGame->bToniChallenge = true;
+						}
+					}
+				}
 				LoadedGame->bWonAsToni = true;
+			}
 
 			if (characterName.Contains("Tex"))
 				LoadedGame->bWonAsTex = true;
@@ -166,6 +178,9 @@ void AEOSPlayerState::Server_WonTheGame_Implementation(const FString& characterN
 
 			if (characterName.Contains("BoltHead"))
 				LoadedGame->bWonAsBoltHead = true;
+
+			if (characterName.Contains("MiniLock"))
+				LoadedGame->bSecretChallenge = true;
 
 			UGameplayStatics::SaveGameToSlot(LoadedGame, TEXT("RabiesSaveData"), 0);
 		}
@@ -190,6 +205,9 @@ void AEOSPlayerState::Server_WonTheGame_Implementation(const FString& characterN
 
 			if (characterName.Contains("BoltHead"))
 				NewSave->bWonAsBoltHead = true;
+
+			if (characterName.Contains("MiniLock"))
+				NewSave->bSecretChallenge = true;
 
 			UGameplayStatics::SaveGameToSlot(NewSave, TEXT("RabiesSaveData"), 0);
 		}
