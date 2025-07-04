@@ -70,6 +70,7 @@ public:
 	static FGameplayTag GetCooldownRefreshTag();
 
 	static FGameplayTag GetImmuneTag();
+	static FGameplayTag GetDefeatedEnemyTag();
 
 	static FGameplayTag GetUltimateHold();
 	static FGameplayTag GetUltimateRelease();

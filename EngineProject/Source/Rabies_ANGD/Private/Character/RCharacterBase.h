@@ -234,6 +234,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Passive")
 	TSubclassOf<UGameplayEffect> SpeedUpPassive;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Passive")
+	TSubclassOf<UGameplayEffect> AirComboAdd;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Passive")
+	TSubclassOf<UGameplayEffect> HealingDoneEffect;
+
+	UPROPERTY()
+	ARCharacterBase* DamagedByPlayer;
+
 	FTimerHandle RadioDelayTimer;
 	FTimerHandle RadiationDelayTimer;
 	FTimerHandle FireDelayTimer;

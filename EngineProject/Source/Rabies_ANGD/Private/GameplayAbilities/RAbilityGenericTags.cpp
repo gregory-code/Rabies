@@ -253,6 +253,11 @@ FGameplayTag URAbilityGenericTags::GetImmuneTag()
 	return FGameplayTag::RequestGameplayTag("stat.immune");
 }
 
+FGameplayTag URAbilityGenericTags::GetDefeatedEnemyTag()
+{
+	return FGameplayTag::RequestGameplayTag("ability.defeatedEnemy");
+}
+
 FGameplayTag URAbilityGenericTags::GetUltimateHold()
 {
 	return FGameplayTag::RequestGameplayTag("ability.attack.HoldUltimate");
