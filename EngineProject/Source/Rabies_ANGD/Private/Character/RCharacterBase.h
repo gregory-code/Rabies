@@ -273,7 +273,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UTexture* CharacterPingIcon;
 
+	UFUNCTION()
+	void AddToHealingDone(ARCharacterBase* characterHealed, int healing);
+
 private:
+
 	UFUNCTION()
 	void ProjectDropShadow();
 
@@ -406,6 +410,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ServerPlayAnimMontage(UAnimMontage* montage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ServerPlayOtherSkeletalMeshAnimMontage(USkeletalMeshComponent* MeshToPlay, UAnimMontage* montage);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ServerPlay_Torso_AnimMontage(UAnimMontage* montage, float animSpeedScale);

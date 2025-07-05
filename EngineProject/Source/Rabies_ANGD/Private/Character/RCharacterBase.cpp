@@ -238,6 +238,41 @@ void ARCharacterBase::Tick(float DeltaTime)
 	ProjectDropShadow();
 }
 
+void ARCharacterBase::AddToHealingDone(ARCharacterBase* characterHealed, int healing)
+{
+	if (characterHealed->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetFullHealthTag()))
+	{
+		return;
+	}
+	
+	bool bMaxHealth = false;
+	bool bCurrentHealth = false;
+	float maxHealth = characterHealed->GetAbilitySystemComponent()->GetGameplayAttributeValue(URAttributeSet::GetMaxHealthAttribute(), bMaxHealth);
+	float currentHealth = characterHealed->GetAbilitySystemComponent()->GetGameplayAttributeValue(URAttributeSet::GetHealthAttribute(), bCurrentHealth);
+
+	if (bMaxHealth == false || bCurrentHealth == false)
+	{
+		return;
+	}
+
+	float OldHealth = currentHealth;
+
+	// Apply healing, clamping to MaxHealth
+	currentHealth = FMath::Clamp(currentHealth + healing, 0.0f, maxHealth);
+
+	float ActualHealed = currentHealth - OldHealth;
+
+	///////////////////////////////////// add to healing done value
+	FGameplayEffectSpecHandle specHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(HealingDoneEffect, 1.0f, GetAbilitySystemComponent()->MakeEffectContext());
+	FGameplayEffectSpec* spec = specHandle.Data.Get();
+	if (spec)
+	{
+		spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), ActualHealed);
+		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
+	}
+	//////////////////////////////////////
+}
+
 void ARCharacterBase::ProjectDropShadow()
 {
 	//return;
@@ -629,6 +664,8 @@ void ARCharacterBase::HitSpecialAttack(ARCharacterBase* hitCharacter)
 	if (HasAuthority() == false)
 		return;
 
+	CheckIVBag();
+
 	if (hitCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 	{
 		if (SpeedUpPassive == nullptr)
@@ -646,7 +683,6 @@ void ARCharacterBase::HitSpecialAttack(ARCharacterBase* hitCharacter)
 		return;
 	}
 
-	CheckIVBag();
 	ApplyItemEffectAtRandom(hitCharacter, URAttributeSet::GetUraniumEffectChanceAttribute(), RadiationEffect);
 	ApplyItemEffectAtRandom(hitCharacter, URAttributeSet::GetTaserStunChanceAttribute(), TaserEffect);
 	DealtDamage(hitCharacter);
@@ -672,12 +708,13 @@ void ARCharacterBase::HitMeleeAttack(ARCharacterBase* hitCharacter)
 	if (HasAuthority() == false)
 		return;
 
+	CheckHardhat();
+
 	if (hitCharacter->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
 	{
 		return;
 	}
 
-	CheckHardhat();
 	ApplyItemEffectAtRandom(hitCharacter, URAttributeSet::GetNailsEffectChanceAttribute(), NailsEfffect);
 	DealtDamage(hitCharacter);
 }
@@ -739,6 +776,7 @@ void ARCharacterBase::CheckHardhat()
 	FGameplayEffectSpec* spec = specHandle.Data.Get();
 	if (spec)
 	{
+		AddToHealingDone(this, meleeStrength * lifesteal);
 		//UE_LOG(LogTemp, Error, TEXT("%s Healed from melee attack!"), *GetName());
 		spec->SetSetByCallerMagnitude(URAbilityGenericTags::GetGenericTargetAquiredTag(), meleeStrength * lifesteal);
 		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
@@ -989,6 +1027,14 @@ void ARCharacterBase::HealingRadiusEffect(TSubclassOf<UGameplayEffect> healingEf
 					}
 
 					alreadyHealedPlayers.Add(player);
+					///////////////////////////////////// add to healing done value
+					float healingPower = (IVBag) ? AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetAbilityHealingStrengthAttribute(), bFound) : AbilitySystemComponent->GetGameplayAttributeValue(URAttributeSet::GetFriendshipHealingStrengthAttribute(), bFound);
+					if (bFound == false || healingPower >= 0)
+					{
+						AddToHealingDone(player, healingPower);
+					}
+					//////////////////////////////////////
+
 					player->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*spec);
 				}
 			}
@@ -1191,6 +1237,11 @@ void ARCharacterBase::ForwardSpeedUpdated(const FOnAttributeChangeData& ChangeDa
 
 		GetCharacterMovement()->AddImpulse(force, true);
 	}
+}
+
+void ARCharacterBase::ServerPlayOtherSkeletalMeshAnimMontage_Implementation(USkeletalMeshComponent* MeshToPlay, UAnimMontage* montage)
+{
+	MeshToPlay->PlayAnimation(montage, false);
 }
 
 void ARCharacterBase::LaunchBozo_Implementation(FVector launchVelocity)

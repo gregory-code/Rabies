@@ -199,7 +199,7 @@ void UGA_DotFlying::ProcessFlying()
 				float ScaledStrength = ((OrigMax - strength) / (OrigMax - OrigMin)) * (TargetMax - TargetMin) + TargetMin;
 
 				float velocityLength = currentVelocity.Length() * 0.001f;
-				float velocityMultiplier = FMath::Clamp(velocityLength, 0.01f, 2.0f);
+				float velocityMultiplier = FMath::Clamp(velocityLength, 0.015f, 2.0f);
 				float multiplier = velocityMultiplier * ScaledStrength * 0.1f;
 
 				CurrentHoldDuration -= GetWorld()->GetDeltaSeconds() * multiplier;

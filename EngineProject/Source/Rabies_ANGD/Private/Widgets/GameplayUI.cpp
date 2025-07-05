@@ -428,6 +428,33 @@ void UGameplayUI::SetHealingGivenText(int health)
 {
 	FText Text = FText::Format(FText::FromString("Healing Done: {0}"), FText::AsNumber((int)health));
 	HealthGivenText->SetText(Text);
+
+	if (health >= 1000)
+	{
+		if (UGameplayStatics::DoesSaveGameExist(TEXT("RabiesSaveData"), 0))
+		{
+			USaveGame* baseSave = UGameplayStatics::LoadGameFromSlot(TEXT("RabiesSaveData"), 0);
+			URSaveGame* LoadedGame = Cast<URSaveGame>(baseSave);
+			if (LoadedGame)
+			{
+				if (GetOwningPlayerPawn()->GetName().Contains("Chester"))
+					LoadedGame->bChesterChallenge = true;
+
+				UGameplayStatics::SaveGameToSlot(LoadedGame, TEXT("RabiesSaveData"), 0);
+			}
+		}
+		else
+		{
+			URSaveGame* NewSave = Cast<URSaveGame>(UGameplayStatics::CreateSaveGameObject(URSaveGame::StaticClass()));
+			if (NewSave)
+			{
+				if (GetOwningPlayerPawn()->GetName().Contains("Chester"))
+					NewSave->bChesterChallenge = true;
+
+				UGameplayStatics::SaveGameToSlot(NewSave, TEXT("RabiesSaveData"), 0);
+			}
+		}
+	}
 }
 
 void UGameplayUI::DeadTimer(float timeRemaining)
