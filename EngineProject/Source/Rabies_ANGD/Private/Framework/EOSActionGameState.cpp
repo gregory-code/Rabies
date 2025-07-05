@@ -905,6 +905,33 @@ void AEOSActionGameState::Multicast_RequestPlayAudio_Implementation(USoundBase* 
     UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, Location, Rotation, VolumeMultiplier, PitchMultiplier, StartTime, AttenuationSettings);
 }
 
+void AEOSActionGameState::Multicast_RequestPlayAudioComponentRolling_Implementation(USoundBase* Sound, ARCharacterBase* characterToAttach, FVector Location, FRotator Rotation, float VolumeMultiplier, float PitchMultiplier, float StartTime, USoundAttenuation* AttenuationSettings)
+{
+    if (AttenuationSettings == nullptr && VoiceAttenuationSettings != nullptr)
+        AttenuationSettings = VoiceAttenuationSettings;
+
+    //Multicast_StopComponentRolling(characterToAttach);
+
+    UAudioComponent* NewComponent = UGameplayStatics::SpawnSoundAttached(Sound, characterToAttach->GetMesh(), NAME_None, Location, EAttachLocation::KeepRelativeOffset, false, 1, 1, 0, VoiceAttenuationSettings);
+    if (NewComponent)
+    {
+        RollingAudioComponentsByCharacter.Add(characterToAttach, NewComponent);
+    }
+}
+
+void AEOSActionGameState::Multicast_StopComponentRolling_Implementation(ARCharacterBase* characterToAttach)
+{
+    if (UAudioComponent** CompPtr = RollingAudioComponentsByCharacter.Find(characterToAttach))
+    {
+        if (UAudioComponent* Comp = *CompPtr)
+        {
+            Comp->Stop();
+        }
+        RollingAudioComponentsByCharacter.Remove(characterToAttach);
+    }
+}
+
+
 void AEOSActionGameState::Server_RequestChangeItem_Implementation(AItemPickup* ChoosingItem, URItemDataAsset* chosenItem)
 {
     for (AItemPickup* item : AllItems) // send back a failure so that they don't softlock
@@ -1234,6 +1261,8 @@ void AEOSActionGameState::Multicast_SpawnRadio_Implementation(UNiagaraSystem* Sy
 
     if (SpawnSystemAttached)
     {
+        size = FMath::Clamp(size, 0.0f, 150.0f);
+
         SpawnSystemAttached->SetFloatParameter(FName("amount"), size * 0.25f);
         SpawnSystemAttached->SetFloatParameter(FName("lifetime"), size * 0.1f);
         SpawnSystemAttached->SetFloatParameter(FName("finalSize"), size);
