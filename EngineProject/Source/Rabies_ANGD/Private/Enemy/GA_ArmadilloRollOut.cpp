@@ -149,9 +149,10 @@ void UGA_ArmadilloRollOut::FinishRevingUp()
 			Enemy->ServerPlayOtherSkeletalMeshAnimMontage(RollerSkeletalMesh, Ball_RollLoop);
 
 			bStopRolling = false;
+			PlayAudioLine(Rolling, true);
+
 			GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &UGA_ArmadilloRollOut::RollForward));
 
-			PlayAudioLine(Rolling, true);
 
 			playRollLoopMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Basic_RollLoop);
 			playRollLoopMontageTask->OnBlendOut.AddDynamic(this, &UGA_ArmadilloRollOut::ExhaustedRolling);
@@ -167,6 +168,13 @@ void UGA_ArmadilloRollOut::RollForward()
 {
 	if (bStopRolling)
 		return;
+
+	if (Enemy->GetAbilitySystemComponent()->HasMatchingGameplayTag(URAbilityGenericTags::GetDeadTag()))
+	{
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Enemy->GetOwner(), URAbilityGenericTags::GetUnrollTag(), FGameplayEventData());
+		FinishAbility();
+		return;
+	}
 
 	if (TargetActor)
 	{
