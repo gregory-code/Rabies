@@ -89,6 +89,8 @@ public:
 
 private:
 
+	bool bToyBoxOpened;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> EndCutscene;
 
