@@ -362,6 +362,16 @@ bool ARPlayerController::CashMyLuck()
 	return GameplayUI->CashMyLuck();
 }
 
+bool ARPlayerController::IsItemUnique(URItemDataAsset* itemAssetToCheck)
+{
+	if (GameplayUI)
+	{
+		return GameplayUI->IsItemUnique(itemAssetToCheck);
+	}
+
+	return false;
+}
+
 void ARPlayerController::GameOver()
 {
 	if (GameplayUI)

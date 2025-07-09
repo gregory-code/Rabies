@@ -17,6 +17,9 @@ class ARPlayerController : public APlayerController
 public:
 
 	UFUNCTION()
+	bool IsItemUnique(class URItemDataAsset* itemAssetToCheck);
+
+	UFUNCTION()
 	void SetAirComboText(int kills);
 
 	UFUNCTION()
