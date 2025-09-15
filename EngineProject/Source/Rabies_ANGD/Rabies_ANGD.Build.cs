@@ -12,12 +12,20 @@ public class Rabies_ANGD : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "GameplayAbilities", "GameplayTags", "GameplayTasks", "Slate", "SlateCore", "UMG", "AIModule", "OnlineSubsystem", "OnlineSubsystemUtils", "OnlineSubsystemEOS", "CinematicCamera", "LevelSequence", "MovieScene", "NavigationSystem", "Niagara", "NiagaraCore", "AdvancedWidgets", "Media", "MediaAssets", "HTTP"});
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
+        // Force-disable legacy XAudio2.7
+        //PublicDefinitions.Add("XAUDIO_SUPPORTS_XAUDIO27=0");
+        //PublicDefinitions.Add("WITH_XAUDIO2=0");
 
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-	}
+        PublicDefinitions.Add("XAUDIO_SUPPORTS_XAUDIO27=0");  // disable legacy
+        PublicDefinitions.Add("WITH_XAUDIO2=1");               // keep XAudio2 backend alive
+        PublicDefinitions.Add("XAUDIO_SUPPORTS_XAUDIO29=1");   // force 2.9
+
+        // Uncomment if you are using Slate UI
+        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+
+        // Uncomment if you are using online features
+        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
+
+        // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+    }
 }

@@ -53,7 +53,7 @@ unzip Deploy.zip
 cd Deploy
 ```
 
-* make the server excutable and excutable:
+* make the server excutable and excutable, and make sure it's named Rabies_ANGDServer:
 ```sh
 chmod +x /server/server/Rabies_ANGD/Binaries/Linux/Rabies_ANGDServer
 ```

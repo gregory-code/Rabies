@@ -11,5 +11,6 @@ public class Rabies_ANGDTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
 		ExtraModuleNames.Add("Rabies_ANGD");
-	}
+		GlobalDefinitions.Add("WITH_XAUDIO2=0");// disable legacy device at compile-time
+    }
 }
