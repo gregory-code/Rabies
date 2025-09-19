@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class Rabies_ANGDEditorTarget : TargetRules
+public class RabiesANGDEditorTarget : TargetRules
 {
-	public Rabies_ANGDEditorTarget( TargetInfo Target) : base(Target)
+	public RabiesANGDEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
-		ExtraModuleNames.Add("Rabies_ANGD");
-	}
+		ExtraModuleNames.Add("RabiesANGD");
+    }
 }

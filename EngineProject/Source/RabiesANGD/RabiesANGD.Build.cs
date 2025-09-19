@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class Rabies_ANGD : ModuleRules
+public class RabiesANGD : ModuleRules
 {
-	public Rabies_ANGD(ReadOnlyTargetRules Target) : base(Target)
+	public RabiesANGD(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	

@@ -3,14 +3,15 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class Rabies_ANGDTarget : TargetRules
+public class RabiesANGDTarget : TargetRules
 {
-	public Rabies_ANGDTarget(TargetInfo Target) : base(Target)
+	public RabiesANGDTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
-		ExtraModuleNames.Add("Rabies_ANGD");
-		GlobalDefinitions.Add("WITH_XAUDIO2=0");// disable legacy device at compile-time
+		ExtraModuleNames.Add("RabiesANGD");
+
+		//GlobalDefinitions.Add("WITH_XAUDIO2=0");// disable legacy device at compile-time
     }
 }
