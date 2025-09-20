@@ -48,7 +48,10 @@ void ARCharacterSelectController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	BP_OnRep_PlayerState();
+	/*MyPlayerState = Cast<AEOSPlayerState>(PlayerState);
+	if (!MyPlayerState)
+		return;
+
 	if (IsLocalController() && CharacterSelectUI == nullptr) //maybe also check if they have authority?
 	{
 		GetCameraView();
@@ -66,16 +69,6 @@ void ARCharacterSelectController::OnRep_PlayerState()
 			}
 		}
 
-		MyPlayerState = Cast<AEOSPlayerState>(PlayerState);
-		if (MyPlayerState == nullptr)
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No Playerstate was found on rep player state!"));
-			}
-			return;
-		}
-
 		MyPlayerState->OnLoadNewScene.AddUObject(this, &ARCharacterSelectController::CreateLoadingScreenUI);
 
 		if (!MyPlayerState->OnHoveredCharacterIndexReplicated.IsAlreadyBound(this, &ARCharacterSelectController::HoveredCharacterIndexChange))
@@ -84,6 +77,7 @@ void ARCharacterSelectController::OnRep_PlayerState()
 			MyPlayerState->OnHoveredCharacterIndexReplicated.AddDynamic(this, &ARCharacterSelectController::HoveredCharacterIndexChange);
 		}
 	}
+	BP_OnRep_PlayerState();*/
 }
 
 void ARCharacterSelectController::OnPossess(APawn* NewPawn)
@@ -105,7 +99,7 @@ void ARCharacterSelectController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FInputModeGameAndUI input;
+	/*FInputModeGameAndUI input;
 	SetInputMode(input);
 	bEnableMouseOverEvents = true;
 
@@ -179,7 +173,7 @@ void ARCharacterSelectController::BeginPlay()
 	if (!MyPlayerState->OnHoveredCharacterIndexReplicated.IsAlreadyBound(this, &ARCharacterSelectController::HoveredCharacterIndexChange))
 	{
 		MyPlayerState->OnHoveredCharacterIndexReplicated.AddDynamic(this, &ARCharacterSelectController::HoveredCharacterIndexChange);
-	}
+	}*/
 }
 
 void ARCharacterSelectController::PlayMedia(UFileMediaSource* mediaSource)

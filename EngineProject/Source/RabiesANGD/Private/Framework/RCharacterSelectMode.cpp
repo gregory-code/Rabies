@@ -20,11 +20,19 @@ void ARCharacterSelectMode::InitGameState()
 {
 	Super::InitGameState();
 
-	AEOSGameState* gameState = Cast<AEOSGameState>(GameState);
-	UEOSGameInstance* gameInstance = GetGameInstance<UEOSGameInstance>();
+	//FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &ARCharacterSelectMode::HandlePostMapLoad);
+}
 
-	if (gameState && gameInstance)
+void ARCharacterSelectMode::HandlePostMapLoad(UWorld* LoadedWorld)
+{
+	/*if (LoadedWorld)
 	{
-		gameState->SetSessionName(gameInstance->GetCurrentSessionName());
-	}
+		AEOSGameState* EOSGameState = Cast<AEOSGameState>(LoadedWorld->GetGameState());
+		UEOSGameInstance* GameInstance = Cast<UEOSGameInstance>(LoadedWorld->GetGameInstance());
+
+		if (EOSGameState && GameInstance)
+		{
+			EOSGameState->SetSessionName(GameInstance->GetCurrentSessionName());
+		}
+	}*/
 }

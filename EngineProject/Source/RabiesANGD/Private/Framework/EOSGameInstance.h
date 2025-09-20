@@ -49,6 +49,12 @@ public:
 
 	void SetMenuController(class ARMainMenuController* menuController);
 
+	UFUNCTION()
+	void HandlePostMapLoad(UWorld* LoadedWorld);
+
+	UFUNCTION()
+	void HandleDelayInit();
+
 protected:
 	virtual void Init() override;
 

@@ -21,6 +21,9 @@ protected:
 
 private:
 
+	UFUNCTION()
+	void HandlePostMapLoad(UWorld* LoadedWorld);
+
 	UPROPERTY(EditDefaultsOnly, Category = "CagedCharacter")
 	FVector ShownCage;
 

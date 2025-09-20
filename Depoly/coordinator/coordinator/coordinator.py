@@ -22,7 +22,7 @@ class UnrealServerRequestHandler(BaseHTTPRequestHandler):
         print(f"launching server with name: {serverName}, id: {serverId}, port: {port}")
         # "C:/JT/UnrealSrc/UnrealEngine/Engine/Binaries/Win64/UnrealEditor.exe" %~dp0../BattleInfinity.uproject -server -log -epicapp="Server" -SESSION_UNIQUE_ID "TestUniqueIDValuesdfsdfsdfsdfsd"
         # EngineExcutable = "C:/UnrealEngine_Source/UnrealEngine/Engine/Binaries/Win64/UnrealEditor.exe"
-        # ProjectPath = "C:/P4Dev/2025_ANGD_4440/Rabies/EngineProject/Rabies_ANGD.uproject"
+        # ProjectPath = "C:/P4Dev/2025_ANGD_4440/Rabies/EngineProject/RabiesANGD.uproject"
 
         subprocess.Popen(["docker", "run",
                   "--rm",

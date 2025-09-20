@@ -22,6 +22,7 @@ void AEOSGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetWorld()->GetTimerManager().ClearTimer(ShowSettingsGameTimer);
 	GetWorld()->GetTimerManager().SetTimer(ShowSettingsGameTimer, this, &AEOSGameState::ShowSettings, 2.0f, true);
 }
 

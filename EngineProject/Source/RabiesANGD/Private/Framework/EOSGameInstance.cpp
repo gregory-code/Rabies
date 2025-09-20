@@ -204,7 +204,22 @@ void UEOSGameInstance::Init()
 {
 	Super::Init();	
 	
-	onlineSubsystem =  IOnlineSubsystem::Get();
+	FTimerHandle delayInit;
+	GetWorld()->GetTimerManager().SetTimer(delayInit, this, &UEOSGameInstance::HandleDelayInit, 0.5f);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEOSGameInstance::HandlePostMapLoad);
+}
+
+void UEOSGameInstance::HandlePostMapLoad(UWorld* LoadedWorld)
+{
+	HandleDelayInit();
+}
+
+void UEOSGameInstance::HandleDelayInit()
+{
+	onlineSubsystem = IOnlineSubsystem::Get();
+	if (onlineSubsystem == nullptr)
+		return;
+
 	identityPtr = onlineSubsystem->GetIdentityInterface();
 	identityPtr->OnLoginCompleteDelegates->AddUObject(this, &UEOSGameInstance::LoginCompleted);
 
@@ -242,6 +257,7 @@ void UEOSGameInstance::Init()
 		UE_LOG(LogTemp, Warning, TEXT("failed to login"));
 	}
 }
+
 
 bool UEOSGameInstance::AttemptAutoLogin()
 {
