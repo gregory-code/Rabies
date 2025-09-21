@@ -204,8 +204,6 @@ void UEOSGameInstance::Init()
 {
 	Super::Init();	
 	
-	FTimerHandle delayInit;
-	GetWorld()->GetTimerManager().SetTimer(delayInit, this, &UEOSGameInstance::HandleDelayInit, 0.5f);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UEOSGameInstance::HandlePostMapLoad);
 }
 

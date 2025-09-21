@@ -48,7 +48,7 @@ void ARCharacterSelectController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	/*MyPlayerState = Cast<AEOSPlayerState>(PlayerState);
+	MyPlayerState = Cast<AEOSPlayerState>(PlayerState);
 	if (!MyPlayerState)
 		return;
 
@@ -77,7 +77,7 @@ void ARCharacterSelectController::OnRep_PlayerState()
 			MyPlayerState->OnHoveredCharacterIndexReplicated.AddDynamic(this, &ARCharacterSelectController::HoveredCharacterIndexChange);
 		}
 	}
-	BP_OnRep_PlayerState();*/
+	BP_OnRep_PlayerState();
 }
 
 void ARCharacterSelectController::OnPossess(APawn* NewPawn)
@@ -99,7 +99,7 @@ void ARCharacterSelectController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*FInputModeGameAndUI input;
+	FInputModeGameAndUI input;
 	SetInputMode(input);
 	bEnableMouseOverEvents = true;
 
@@ -173,7 +173,7 @@ void ARCharacterSelectController::BeginPlay()
 	if (!MyPlayerState->OnHoveredCharacterIndexReplicated.IsAlreadyBound(this, &ARCharacterSelectController::HoveredCharacterIndexChange))
 	{
 		MyPlayerState->OnHoveredCharacterIndexReplicated.AddDynamic(this, &ARCharacterSelectController::HoveredCharacterIndexChange);
-	}*/
+	}
 }
 
 void ARCharacterSelectController::PlayMedia(UFileMediaSource* mediaSource)
